@@ -20,4 +20,9 @@ public abstract class Block {
 	protected void addOutputPort(OutputPort<?> outputPort) {
 		outputPorts.add(outputPort);
 	}
+	
+	public void resetPortCaches() {
+		inputPorts.forEach(valueCacher -> valueCacher.setCachedValueSet(false));
+		inputPorts.forEach(valueCacher -> valueCacher.setCachedValueSet(false));
+	}
 }

@@ -1,19 +1,16 @@
 package com.ogpe.model;
 
-public class OutputPort<T> {
+public class OutputPort<T> extends ValueCacher<T> {
 
 	private Provider<T> outputProvider;
-	
-	private T outputValue;
-	private boolean outputValueSet;
 
 	public OutputPort(Provider<T> valueProvider) {
 		outputProvider = () -> {
-			if (!outputValueSet) {
-				outputValue = valueProvider.provide();
-				outputValueSet = true;
+			if (!isCachedValueSet()) {
+				setCachedValue(valueProvider.provide());
+				setCachedValueSet(true);
 			}
-			return outputValue;
+			return getCachedValue();
 		};
 	}
 

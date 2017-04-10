@@ -1,22 +1,19 @@
 package com.ogpe.model;
 
-public class InputPort<T> {
+public class InputPort<T> extends ValueCacher<T> {
 	
 	private Provider<T> inputProvider;
 	
-	private T inputValue;
-	private boolean inputValueSet;
-	
 	public InputPort(Provider<T> inputProvider) {
 		this.inputProvider = inputProvider;
-		inputValueSet = false;
+		setCachedValueSet(false);
 	}
 	
 	public T request() {
-		if (!inputValueSet) {
-			inputValue = inputProvider.provide();
-			inputValueSet = true;
+		if (!isCachedValueSet()) {
+			setCachedValue(inputProvider.provide());
+			setCachedValueSet(true);
 		}
-		return inputValue;
+		return getCachedValue();
 	}
 }
