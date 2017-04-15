@@ -5,13 +5,13 @@ import com.ogpe.block.behaviour.OutputPort;
 import com.ogpe.block.behaviour.Provider;
 import com.ogpe.block.model.implementation.ConstantBlockModel;
 
-public class ConstantBlockBehavior extends BlockBehavior<ConstantBlockModel>{
+public class ConstantBlockBehavior extends BlockBehavior<ConstantBlockModel> {
 
 	private OutputPort<Integer> constantValueOutputPort;
-	
-	public ConstantBlockBehavior(ConstantBlockModel constantBlockModel) {
-		super(constantBlockModel);
-		constantValueOutputPort = new OutputPort<>(() -> getBlockModel().getConstantValue());
+
+	public ConstantBlockBehavior() {
+		super();
+		constantValueOutputPort = new OutputPort<>(() -> getBlockModelProvider().provide().getConstantValue());
 		addOutputPort(constantValueOutputPort);
 	}
 

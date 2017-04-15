@@ -1,19 +1,20 @@
 package com.ogpe.block.view;
 
+import com.ogpe.block.behaviour.Provider;
 import com.ogpe.block.model.BlockModel;
-import com.ogpe.block.model.BlockModelContainer;
 
 import javafx.scene.canvas.GraphicsContext;
 
-public abstract class BlockView<T extends BlockModel> extends BlockModelContainer<T> {
+public abstract class BlockView<T extends BlockModel> {
+
+	private Provider<T> blockModelProvider;
 
 	private double x;
 	private double y;
 	private double w;
 	private double h;
 
-	public BlockView(T blockModel, double x, double y, double w, double h) {
-		super(blockModel);
+	public BlockView(double x, double y, double w, double h) {
 		this.x = x;
 		this.y = y;
 		this.w = w;
@@ -21,6 +22,14 @@ public abstract class BlockView<T extends BlockModel> extends BlockModelContaine
 	}
 
 	public abstract void drawBlock(GraphicsContext graphicsContext);
+
+	public Provider<T> getBlockModelProvider() {
+		return blockModelProvider;
+	}
+
+	public void setBlockModelProvider(Provider<T> blockModelProvider) {
+		this.blockModelProvider = blockModelProvider;
+	}
 
 	public double getX() {
 		return x;

@@ -12,7 +12,8 @@ public class BlockTest {
 	public void testConstantBlock() {
 		Integer constantValue = 5;
 		ConstantBlockModel constantBlockModel = new ConstantBlockModel(constantValue);
-		ConstantBlockBehavior constantBlock = new ConstantBlockBehavior(constantBlockModel);
+		ConstantBlockBehavior constantBlock = new ConstantBlockBehavior();
+		constantBlock.setBlockModelProvider(() -> constantBlockModel);
 		Integer returnedValue = constantBlock.getOutputProvider().provide();
 		Assert.assertEquals(constantValue, returnedValue);
 	}

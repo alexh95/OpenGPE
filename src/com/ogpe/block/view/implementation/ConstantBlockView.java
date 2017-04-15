@@ -8,8 +8,8 @@ import javafx.scene.paint.Color;
 
 public class ConstantBlockView extends BlockView<ConstantBlockModel> {
 
-	public ConstantBlockView(ConstantBlockModel constantBlockModel, double x, double y) {
-		super(constantBlockModel, x, y, 32, 32);
+	public ConstantBlockView(double x, double y) {
+		super(x, y, 32, 32);
 	}
 
 	@Override
