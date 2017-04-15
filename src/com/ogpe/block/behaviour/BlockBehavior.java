@@ -5,9 +5,9 @@ import java.util.Collection;
 
 import com.ogpe.block.model.BlockModel;
 
-public abstract class BlockBehavior<T extends BlockModel> {
+public abstract class BlockBehavior<M extends BlockModel> {
 
-	private Provider<T> blockModelProvider;
+	private Provider<M> blockModelProvider;
 
 	private Collection<InputPort<?>> inputPorts;
 	private Collection<OutputPort<?>> outputPorts;
@@ -30,11 +30,11 @@ public abstract class BlockBehavior<T extends BlockModel> {
 		inputPorts.forEach(valueCacher -> valueCacher.setCachedValueSet(false));
 	}
 
-	public Provider<T> getBlockModelProvider() {
+	public Provider<M> getBlockModelProvider() {
 		return blockModelProvider;
 	}
 
-	public void setBlockModelProvider(Provider<T> blockModelProvider) {
+	public void setBlockModelProvider(Provider<M> blockModelProvider) {
 		this.blockModelProvider = blockModelProvider;
 	}
 }

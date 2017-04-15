@@ -5,9 +5,9 @@ import com.ogpe.block.model.BlockModel;
 
 import javafx.scene.canvas.GraphicsContext;
 
-public abstract class BlockView<T extends BlockModel> {
+public abstract class BlockView<M extends BlockModel> {
 
-	private Provider<T> blockModelProvider;
+	private Provider<M> blockModelProvider;
 
 	private double x;
 	private double y;
@@ -23,11 +23,11 @@ public abstract class BlockView<T extends BlockModel> {
 
 	public abstract void drawBlock(GraphicsContext graphicsContext);
 
-	public Provider<T> getBlockModelProvider() {
+	public Provider<M> getBlockModelProvider() {
 		return blockModelProvider;
 	}
 
-	public void setBlockModelProvider(Provider<T> blockModelProvider) {
+	public void setBlockModelProvider(Provider<M> blockModelProvider) {
 		this.blockModelProvider = blockModelProvider;
 	}
 

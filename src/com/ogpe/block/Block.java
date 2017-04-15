@@ -5,15 +5,15 @@ import com.ogpe.block.behaviour.Provider;
 import com.ogpe.block.model.BlockModel;
 import com.ogpe.block.view.BlockView;
 
-public abstract class Block<T extends BlockModel, B extends BlockBehavior<T>, V extends BlockView<T>> {
+public abstract class Block<M extends BlockModel, B extends BlockBehavior<M>, V extends BlockView<M>> {
 
-	private T blockModel;
-	private Provider<T> blockModelProvider;
+	private M blockModel;
+	private Provider<M> blockModelProvider;
 
 	private B blockBehavior;
 	private V blockView;
 
-	public Block(T blockModel, B blockBehavior, V blockView) {
+	public Block(M blockModel, B blockBehavior, V blockView) {
 		this.blockModel = blockModel;
 		blockModelProvider = () -> this.blockModel;
 		this.blockBehavior = blockBehavior;
@@ -23,7 +23,7 @@ public abstract class Block<T extends BlockModel, B extends BlockBehavior<T>, V 
 		this.blockView.setBlockModelProvider(blockModelProvider);
 	}
 
-	public T getBlockModel() {
+	public M getBlockModel() {
 		return blockModel;
 	}
 

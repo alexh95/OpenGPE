@@ -27,7 +27,7 @@ public class Project {
 		blocks.remove(block);
 	}
 
-	public void forEachBlockView(Consumer<? super BlockView<?>> action) {
+	public void forEachBlockView(Consumer<? super BlockView<? extends BlockModel>> action) {
 		blocks.stream().map(block -> block.getBlockView()).forEach(action);
 	}
 }
