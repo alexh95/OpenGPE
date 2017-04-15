@@ -1,4 +1,4 @@
-package com.ogpe.model;
+package com.ogpe.block.behaviour;
 
 public abstract class ValueCacher<T> {
 

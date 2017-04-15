@@ -1,8 +1,9 @@
 package com.ogpe.fx;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.ogpe.block.behaviour.implementation.ConstantBlockBehavior;
+import com.ogpe.block.model.implementation.ConstantBlockModel;
+import com.ogpe.block.view.implementation.ConstantBlockView;
+import com.ogpe.project.Project;
 import com.sun.glass.ui.Screen;
 
 import javafx.application.Application;
@@ -16,7 +17,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class MainWindow extends Application {
@@ -25,10 +25,10 @@ public class MainWindow extends Application {
 		Application.launch(args);
 	}
 
-	private List<DrawOperation> drawOperations;
+	private Project project;
 
 	@Override
-	public void start(Stage primaryStage) throws Exception {
+	public void start(Stage primaryStage) {
 		primaryStage.setTitle("OpenGPE Editor");
 		BorderPane root = new BorderPane();
 
@@ -41,10 +41,12 @@ public class MainWindow extends Application {
 
 		// Sub-menus
 		Menu fileMenu = new Menu("File");
-		Menu fileHelp = new Menu("Help");
-		menuBar.getMenus().addAll(fileMenu, fileHelp);
+		Menu editMenu = new Menu("Edit");
+		Menu runMenu = new Menu("Run");
+		Menu helpMenu = new Menu("Help");
+		menuBar.getMenus().addAll(fileMenu, editMenu, runMenu, helpMenu);
 
-		// File sub-menu items
+		// File menu items
 		MenuItem newProjectFileMenuItem = new MenuItem("New Project");
 		MenuItem openProjectFileMenuItem = new MenuItem("Open Project");
 		MenuItem saveProjectFileMenuItem = new MenuItem("Save Project");
@@ -67,28 +69,54 @@ public class MainWindow extends Application {
 		});
 		exitFileMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCodeCombination.CONTROL_DOWN));
 
-		// Help sub-menu items
+		// Edit menu items
+		MenuItem copyEditMenuItem = new MenuItem("Copy");
+		MenuItem pasteEditMenuItem = new MenuItem("Paste");
+		editMenu.getItems().addAll(copyEditMenuItem, pasteEditMenuItem);
+
+		// Edit -> Copy
+		copyEditMenuItem.setOnAction(event -> {
+
+		});
+		// Edit -> Paste
+		pasteEditMenuItem.setOnAction(event -> {
+
+		});
+
+		// Run menu items
+		MenuItem runRunMenuItem = new MenuItem("Run");
+		MenuItem runContinuouslyRunMenuItem = new MenuItem("Run Continously");
+		runMenu.getItems().addAll(runRunMenuItem, runContinuouslyRunMenuItem);
+
+		// Run -> Run
+		runRunMenuItem.setOnAction(event -> {
+
+		});
+		// Run -> Run Continuously
+		runContinuouslyRunMenuItem.setOnAction(event -> {
+
+		});
+
+		// Help menu items
 		MenuItem tutorialHelpMenuItem = new MenuItem("Tutorial");
-		fileHelp.getItems().addAll(tutorialHelpMenuItem);
+		helpMenu.getItems().addAll(tutorialHelpMenuItem);
 
 		// Canvas
 		CanvasPane canvasPane = new CanvasPane();
 		root.setCenter(canvasPane);
-		drawOperations = new ArrayList<>();
+		project = new Project();
 		canvasPane.setDrawer(graphicsContext -> {
-			graphicsContext.setFill(Color.BLUE);
-			drawOperations.forEach(drawOperation -> {
-				double x = drawOperation.getX();
-				double y = drawOperation.getY();
-				double w = drawOperation.getWidth();
-				double h = drawOperation.getHeight();
-				graphicsContext.fillRect(x, y, w, h);
+			project.forEachBlockView(blockView -> {
+				blockView.drawBlock(graphicsContext);
 			});
 		});
 		canvasPane.setOnMousePressed(event -> {
 			double x = event.getX();
 			double y = event.getY();
-			drawOperations.add(new DrawOperation(x, y, 16, 16));
+			ConstantBlockModel constantBlockModel = new ConstantBlockModel(0);
+			ConstantBlockBehavior constantBlock = new ConstantBlockBehavior(constantBlockModel);
+			ConstantBlockView constantBlockView = new ConstantBlockView(constantBlockModel, x, y);
+			project.addBlock(constantBlock, constantBlockView);
 			canvasPane.redraw();
 		});
 

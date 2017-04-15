@@ -1,4 +1,4 @@
-package com.ogpe.model;
+package com.ogpe.block.behaviour;
 
 public class InputPort<T> extends ValueCacher<T> {
 	

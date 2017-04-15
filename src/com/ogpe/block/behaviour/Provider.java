@@ -1,4 +1,4 @@
-package com.ogpe.model;
+package com.ogpe.block.behaviour;
 
 @FunctionalInterface
 public interface Provider<T> {

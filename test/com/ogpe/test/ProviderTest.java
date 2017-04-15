@@ -2,7 +2,7 @@ package com.ogpe.test;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.ogpe.model.Provider;
+import com.ogpe.block.behaviour.Provider;
 
 public class ProviderTest {
 
