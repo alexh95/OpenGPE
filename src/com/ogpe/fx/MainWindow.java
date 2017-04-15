@@ -1,8 +1,7 @@
 package com.ogpe.fx;
 
-import com.ogpe.block.behaviour.implementation.ConstantBlockBehavior;
+import com.ogpe.block.implementation.ConstantBlock;
 import com.ogpe.block.model.implementation.ConstantBlockModel;
-import com.ogpe.block.view.implementation.ConstantBlockView;
 import com.ogpe.project.Project;
 import com.sun.glass.ui.Screen;
 
@@ -113,10 +112,8 @@ public class MainWindow extends Application {
 		canvasPane.setOnMousePressed(event -> {
 			double x = event.getX();
 			double y = event.getY();
-			ConstantBlockModel constantBlockModel = new ConstantBlockModel(0);
-			ConstantBlockBehavior constantBlock = new ConstantBlockBehavior(constantBlockModel);
-			ConstantBlockView constantBlockView = new ConstantBlockView(constantBlockModel, x, y);
-			project.addBlock(constantBlock, constantBlockView);
+			ConstantBlock constantBlock = new ConstantBlock(new ConstantBlockModel(0), x, y);
+			project.addBlock(constantBlock);
 			canvasPane.redraw();
 		});
 

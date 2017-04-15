@@ -4,30 +4,27 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Consumer;
 
-import com.ogpe.block.behaviour.BlockBehavior;
+import com.ogpe.block.Block;
+import com.ogpe.block.model.BlockModel;
 import com.ogpe.block.view.BlockView;
 
 public class Project {
 
-	private Collection<BlockBehavior<?>> blocks;
-	private Collection<BlockView<?>> blockViews;
-	
+	private Collection<Block<? extends BlockModel>> blocks;
+
 	public Project() {
 		blocks = new ArrayList<>();
-		blockViews = new ArrayList<>();
 	}
-	
-	public void addBlock(BlockBehavior<?> block, BlockView<?> blockView) {
+
+	public void addBlock(Block<? extends BlockModel> block) {
 		blocks.add(block);
-		blockViews.add(blockView);
 	}
-	
-	public void removeBlock(BlockBehavior<?> block, BlockView<?> blockView) {
+
+	public void removeBlock(Block<? extends BlockModel> block) {
 		blocks.remove(block);
-		blockViews.remove(blockView);
 	}
 
 	public void forEachBlockView(Consumer<? super BlockView<?>> action) {
-		blockViews.forEach(action);
+		blocks.stream().map(block -> block.getBlockView()).forEach(action);
 	}
 }

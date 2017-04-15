@@ -12,8 +12,12 @@ public abstract class BlockView<T extends BlockModel> extends BlockModelContaine
 	private double w;
 	private double h;
 
-	public BlockView(T blockModel) {
+	public BlockView(T blockModel, double x, double y, double w, double h) {
 		super(blockModel);
+		this.x = x;
+		this.y = y;
+		this.w = w;
+		this.h = h;
 	}
 
 	public abstract void drawBlock(GraphicsContext graphicsContext);

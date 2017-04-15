@@ -7,8 +7,8 @@ import javafx.scene.canvas.GraphicsContext;
 
 public class PrintBlockView extends BlockView<PrintBlockModel>{
 
-	public PrintBlockView(PrintBlockModel blockModel) {
-		super(blockModel);
+	public PrintBlockView(PrintBlockModel printBlockModel, double x, double y) {
+		super(printBlockModel, x, y, 32, 32);
 	}
 
 	@Override
