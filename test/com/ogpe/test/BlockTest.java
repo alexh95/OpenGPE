@@ -13,8 +13,8 @@ public class BlockTest {
 		Integer constantValue = 5;
 		ConstantBlockModel constantBlockModel = new ConstantBlockModel(constantValue);
 		ConstantBlockBehavior constantBlock = new ConstantBlockBehavior();
-		constantBlock.setBlockModelProvider(() -> constantBlockModel);
-		Integer returnedValue = constantBlock.getOutputProvider().provide();
+		constantBlock.setBlockModelRequester(() -> constantBlockModel);
+		Integer returnedValue = constantBlock.getOutputRequester().request();
 		Assert.assertEquals(constantValue, returnedValue);
 	}
 }

@@ -2,8 +2,8 @@ package com.ogpe.block.behaviour.implementation;
 
 import com.ogpe.block.behaviour.BlockBehavior;
 import com.ogpe.block.behaviour.OutputPort;
-import com.ogpe.block.behaviour.Provider;
 import com.ogpe.block.model.implementation.ConstantBlockModel;
+import com.ogpe.requester.Requester;
 
 public class ConstantBlockBehavior extends BlockBehavior<ConstantBlockModel> {
 
@@ -11,11 +11,11 @@ public class ConstantBlockBehavior extends BlockBehavior<ConstantBlockModel> {
 
 	public ConstantBlockBehavior() {
 		super();
-		constantValueOutputPort = new OutputPort<>(() -> getBlockModelProvider().provide().getConstantValue());
+		constantValueOutputPort = new OutputPort<>(() -> getBlockModelRequester().request().getConstantValue());
 		addOutputPort(constantValueOutputPort);
 	}
 
-	public Provider<Integer> getOutputProvider() {
-		return constantValueOutputPort.getOutputProvider();
+	public Requester<Integer> getOutputRequester() {
+		return constantValueOutputPort.getOutputRequester();
 	}
 }

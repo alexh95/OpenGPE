@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.ogpe.block.behaviour.InputPort;
-import com.ogpe.block.behaviour.Provider;
+import com.ogpe.requester.Requester;
 
 public class InputPortTest {
 
@@ -13,7 +13,7 @@ public class InputPortTest {
 	@Test
 	public void testInputPort() throws NoSuchFieldException, IllegalAccessException {
 		providingValue = "test";
-		Provider<String> inputProvider = () -> providingValue;
+		Requester<String> inputProvider = () -> providingValue;
 		InputPort<String> inputPort = new InputPort<>(inputProvider);
 
 		String requestedValue = inputPort.request();

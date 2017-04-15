@@ -1,13 +1,13 @@
 package com.ogpe.block.view;
 
-import com.ogpe.block.behaviour.Provider;
 import com.ogpe.block.model.BlockModel;
+import com.ogpe.requester.Requester;
 
 import javafx.scene.canvas.GraphicsContext;
 
 public abstract class BlockView<M extends BlockModel> {
 
-	private Provider<M> blockModelProvider;
+	private Requester<M> blockModelRequester;
 
 	private double x;
 	private double y;
@@ -23,12 +23,12 @@ public abstract class BlockView<M extends BlockModel> {
 
 	public abstract void drawBlock(GraphicsContext graphicsContext);
 
-	public Provider<M> getBlockModelProvider() {
-		return blockModelProvider;
+	public Requester<M> getBlockModelRequester() {
+		return blockModelRequester;
 	}
 
-	public void setBlockModelProvider(Provider<M> blockModelProvider) {
-		this.blockModelProvider = blockModelProvider;
+	public void setBlockModelRequester(Requester<M> blockModelRequester) {
+		this.blockModelRequester = blockModelRequester;
 	}
 
 	public double getX() {

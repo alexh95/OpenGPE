@@ -1,21 +1,21 @@
 package com.ogpe.block.model.implementation;
 
-import com.ogpe.block.behaviour.Provider;
 import com.ogpe.block.model.BlockModel;
+import com.ogpe.requester.Requester;
 
 public class PrintBlockModel extends BlockModel {
-	
-	private Provider<?> printValueProvider;
 
-	public PrintBlockModel(Provider<?> printValueProvider) {
-		this.printValueProvider = printValueProvider;
+	private Requester<?> printValueRequester;
+
+	public PrintBlockModel(Requester<?> printValueRequester) {
+		this.printValueRequester = printValueRequester;
 	}
 
-	public Provider<?> getPrintValueProvider() {
-		return printValueProvider;
+	public Requester<?> getPrintValueRequester() {
+		return printValueRequester;
 	}
 
-	public void setPrintValueProvider(Provider<?> printValueProvider) {
-		this.printValueProvider = printValueProvider;
+	public void setPrintValueRequester(Requester<?> printValueRequester) {
+		this.printValueRequester = printValueRequester;
 	}
 }

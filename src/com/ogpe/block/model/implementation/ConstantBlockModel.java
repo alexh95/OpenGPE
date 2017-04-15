@@ -3,7 +3,7 @@ package com.ogpe.block.model.implementation;
 import com.ogpe.block.model.BlockModel;
 
 public class ConstantBlockModel extends BlockModel {
-	
+
 	private Integer constantValue;
 
 	public ConstantBlockModel(Integer constantValue) {
@@ -17,5 +17,5 @@ public class ConstantBlockModel extends BlockModel {
 	public void setConstantValue(Integer constantValue) {
 		this.constantValue = constantValue;
 	}
-	
+
 }

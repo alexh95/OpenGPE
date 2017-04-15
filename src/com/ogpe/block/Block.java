@@ -1,26 +1,26 @@
 package com.ogpe.block;
 
 import com.ogpe.block.behaviour.BlockBehavior;
-import com.ogpe.block.behaviour.Provider;
 import com.ogpe.block.model.BlockModel;
 import com.ogpe.block.view.BlockView;
+import com.ogpe.requester.Requester;
 
 public abstract class Block<M extends BlockModel, B extends BlockBehavior<M>, V extends BlockView<M>> {
 
 	private M blockModel;
-	private Provider<M> blockModelProvider;
+	private Requester<M> blockModelRequester;
 
 	private B blockBehavior;
 	private V blockView;
 
 	public Block(M blockModel, B blockBehavior, V blockView) {
 		this.blockModel = blockModel;
-		blockModelProvider = () -> this.blockModel;
+		blockModelRequester = () -> this.blockModel;
 		this.blockBehavior = blockBehavior;
 		this.blockView = blockView;
 
-		this.blockBehavior.setBlockModelProvider(blockModelProvider);
-		this.blockView.setBlockModelProvider(blockModelProvider);
+		this.blockBehavior.setBlockModelRequester(blockModelRequester);
+		this.blockView.setBlockModelRequester(blockModelRequester);
 	}
 
 	public M getBlockModel() {

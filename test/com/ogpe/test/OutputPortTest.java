@@ -4,29 +4,29 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.ogpe.block.behaviour.OutputPort;
-import com.ogpe.block.behaviour.Provider;
+import com.ogpe.requester.Requester;
 
 public class OutputPortTest {
 
 	private String providingValue;
-	
+
 	@Test
 	public void testInputPort() throws NoSuchFieldException, IllegalAccessException {
 		providingValue = "test";
-		Provider<String> valueProvider = () -> providingValue;
-		OutputPort<String> outputPort = new OutputPort<>(valueProvider);
+		Requester<String> valueRequester = () -> providingValue;
+		OutputPort<String> outputPort = new OutputPort<>(valueRequester);
 
-		String requestedValue = outputPort.getOutputProvider().provide();
+		String requestedValue = outputPort.getOutputRequester().request();
 		Assert.assertEquals(providingValue, requestedValue);
-		
+
 		String oldProvidingValue = providingValue;
 		providingValue = "new test";
-		requestedValue = outputPort.getOutputProvider().provide();
+		requestedValue = outputPort.getOutputRequester().request();
 		Assert.assertEquals(oldProvidingValue, requestedValue);
-		
+
 		outputPort.setCachedValueSet(false);
 
-		requestedValue = outputPort.getOutputProvider().provide();
+		requestedValue = outputPort.getOutputRequester().request();
 		Assert.assertEquals(providingValue, requestedValue);
 	}
 }

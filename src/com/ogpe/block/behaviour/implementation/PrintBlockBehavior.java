@@ -11,7 +11,7 @@ public class PrintBlockBehavior extends BlockBehavior<PrintBlockModel> {
 	public PrintBlockBehavior() {
 		super();
 		printValueInputPort = new InputPort<>(
-				() -> getBlockModelProvider().provide().getPrintValueProvider().provide().toString());
+				() -> getBlockModelRequester().request().getPrintValueRequester().request().toString());
 		addInputPort(printValueInputPort);
 	}
 

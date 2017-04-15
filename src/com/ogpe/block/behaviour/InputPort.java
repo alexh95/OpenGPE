@@ -1,17 +1,19 @@
 package com.ogpe.block.behaviour;
 
+import com.ogpe.requester.Requester;
+
 public class InputPort<T> extends ValueCacher<T> {
-	
-	private Provider<T> inputProvider;
-	
-	public InputPort(Provider<T> inputProvider) {
-		this.inputProvider = inputProvider;
+
+	private Requester<T> inputRequester;
+
+	public InputPort(Requester<T> inputRequester) {
+		this.inputRequester = inputRequester;
 		setCachedValueSet(false);
 	}
-	
+
 	public T request() {
 		if (!isCachedValueSet()) {
-			setCachedValue(inputProvider.provide());
+			setCachedValue(inputRequester.request());
 			setCachedValueSet(true);
 		}
 		return getCachedValue();

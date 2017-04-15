@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.ogpe.block.model.BlockModel;
+import com.ogpe.requester.Requester;
 
 public abstract class BlockBehavior<M extends BlockModel> {
 
-	private Provider<M> blockModelProvider;
+	private Requester<M> blockModelRequester;
 
 	private Collection<InputPort<?>> inputPorts;
 	private Collection<OutputPort<?>> outputPorts;
@@ -30,11 +31,11 @@ public abstract class BlockBehavior<M extends BlockModel> {
 		inputPorts.forEach(valueCacher -> valueCacher.setCachedValueSet(false));
 	}
 
-	public Provider<M> getBlockModelProvider() {
-		return blockModelProvider;
+	public Requester<M> getBlockModelRequester() {
+		return blockModelRequester;
 	}
 
-	public void setBlockModelProvider(Provider<M> blockModelProvider) {
-		this.blockModelProvider = blockModelProvider;
+	public void setBlockModelRequester(Requester<M> blockModelRequester) {
+		this.blockModelRequester = blockModelRequester;
 	}
 }
