@@ -3,7 +3,6 @@ Graphical Programming Environment Project
 
 ## TODO:
 1. Constant Block View:
-* Finish the view part: Center the text number
 * Upgrade from Integer to BigDecimal
 * Think of a solution for displaying big numbers without changing the size of the block (maybe right-clicking on the block pops up an editing window)
 2. Print Block:
