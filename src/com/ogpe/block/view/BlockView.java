@@ -14,14 +14,25 @@ public abstract class BlockView<M extends BlockModel> {
 	private double w;
 	private double h;
 
+	private boolean selected;
+
 	public BlockView(double x, double y, double w, double h) {
 		this.x = x;
 		this.y = y;
 		this.w = w;
 		this.h = h;
+		setSelected(false);
 	}
 
 	public abstract void drawBlock(GraphicsContext graphicsContext);
+
+	public boolean isInside(double x, double y) {
+		return this.x <= x && x <= this.x + this.w && this.y <= y && y <= this.y + this.h;
+	}
+
+	public boolean intersects(double x, double y, double w, double h) {
+		return this.x <= x + w && this.x + this.w >= x && this.y <= y + h && this.y + this.h >= y;
+	}
 
 	public Requester<M> getBlockModelRequester() {
 		return blockModelRequester;
@@ -61,5 +72,13 @@ public abstract class BlockView<M extends BlockModel> {
 
 	public void setH(double h) {
 		this.h = h;
+	}
+
+	public boolean isSelected() {
+		return selected;
+	}
+
+	public void setSelected(boolean selected) {
+		this.selected = selected;
 	}
 }
