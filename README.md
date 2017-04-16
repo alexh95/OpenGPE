@@ -9,9 +9,10 @@ Graphical Programming Environment Project
 2. Print Block:
 * Implement the visuals
 3. Sum Block:
-* implement it and test it
-* visuals included
+* Implement it and test it using BigDecimal, of course
+* Visuals included
 4. Wire Tool:
-* Visual representation for connecting I/O ports
+* Visual representation for I/O ports connections
 * Rectangular line with editable nodes
-* probably really hard
+* Smart UI tool
+* Probably really hard
