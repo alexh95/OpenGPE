@@ -5,9 +5,9 @@ import com.ogpe.block.behaviour.OutputPort;
 import com.ogpe.block.model.implementation.ConstantBlockModel;
 import com.ogpe.requester.Requester;
 
-public class ConstantBlockBehavior extends BlockBehavior<ConstantBlockModel> {
+public abstract class ConstantBlockBehavior<T> extends BlockBehavior<ConstantBlockModel<T>> {
 
-	private OutputPort<Integer> constantValueOutputPort;
+	private OutputPort<T> constantValueOutputPort;
 
 	public ConstantBlockBehavior() {
 		super();
@@ -15,7 +15,7 @@ public class ConstantBlockBehavior extends BlockBehavior<ConstantBlockModel> {
 		addOutputPort(constantValueOutputPort);
 	}
 
-	public Requester<Integer> getOutputRequester() {
+	public Requester<T> getOutputRequester() {
 		return constantValueOutputPort.getOutputRequester();
 	}
 }

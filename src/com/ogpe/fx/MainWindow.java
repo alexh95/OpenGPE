@@ -1,8 +1,16 @@
 package com.ogpe.fx;
 
-import com.ogpe.block.implementation.ConstantBlock;
-import com.ogpe.block.model.implementation.ConstantBlockModel;
-import com.ogpe.block.view.implementation.ConstantBlockView;
+import java.math.BigDecimal;
+
+import com.ogpe.block.implementation.ConstantBooleanBlock;
+import com.ogpe.block.implementation.ConstantNumberBlock;
+import com.ogpe.block.implementation.ConstantStringBlock;
+import com.ogpe.block.model.implementation.ConstantBooleanBlockModel;
+import com.ogpe.block.model.implementation.ConstantNumberBlockModel;
+import com.ogpe.block.model.implementation.ConstantStringBlockModel;
+import com.ogpe.block.view.implementation.ConstantBooleanBlockView;
+import com.ogpe.block.view.implementation.ConstantNumberBlockView;
+import com.ogpe.block.view.implementation.ConstantStringBlockView;
 import com.ogpe.project.Project;
 import com.sun.glass.ui.Screen;
 
@@ -37,13 +45,50 @@ public class MainWindow extends Application {
 
 	private BlockListElement selectedBlock;
 
+	private CanvasPane canvasPane;
+
+	private void placeBlock(double x, double y) {
+		switch (selectedBlock) {
+		case CONSTANT_NUMBER:
+			if (project.canPlace(x, y, ConstantNumberBlockView.WIDTH, ConstantNumberBlockView.HEIGHT)) {
+				ConstantNumberBlockModel model = new ConstantNumberBlockModel(BigDecimal.valueOf(0));
+				ConstantNumberBlock block = new ConstantNumberBlock(model, x, y);
+				project.addBlock(block);
+				canvasPane.redraw();
+			}
+			break;
+		case CONSTANT_BOOLEAN:
+			if (project.canPlace(x, y, ConstantBooleanBlockView.WIDTH, ConstantBooleanBlockView.HEIGHT)) {
+				ConstantBooleanBlockModel model = new ConstantBooleanBlockModel(false);
+				ConstantBooleanBlock block = new ConstantBooleanBlock(model, x, y);
+				project.addBlock(block);
+				canvasPane.redraw();
+			}
+			break;
+		case CONSTANT_STRING:
+			if (project.canPlace(x, y, ConstantStringBlockView.WIDTH, ConstantStringBlockView.HEIGHT)) {
+				ConstantStringBlockModel model = new ConstantStringBlockModel("text");
+				ConstantStringBlock block = new ConstantStringBlock(model, x, y);
+				project.addBlock(block);
+				canvasPane.redraw();
+			}
+			break;
+		case SUM:
+			// TODO: implement sum block
+			break;
+		case PRINT:
+			// TODO:
+			break;
+		}
+	}
+
 	@Override
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("OpenGPE Editor");
 		BorderPane root = new BorderPane();
 
 		// Canvas
-		CanvasPane canvasPane = new CanvasPane();
+		canvasPane = new CanvasPane();
 		root.setCenter(canvasPane);
 		project = new Project();
 		canvasPane.setDrawer(graphicsContext -> {
@@ -64,11 +109,7 @@ public class MainWindow extends Application {
 				canvasPane.redraw();
 				break;
 			case PLACE:
-				if (project.canPlace(x, y, ConstantBlockView.WIDTH, ConstantBlockView.HEIGHT)) {
-					ConstantBlock constantBlock = new ConstantBlock(new ConstantBlockModel(0), x, y);
-					project.addBlock(constantBlock);
-					canvasPane.redraw();
-				}
+				placeBlock(x, y);
 				break;
 			case MOVE:
 				break;
@@ -94,6 +135,7 @@ public class MainWindow extends Application {
 			selectedBlock = BlockListElement.valueOfDisplayName(newValue);
 			selectedBlockLabel.setText("Selected: " + newValue);
 		});
+		blockSelectionList.getSelectionModel().select(0);
 
 		// Top menu
 		VBox topContaioner = new VBox();

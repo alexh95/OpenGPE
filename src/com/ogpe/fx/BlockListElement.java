@@ -1,7 +1,9 @@
 package com.ogpe.fx;
 
 public enum BlockListElement {
-	CONSTANT("Constant Block"), 
+	CONSTANT_NUMBER("Constant Number Block"),
+	CONSTANT_BOOLEAN("Constant Boolean Block"), 
+	CONSTANT_STRING("Constant String Block"), 
 	SUM("Sum Block"), 
 	PRINT("Print Block");
 

@@ -2,19 +2,19 @@ package com.ogpe.block.model.implementation;
 
 import com.ogpe.block.model.BlockModel;
 
-public class ConstantBlockModel extends BlockModel {
+public abstract class ConstantBlockModel<T> extends BlockModel {
 
-	private Integer constantValue;
+	private T constantValue;
 
-	public ConstantBlockModel(Integer constantValue) {
+	public ConstantBlockModel(T constantValue) {
 		this.constantValue = constantValue;
 	}
 
-	public Integer getConstantValue() {
+	public T getConstantValue() {
 		return constantValue;
 	}
 
-	public void setConstantValue(Integer constantValue) {
+	public void setConstantValue(T constantValue) {
 		this.constantValue = constantValue;
 	}
 
