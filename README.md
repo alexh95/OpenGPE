@@ -4,12 +4,13 @@ Graphical Programming Environment Project
 ## TODO:
 
 ### Wire Tool:
-* Visual representation for I/O ports connections
+* Visual representation for I/O port connections
 * Rectangular line with editable nodes
 * It is a smart UI tool
 * Probably really hard
 * It is really hard :]
 * Or is it really complex? :thinking:
+* :thinking: Probably :thinking: Both :thinking:
 
 ### Pan Tool
 * Visible canvas bounds
