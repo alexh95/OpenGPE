@@ -7,16 +7,19 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.ogpe.block.Block;
+import com.ogpe.block.implementation.AdditionBlock;
 import com.ogpe.block.implementation.ConstantBooleanBlock;
 import com.ogpe.block.implementation.ConstantNumberBlock;
 import com.ogpe.block.implementation.ConstantStringBlock;
 import com.ogpe.block.implementation.PrintBlock;
 import com.ogpe.block.model.BlockModel;
+import com.ogpe.block.model.implementation.AdditionBlockModel;
 import com.ogpe.block.model.implementation.ConstantBooleanBlockModel;
 import com.ogpe.block.model.implementation.ConstantNumberBlockModel;
 import com.ogpe.block.model.implementation.ConstantStringBlockModel;
 import com.ogpe.block.model.implementation.PrintBlockModel;
 import com.ogpe.block.view.BlockView;
+import com.ogpe.block.view.implementation.AdditionBlockView;
 import com.ogpe.block.view.implementation.ConstantBooleanBlockView;
 import com.ogpe.block.view.implementation.ConstantNumberBlockView;
 import com.ogpe.block.view.implementation.ConstantStringBlockView;
@@ -89,8 +92,8 @@ public class Project {
 			case CONSTANT_STRING:
 				block = new ConstantStringBlock(new ConstantStringBlockModel("text"), x, y);
 				break;
-			case SUM:
-				// TODO: implement sum block
+			case ADDITION_BLOCK:
+				block = new AdditionBlock(new AdditionBlockModel(), x, y);
 				break;
 			case PRINT:
 				block = new PrintBlock(new PrintBlockModel(() -> "printed"), x, y);
@@ -121,8 +124,10 @@ public class Project {
 			selectingBlockPlacingRectangle = new Rectangle(x, y, ConstantStringBlockView.WIDTH,
 					ConstantStringBlockView.HEIGHT);
 			break;
-		case SUM:
-			// TODO: implement sum block
+		case ADDITION_BLOCK:
+			selectedBlockPlaceble = canPlace(x, y, AdditionBlockView.WIDTH, AdditionBlockView.HEIGHT);
+			selectingBlockPlacingRectangle = new Rectangle(x, y, AdditionBlockView.WIDTH,
+					AdditionBlockView.HEIGHT);
 			break;
 		case PRINT:
 			selectedBlockPlaceble = canPlace(x, y, PrintBlockView.WIDTH, PrintBlockView.HEIGHT);

@@ -7,6 +7,7 @@ import com.ogpe.observable.Observable;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
@@ -64,6 +65,7 @@ public class PrintBlockView extends BlockView<PrintBlockModel> {
 	
 	@Override
 	protected Node getEditingPane(Observable observable) {
-		return null;
+		VBox editingPane = new VBox();
+		return editingPane;
 	}
 }

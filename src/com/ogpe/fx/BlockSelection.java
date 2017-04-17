@@ -4,7 +4,7 @@ public enum BlockSelection {
 	CONSTANT_NUMBER("Constant Number Block"),
 	CONSTANT_BOOLEAN("Constant Boolean Block"), 
 	CONSTANT_STRING("Constant String Block"), 
-	SUM("Sum Block"), 
+	ADDITION_BLOCK("Addition Block"), 
 	PRINT("Print Block");
 
 	public static BlockSelection valueOfDisplayName(String displayName) {

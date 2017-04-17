@@ -409,13 +409,13 @@ public class MainWindow extends Application {
 		panToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.Q));
 		// Tool -> Place Tool
 		placeToolMenuItem.setOnAction(event -> toolPlaceToolBarItem.fire());
-		placeToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.E));
+		placeToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.A));
 		// Tool -> Select Tool
 		selectToolMenuItem.setOnAction(event -> toolSelectToolBarItem.fire());
 		selectToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S));
 		// Tool -> Move Tool
 		moveToolMenuItem.setOnAction(event -> toolMoveToolBarItem.fire());
-		moveToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.A));
+		moveToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.D));
 		// Tool -> Wire Tool
 		wireToolMenuItem.setOnAction(event -> toolWireToolBarItem.fire());
 		wireToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.W));
