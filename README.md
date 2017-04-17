@@ -8,6 +8,8 @@ Graphical Programming Environment Project
 * Rectangular line with editable nodes
 * It is a smart UI tool
 * Probably really hard
+* It is really hard :]
+* Or is it really complex? :thinking:
 
 ### Pan Tool
 * Visible canvas bounds
