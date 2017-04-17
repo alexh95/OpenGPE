@@ -8,6 +8,11 @@ import com.ogpe.block.view.implementation.PrintBlockView;
 public class PrintBlock extends Block<PrintBlockModel, PrintBlockBehavior, PrintBlockView> {
 
 	public PrintBlock(PrintBlockModel printBlockModel, double x, double y) {
-		super(printBlockModel, new PrintBlockBehavior(), new PrintBlockView(x, y));
+		super(printBlockModel, new PrintBlockView(printBlockModel, x, y));
+	}
+
+	@Override
+	public PrintBlockBehavior makeBlockBehavior() {
+		return new PrintBlockBehavior(getBlockModel());
 	}
 }

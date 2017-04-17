@@ -2,6 +2,7 @@ package com.ogpe.block.view.implementation;
 
 import java.math.BigDecimal;
 
+import com.ogpe.block.model.implementation.ConstantBlockModel;
 import com.ogpe.observable.Observable;
 
 import javafx.geometry.VPos;
@@ -19,8 +20,8 @@ public class ConstantNumberBlockView extends ConstantBlockView<BigDecimal> {
 	public static final double WIDTH = 45;
 	public static final double HEIGHT = 20;
 
-	public ConstantNumberBlockView(double x, double y) {
-		super(x, y, WIDTH, HEIGHT);
+	public ConstantNumberBlockView(ConstantBlockModel<BigDecimal> constantBlockModel, double x, double y) {
+		super(constantBlockModel, x, y, WIDTH, HEIGHT);
 	}
 
 	@Override
@@ -57,7 +58,7 @@ public class ConstantNumberBlockView extends ConstantBlockView<BigDecimal> {
 		graphicsContext.setFill(graphicsContext.getStroke());
 		graphicsContext.setTextAlign(TextAlignment.CENTER);
 		graphicsContext.setTextBaseline(VPos.CENTER);
-		String text = getBlockModelRequester().request().getConstantValue().toString();
+		String text = getBlockModel().getConstantValue().toString();
 		double textX = getX() + Math.round(getW() / 2);
 		double textY = getY() + Math.round(getH() / 2) - 2;
 		graphicsContext.fillText(text, textX, textY);
@@ -72,7 +73,7 @@ public class ConstantNumberBlockView extends ConstantBlockView<BigDecimal> {
 		Button updateButton = new Button("Update");
 		editingPane.getChildren().addAll(numberValueLabel, numberValueTextField, numberValueResultLabel, updateButton);
 
-		BigDecimal currentNumberValue = getBlockModelRequester().request().getConstantValue();
+		BigDecimal currentNumberValue = getBlockModel().getConstantValue();
 		String currentValue = currentNumberValue.toString();
 		numberValueTextField.setText(currentValue);
 
@@ -80,7 +81,7 @@ public class ConstantNumberBlockView extends ConstantBlockView<BigDecimal> {
 			String value = numberValueTextField.getText();
 			try {
 				BigDecimal numberValue = new BigDecimal(value);
-				getBlockModelRequester().request().setConstantValue(numberValue);
+				getBlockModel().setConstantValue(numberValue);
 				numberValueResultLabel.setText("Value set");
 			} catch (NumberFormatException e) {
 				numberValueResultLabel.setText("Invalid value");

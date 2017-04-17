@@ -2,8 +2,8 @@
 Graphical Programming Environment Project
 
 ## TODO:
-0. Split the creation of Behavior and View, or find a nice solution to set the behavior from the model and view. 
-4. Wire Tool:
+
+### Wire Tool:
 * Visual representation for I/O ports connections
 * Rectangular line with editable nodes
 * Smart UI tool

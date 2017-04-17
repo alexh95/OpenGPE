@@ -2,7 +2,6 @@ package com.ogpe.block.view;
 
 import com.ogpe.block.model.BlockModel;
 import com.ogpe.observable.Observable;
-import com.ogpe.requester.Requester;
 
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -10,7 +9,7 @@ import javafx.scene.canvas.GraphicsContext;
 
 public abstract class BlockView<M extends BlockModel> {
 
-	private Requester<M> blockModelRequester;
+	private M blockModel;
 
 	private double x;
 	private double y;
@@ -20,7 +19,8 @@ public abstract class BlockView<M extends BlockModel> {
 	private boolean selected;
 	private boolean moving;
 
-	public BlockView(double x, double y, double w, double h) {
+	public BlockView(M blockModel, double x, double y, double w, double h) {
+		this.blockModel = blockModel;
 		this.x = x;
 		this.y = y;
 		this.w = w;
@@ -34,7 +34,7 @@ public abstract class BlockView<M extends BlockModel> {
 	public void clearEditPanel(Group panel) {
 		panel.getChildren().clear();
 	}
-	
+
 	public void populateEditPanel(Observable observable, Group panel) {
 		Node editingPanel = getEditingPane(observable);
 		clearEditPanel(panel);
@@ -51,12 +51,8 @@ public abstract class BlockView<M extends BlockModel> {
 		return this.x <= x + w && this.x + this.w >= x && this.y <= y + h && this.y + this.h >= y;
 	}
 
-	public Requester<M> getBlockModelRequester() {
-		return blockModelRequester;
-	}
-
-	public void setBlockModelRequester(Requester<M> blockModelRequester) {
-		this.blockModelRequester = blockModelRequester;
+	public M getBlockModel() {
+		return blockModel;
 	}
 
 	public double getX() {

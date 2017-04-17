@@ -14,9 +14,7 @@ import com.ogpe.block.implementation.ConstantStringBlock;
 import com.ogpe.block.implementation.PrintBlock;
 import com.ogpe.block.model.BlockModel;
 import com.ogpe.block.model.implementation.AdditionBlockModel;
-import com.ogpe.block.model.implementation.ConstantBooleanBlockModel;
-import com.ogpe.block.model.implementation.ConstantNumberBlockModel;
-import com.ogpe.block.model.implementation.ConstantStringBlockModel;
+import com.ogpe.block.model.implementation.ConstantBlockModel;
 import com.ogpe.block.model.implementation.PrintBlockModel;
 import com.ogpe.block.view.BlockView;
 import com.ogpe.block.view.implementation.AdditionBlockView;
@@ -49,8 +47,9 @@ public class Project {
 	private double movingBlockOffsetY;
 
 	public Project() {
-		selectedBlocks = new ArrayList<>();
 		blocks = new ArrayList<>();
+		selectedBlocks = new ArrayList<>();
+		movingBlock = null;
 	}
 
 	public void forEachBlockView(Consumer<? super BlockView<? extends BlockModel>> action) {
@@ -70,6 +69,7 @@ public class Project {
 	public void resetDisplayingContext() {
 		displayPlacing = false;
 		isDragSelecting = false;
+		deselectAllBlocks();
 		releaseMoveBlock();
 	}
 
@@ -84,13 +84,13 @@ public class Project {
 			Block<?, ?, ?> block = null;
 			switch (selectedBlock) {
 			case CONSTANT_NUMBER:
-				block = new ConstantNumberBlock(new ConstantNumberBlockModel(BigDecimal.valueOf(0)), x, y);
+				block = new ConstantNumberBlock(new ConstantBlockModel<BigDecimal>(BigDecimal.valueOf(0)), x, y);
 				break;
 			case CONSTANT_BOOLEAN:
-				block = new ConstantBooleanBlock(new ConstantBooleanBlockModel(false), x, y);
+				block = new ConstantBooleanBlock(new ConstantBlockModel<Boolean>(false), x, y);
 				break;
 			case CONSTANT_STRING:
-				block = new ConstantStringBlock(new ConstantStringBlockModel("text"), x, y);
+				block = new ConstantStringBlock(new ConstantBlockModel<String>("text"), x, y);
 				break;
 			case ADDITION_BLOCK:
 				block = new AdditionBlock(new AdditionBlockModel(), x, y);
@@ -126,8 +126,7 @@ public class Project {
 			break;
 		case ADDITION_BLOCK:
 			selectedBlockPlaceble = canPlace(x, y, AdditionBlockView.WIDTH, AdditionBlockView.HEIGHT);
-			selectingBlockPlacingRectangle = new Rectangle(x, y, AdditionBlockView.WIDTH,
-					AdditionBlockView.HEIGHT);
+			selectingBlockPlacingRectangle = new Rectangle(x, y, AdditionBlockView.WIDTH, AdditionBlockView.HEIGHT);
 			break;
 		case PRINT:
 			selectedBlockPlaceble = canPlace(x, y, PrintBlockView.WIDTH, PrintBlockView.HEIGHT);

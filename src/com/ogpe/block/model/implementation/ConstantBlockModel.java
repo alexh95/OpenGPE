@@ -2,7 +2,7 @@ package com.ogpe.block.model.implementation;
 
 import com.ogpe.block.model.BlockModel;
 
-public abstract class ConstantBlockModel<T> extends BlockModel {
+public class ConstantBlockModel<T> extends BlockModel {
 
 	private T constantValue;
 

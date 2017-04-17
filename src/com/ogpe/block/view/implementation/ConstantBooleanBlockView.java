@@ -1,5 +1,6 @@
 package com.ogpe.block.view.implementation;
 
+import com.ogpe.block.model.implementation.ConstantBlockModel;
 import com.ogpe.observable.Observable;
 
 import javafx.geometry.VPos;
@@ -17,8 +18,8 @@ public class ConstantBooleanBlockView extends ConstantBlockView<Boolean> {
 	public static final double WIDTH = 19;
 	public static final double HEIGHT = 20;
 
-	public ConstantBooleanBlockView(double x, double y) {
-		super(x, y, WIDTH, HEIGHT);
+	public ConstantBooleanBlockView(ConstantBlockModel<Boolean> constantBlockModel, double x, double y) {
+		super(constantBlockModel, x, y, WIDTH, HEIGHT);
 	}
 
 	@Override
@@ -52,7 +53,7 @@ public class ConstantBooleanBlockView extends ConstantBlockView<Boolean> {
 		double portH = 5;
 		graphicsContext.strokeRect(portX + 0.5, portY + 0.5, portW, portH);
 
-		Boolean value = getBlockModelRequester().request().getConstantValue();
+		Boolean value = getBlockModel().getConstantValue();
 		String text;
 		if (value) {
 			graphicsContext.setFill(Color.GREEN);
@@ -79,12 +80,12 @@ public class ConstantBooleanBlockView extends ConstantBlockView<Boolean> {
 				updateButton);
 
 		booleanValueComboBox.getItems().addAll(false, true);
-		Boolean currentBooleanValue = getBlockModelRequester().request().getConstantValue();
+		Boolean currentBooleanValue = getBlockModel().getConstantValue();
 		booleanValueComboBox.setValue(currentBooleanValue);
 
 		updateButton.setOnAction(event -> {
 			Boolean value = booleanValueComboBox.getValue();
-			getBlockModelRequester().request().setConstantValue(value);
+			getBlockModel().setConstantValue(value);
 			observable.updateObservers();
 		});
 		return editingPane;

@@ -16,8 +16,8 @@ public class AdditionBlockView extends BlockView<AdditionBlockModel> {
 	public static final double WIDTH = 25;
 	public static final double HEIGHT = 20;
 	
-	public AdditionBlockView(double x, double y) {
-		super(x, y, WIDTH, HEIGHT);
+	public AdditionBlockView(AdditionBlockModel additionBlockModel, double x, double y) {
+		super(additionBlockModel, x, y, WIDTH, HEIGHT);
 	}
 
 	@Override

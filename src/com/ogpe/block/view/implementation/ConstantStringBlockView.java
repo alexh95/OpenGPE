@@ -1,5 +1,6 @@
 package com.ogpe.block.view.implementation;
 
+import com.ogpe.block.model.implementation.ConstantBlockModel;
 import com.ogpe.observable.Observable;
 
 import javafx.geometry.VPos;
@@ -17,8 +18,8 @@ public class ConstantStringBlockView extends ConstantBlockView<String> {
 	public static final double WIDTH = 63;
 	public static final double HEIGHT = 20;
 
-	public ConstantStringBlockView(double x, double y) {
-		super(x, y, WIDTH, HEIGHT);
+	public ConstantStringBlockView(ConstantBlockModel<String> constantBlockModel, double x, double y) {
+		super(constantBlockModel, x, y, WIDTH, HEIGHT);
 	}
 
 	@Override
@@ -55,7 +56,7 @@ public class ConstantStringBlockView extends ConstantBlockView<String> {
 		graphicsContext.setFill(Color.BLACK);
 		graphicsContext.setTextAlign(TextAlignment.CENTER);
 		graphicsContext.setTextBaseline(VPos.CENTER);
-		String text = "\"" + getBlockModelRequester().request().getConstantValue() + "\"";
+		String text = "\"" + getBlockModel().getConstantValue() + "\"";
 		double textX = getX() + Math.round(getW() / 2);
 		double textY = getY() + Math.round(getH() / 2) - 2;
 		graphicsContext.fillText(text, textX, textY);
@@ -70,12 +71,12 @@ public class ConstantStringBlockView extends ConstantBlockView<String> {
 		Button updateButton = new Button("Update");
 		editingPane.getChildren().addAll(stringValueLabel, stringValueTextField, stringValueResultLabel, updateButton);
 
-		String currentStringValue = getBlockModelRequester().request().getConstantValue();
+		String currentStringValue = getBlockModel().getConstantValue();
 		stringValueTextField.setText(currentStringValue);
 
 		updateButton.setOnAction(event -> {
 			String value = stringValueTextField.getText();
-			getBlockModelRequester().request().setConstantValue(value);
+			getBlockModel().setConstantValue(value);
 			observable.updateObservers();
 		});
 		return editingPane;

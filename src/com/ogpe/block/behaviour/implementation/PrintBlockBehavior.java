@@ -8,10 +8,9 @@ public class PrintBlockBehavior extends BlockBehavior<PrintBlockModel> {
 
 	private InputPort<String> printValueInputPort;
 
-	public PrintBlockBehavior() {
-		super();
-		printValueInputPort = new InputPort<>(
-				() -> getBlockModelRequester().request().getPrintValueRequester().request().toString());
+	public PrintBlockBehavior(PrintBlockModel printBlockModel) {
+		super(printBlockModel);
+		printValueInputPort = new InputPort<>(() -> getBlockModel().getPrintValueRequester().request().toString());
 		addInputPort(printValueInputPort);
 	}
 

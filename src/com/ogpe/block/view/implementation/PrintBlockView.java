@@ -16,8 +16,8 @@ public class PrintBlockView extends BlockView<PrintBlockModel> {
 	public static final double WIDTH = 41;
 	public static final double HEIGHT = 21;
 
-	public PrintBlockView(double x, double y) {
-		super(x, y, WIDTH, HEIGHT);
+	public PrintBlockView(PrintBlockModel printBlockModel, double x, double y) {
+		super(printBlockModel, x, y, WIDTH, HEIGHT);
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class PrintBlockView extends BlockView<PrintBlockModel> {
 		double textY = getY() + Math.round(getH() / 2) + 3;
 		graphicsContext.fillText(text, textX, textY);
 	}
-	
+
 	@Override
 	protected Node getEditingPane(Observable observable) {
 		VBox editingPane = new VBox();

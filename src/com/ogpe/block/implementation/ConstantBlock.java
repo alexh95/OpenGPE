@@ -7,7 +7,7 @@ import com.ogpe.block.view.implementation.ConstantBlockView;
 
 public abstract class ConstantBlock<T> extends Block<ConstantBlockModel<T>, ConstantBlockBehavior<T>, ConstantBlockView<T>> {
 
-	public ConstantBlock(ConstantBlockModel<T> constantBlockModel, ConstantBlockBehavior<T> constantBlockBehavior, ConstantBlockView<T> constantBlockView) {
-		super(constantBlockModel, constantBlockBehavior, constantBlockView);
+	public ConstantBlock(ConstantBlockModel<T> constantBlockModel, ConstantBlockView<T> constantBlockView) {
+		super(constantBlockModel, constantBlockView);
 	}
 }

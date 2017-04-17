@@ -7,7 +7,12 @@ import com.ogpe.block.view.implementation.AdditionBlockView;
 
 public class AdditionBlock extends Block<AdditionBlockModel, AdditionBlockBehavior, AdditionBlockView> {
 
-	public AdditionBlock(AdditionBlockModel blockModel, double x, double y) {
-		super(blockModel, new AdditionBlockBehavior(), new AdditionBlockView(x, y));
+	public AdditionBlock(AdditionBlockModel additionBlockModel, double x, double y) {
+		super(additionBlockModel, new AdditionBlockView(additionBlockModel, x, y));
+	}
+
+	@Override
+	public AdditionBlockBehavior makeBlockBehavior() {
+		return new AdditionBlockBehavior(getBlockModel());
 	}
 }

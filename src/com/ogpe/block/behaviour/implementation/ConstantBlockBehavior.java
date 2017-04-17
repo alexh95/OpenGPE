@@ -9,9 +9,9 @@ public abstract class ConstantBlockBehavior<T> extends BlockBehavior<ConstantBlo
 
 	private OutputPort<T> constantValueOutputPort;
 
-	public ConstantBlockBehavior() {
-		super();
-		constantValueOutputPort = new OutputPort<>(() -> getBlockModelRequester().request().getConstantValue());
+	public ConstantBlockBehavior(ConstantBlockModel<T> constantBlockModel) {
+		super(constantBlockModel);
+		constantValueOutputPort = new OutputPort<>(() -> getBlockModel().getConstantValue());
 		addOutputPort(constantValueOutputPort);
 	}
 
