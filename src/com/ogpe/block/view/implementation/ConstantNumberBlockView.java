@@ -2,16 +2,23 @@ package com.ogpe.block.view.implementation;
 
 import java.math.BigDecimal;
 
+import com.ogpe.observable.Observable;
+
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
 public class ConstantNumberBlockView extends ConstantBlockView<BigDecimal> {
-	
+
 	public static final double WIDTH = 45;
 	public static final double HEIGHT = 20;
-	
+
 	public ConstantNumberBlockView(double x, double y) {
 		super(x, y, WIDTH, HEIGHT);
 	}
@@ -54,5 +61,32 @@ public class ConstantNumberBlockView extends ConstantBlockView<BigDecimal> {
 		double textX = getX() + Math.round(getW() / 2);
 		double textY = getY() + Math.round(getH() / 2) - 2;
 		graphicsContext.fillText(text, textX, textY);
+	}
+
+	@Override
+	protected Node getEditingPane(Observable observable) {
+		VBox editingPane = new VBox();
+		Label numberValueLabel = new Label("Value:");
+		TextField numberValueTextField = new TextField();
+		Label numberValueResultLabel = new Label("");
+		Button updateButton = new Button("Update");
+		editingPane.getChildren().addAll(numberValueLabel, numberValueTextField, numberValueResultLabel, updateButton);
+
+		BigDecimal currentNumberValue = getBlockModelRequester().request().getConstantValue();
+		String currentValue = currentNumberValue.toString();
+		numberValueTextField.setText(currentValue);
+
+		updateButton.setOnAction(event -> {
+			String value = numberValueTextField.getText();
+			try {
+				BigDecimal numberValue = new BigDecimal(value);
+				getBlockModelRequester().request().setConstantValue(numberValue);
+				numberValueResultLabel.setText("Value set");
+			} catch (NumberFormatException e) {
+				numberValueResultLabel.setText("Invalid value");
+			}
+			observable.updateObservers();
+		});
+		return editingPane;
 	}
 }

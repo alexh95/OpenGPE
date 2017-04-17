@@ -1,8 +1,11 @@
 package com.ogpe.block.view;
 
 import com.ogpe.block.model.BlockModel;
+import com.ogpe.observable.Observable;
 import com.ogpe.requester.Requester;
 
+import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 
 public abstract class BlockView<M extends BlockModel> {
@@ -27,6 +30,18 @@ public abstract class BlockView<M extends BlockModel> {
 	}
 
 	public abstract void drawBlock(GraphicsContext graphicsContext);
+
+	public void clearEditPanel(Group panel) {
+		panel.getChildren().clear();
+	}
+	
+	public void populateEditPanel(Observable observable, Group panel) {
+		Node editingPanel = getEditingPane(observable);
+		clearEditPanel(panel);
+		panel.getChildren().add(editingPanel);
+	};
+
+	protected abstract Node getEditingPane(Observable observable);
 
 	public boolean isInside(double x, double y) {
 		return this.x <= x && x <= this.x + this.w && this.y <= y && y <= this.y + this.h;

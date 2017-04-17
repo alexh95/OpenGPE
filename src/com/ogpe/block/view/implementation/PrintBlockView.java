@@ -2,8 +2,10 @@ package com.ogpe.block.view.implementation;
 
 import com.ogpe.block.model.implementation.PrintBlockModel;
 import com.ogpe.block.view.BlockView;
+import com.ogpe.observable.Observable;
 
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
@@ -58,5 +60,10 @@ public class PrintBlockView extends BlockView<PrintBlockModel> {
 		double textX = getX() + Math.round(getW() / 2);
 		double textY = getY() + Math.round(getH() / 2) + 3;
 		graphicsContext.fillText(text, textX, textY);
+	}
+	
+	@Override
+	protected Node getEditingPane(Observable observable) {
+		return null;
 	}
 }

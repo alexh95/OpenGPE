@@ -21,8 +21,10 @@ import com.ogpe.block.view.implementation.ConstantBooleanBlockView;
 import com.ogpe.block.view.implementation.ConstantNumberBlockView;
 import com.ogpe.block.view.implementation.ConstantStringBlockView;
 import com.ogpe.block.view.implementation.PrintBlockView;
-import com.ogpe.fx.BlockListElement;
+import com.ogpe.fx.BlockSelection;
+import com.ogpe.observable.Observable;
 
+import javafx.scene.Group;
 import javafx.scene.shape.Rectangle;
 
 public class Project {
@@ -72,8 +74,8 @@ public class Project {
 	public void startDisplayingPlacing() {
 		displayPlacing = true;
 	}
-	
-	public void placeBlock(double x, double y, BlockListElement selectedBlock) {
+
+	public void placeBlock(double x, double y, BlockSelection selectedBlock) {
 		hoverSelectedBlockPlaceble(x, y, selectedBlock);
 		if (selectedBlockPlaceble) {
 			Block<?, ?, ?> block = null;
@@ -100,9 +102,9 @@ public class Project {
 		}
 	}
 
-	public void hoverSelectedBlockPlaceble(double x, double y, BlockListElement selectedBlock) {
+	public void hoverSelectedBlockPlaceble(double x, double y, BlockSelection selectedBlock) {
 		displayPlacing = true;
-		
+
 		switch (selectedBlock) {
 		case CONSTANT_NUMBER:
 			selectedBlockPlaceble = canPlace(x, y, ConstantNumberBlockView.WIDTH, ConstantNumberBlockView.HEIGHT);
@@ -218,6 +220,17 @@ public class Project {
 			return dragSelectionRectangle;
 		} else {
 			return null;
+		}
+	}
+
+	public void editBlock(double x, double y, Observable observable, Group panel) {
+		List<Block<?, ?, ?>> targetBlocks = blocks.stream().filter(block -> block.getBlockView().isInside(x, y))
+				.collect(Collectors.toList());
+		if (targetBlocks.size() == 1) {
+			Block<?, ?, ?> targetBlock = targetBlocks.get(0);
+			targetBlock.getBlockView().populateEditPanel(observable, panel);
+		} else {
+			panel.getChildren().clear();
 		}
 	}
 

@@ -1,7 +1,14 @@
 package com.ogpe.block.view.implementation;
 
+import com.ogpe.observable.Observable;
+
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
@@ -52,5 +59,25 @@ public class ConstantStringBlockView extends ConstantBlockView<String> {
 		double textX = getX() + Math.round(getW() / 2);
 		double textY = getY() + Math.round(getH() / 2) - 2;
 		graphicsContext.fillText(text, textX, textY);
+	}
+
+	@Override
+	protected Node getEditingPane(Observable observable) {
+		VBox editingPane = new VBox();
+		Label stringValueLabel = new Label("Value:");
+		TextField stringValueTextField = new TextField();
+		Label stringValueResultLabel = new Label("");
+		Button updateButton = new Button("Update");
+		editingPane.getChildren().addAll(stringValueLabel, stringValueTextField, stringValueResultLabel, updateButton);
+
+		String currentStringValue = getBlockModelRequester().request().getConstantValue();
+		stringValueTextField.setText(currentStringValue);
+
+		updateButton.setOnAction(event -> {
+			String value = stringValueTextField.getText();
+			getBlockModelRequester().request().setConstantValue(value);
+			observable.updateObservers();
+		});
+		return editingPane;
 	}
 }

@@ -3,6 +3,7 @@ package com.ogpe.fx;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 
 public class CanvasPane extends Pane {
 
@@ -24,7 +25,8 @@ public class CanvasPane extends Pane {
 
 	public void redraw() {
 		GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
-		graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		graphicsContext.setFill(Color.WHITE);
+		graphicsContext.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		drawer.draw(graphicsContext);
 	}
 

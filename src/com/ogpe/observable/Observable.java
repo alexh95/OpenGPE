@@ -3,23 +3,23 @@ package com.ogpe.observable;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Observable<T> {
+public class Observable {
 
-	private Collection<Observer<T>> observers;
+	private Collection<Observer> observers;
 
 	public Observable() {
 		observers = new ArrayList<>();
 	}
 
-	public void addObserver(Observer<T> observer) {
+	public void addObserver(Observer observer) {
 		observers.add(observer);
 	}
 
-	public void removeObserver(Observer<T> observer) {
+	public void removeObserver(Observer observer) {
 		observers.remove(observer);
 	}
 
-	public void updateObservers(T t) {
-		observers.forEach(observer -> observer.update(t));
+	public void updateObservers() {
+		observers.forEach(observer -> observer.update());
 	}
 }
