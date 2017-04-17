@@ -7,7 +7,6 @@ import com.ogpe.block.view.BlockView;
 public abstract class Block<M extends BlockModel, B extends BlockBehavior<M>, V extends BlockView<M>> {
 
 	private M blockModel;
-
 	private V blockView;
 
 	public Block(M blockModel, V blockView) {

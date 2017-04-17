@@ -92,7 +92,7 @@ public class MainWindow extends Application {
 		canvasPane.setOnMouseMoved(event -> {
 			double x = event.getX();
 			double y = event.getY();
-			MouseButton mouseButton = event.getButton();
+			//MouseButton mouseButton = event.getButton();
 
 			switch (selectedCursorTool) {
 			case PAN:
@@ -105,6 +105,7 @@ public class MainWindow extends Application {
 			case MOVE:
 				break;
 			case WIRE:
+				project.hoverWire(x, y);
 				break;
 			}
 			canvasPane.redraw();
@@ -135,6 +136,9 @@ public class MainWindow extends Application {
 				}
 				break;
 			case WIRE:
+				if (mouseButton == MouseButton.PRIMARY) {
+					project.pressWire(x, y);
+				}
 				break;
 			}
 			canvasPane.redraw();
@@ -166,6 +170,9 @@ public class MainWindow extends Application {
 				}
 				break;
 			case WIRE:
+				if (mouseButton == MouseButton.PRIMARY) {
+					project.releaseWire(x, y);
+				}
 				break;
 			}
 			canvasPane.redraw();
@@ -195,6 +202,9 @@ public class MainWindow extends Application {
 				}
 				break;
 			case WIRE:
+				if (mouseButton == MouseButton.PRIMARY) {
+					project.dragWire(x, y);
+				}
 				break;
 			}
 			canvasPane.redraw();

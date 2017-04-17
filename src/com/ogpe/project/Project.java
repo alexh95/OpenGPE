@@ -22,6 +22,9 @@ import com.ogpe.block.view.implementation.ConstantBooleanBlockView;
 import com.ogpe.block.view.implementation.ConstantNumberBlockView;
 import com.ogpe.block.view.implementation.ConstantStringBlockView;
 import com.ogpe.block.view.implementation.PrintBlockView;
+import com.ogpe.block.wire.Wire;
+import com.ogpe.block.wire.WireNodeTarget;
+import com.ogpe.block.wire.model.WireNode;
 import com.ogpe.fx.BlockSelection;
 import com.ogpe.observable.Observable;
 
@@ -46,10 +49,17 @@ public class Project {
 	private double movingBlockOffsetX;
 	private double movingBlockOffsetY;
 
+	private List<Wire> wires;
+	private boolean currentlyWiring = false;
+	private Wire currentWire;
+	private WireNode currentWireNode;
+
 	public Project() {
 		blocks = new ArrayList<>();
 		selectedBlocks = new ArrayList<>();
 		movingBlock = null;
+
+		wires = new ArrayList<>();
 	}
 
 	public void forEachBlockView(Consumer<? super BlockView<? extends BlockModel>> action) {
@@ -71,6 +81,9 @@ public class Project {
 		isDragSelecting = false;
 		deselectAllBlocks();
 		releaseMoveBlock();
+		if (hoverClosestWireNodeTarget != null) {
+			hoverClosestWireNodeTarget.setHighlight(false);
+		}
 	}
 
 	// Block Placement
@@ -274,5 +287,50 @@ public class Project {
 				movingBlock.getBlockView().setY(nextY);
 			}
 		}
+	}
+
+	// Wire
+	private WireNodeTarget hoverClosestWireNodeTarget;
+	
+	public void hoverWire(double x, double y) {
+		List<WireNodeTarget> wireNodeTargets = new ArrayList<>();
+		blocks.stream().map(block -> block.getBlockModel().getWireNodeTargets()).forEach(wireNodeTargets::addAll);
+		// Add Non-Terminal Nodes (in air)
+		hoverClosestWireNodeTarget = null;
+		double closestWireNodeTargetDistance = 0;
+		for (WireNodeTarget wireNodeTarget : wireNodeTargets) {
+			double dx = wireNodeTarget.getX() - x;
+			double dy = wireNodeTarget.getY() - y;
+			double distance = Math.sqrt(dx * dx + dy * dy);
+			if (hoverClosestWireNodeTarget == null || closestWireNodeTargetDistance > distance) {
+				hoverClosestWireNodeTarget = wireNodeTarget;
+				closestWireNodeTargetDistance = distance;
+			}
+		}
+		if (hoverClosestWireNodeTarget != null) {
+			hoverClosestWireNodeTarget.setHighlight(true);
+		}
+
+	}
+
+	public void pressWire(double x, double y) {
+		if (!currentlyWiring) {
+
+		} else {
+
+		}
+
+		// if not already wiring
+		// start wiring from the target node and add that node and choose as
+		// current wiring node
+		// else check if the target node is valid
+	}
+
+	public void releaseWire(double x, double y) {
+
+	}
+
+	public void dragWire(double x, double y) {
+
 	}
 }
