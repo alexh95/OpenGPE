@@ -15,6 +15,7 @@ public abstract class BlockView<M extends BlockModel> {
 	private double h;
 
 	private boolean selected;
+	private boolean moving;
 
 	public BlockView(double x, double y, double w, double h) {
 		this.x = x;
@@ -22,6 +23,7 @@ public abstract class BlockView<M extends BlockModel> {
 		this.w = w;
 		this.h = h;
 		setSelected(false);
+		setMoving(false);
 	}
 
 	public abstract void drawBlock(GraphicsContext graphicsContext);
@@ -80,5 +82,13 @@ public abstract class BlockView<M extends BlockModel> {
 
 	public void setSelected(boolean selected) {
 		this.selected = selected;
+	}
+
+	public boolean isMoving() {
+		return moving;
+	}
+
+	public void setMoving(boolean moving) {
+		this.moving = moving;
 	}
 }

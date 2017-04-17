@@ -18,7 +18,11 @@ public class ConstantNumberBlockView extends ConstantBlockView<BigDecimal> {
 
 	@Override
 	public void drawBlock(GraphicsContext graphicsContext) {
-		graphicsContext.setFill(Color.YELLOW);
+		if (isMoving()) {
+			graphicsContext.setFill(Color.YELLOW);
+		} else {
+			graphicsContext.setFill(Color.YELLOWGREEN);
+		}
 		double rectX = getX();
 		double rectY = getY();
 		double rectW = getW();

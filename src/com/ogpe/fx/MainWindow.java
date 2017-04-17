@@ -1,16 +1,5 @@
 package com.ogpe.fx;
 
-import java.math.BigDecimal;
-
-import com.ogpe.block.implementation.ConstantBooleanBlock;
-import com.ogpe.block.implementation.ConstantNumberBlock;
-import com.ogpe.block.implementation.ConstantStringBlock;
-import com.ogpe.block.model.implementation.ConstantBooleanBlockModel;
-import com.ogpe.block.model.implementation.ConstantNumberBlockModel;
-import com.ogpe.block.model.implementation.ConstantStringBlockModel;
-import com.ogpe.block.view.implementation.ConstantBooleanBlockView;
-import com.ogpe.block.view.implementation.ConstantNumberBlockView;
-import com.ogpe.block.view.implementation.ConstantStringBlockView;
 import com.ogpe.project.Project;
 import com.sun.glass.ui.Screen;
 
@@ -31,6 +20,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class MainWindow extends Application {
@@ -41,46 +32,10 @@ public class MainWindow extends Application {
 
 	private Project project;
 
-	private CursorTool selectedCursorTool;
-
-	private BlockListElement selectedBlock;
-
 	private CanvasPane canvasPane;
 
-	private void placeBlock(double x, double y) {
-		switch (selectedBlock) {
-		case CONSTANT_NUMBER:
-			if (project.canPlace(x, y, ConstantNumberBlockView.WIDTH, ConstantNumberBlockView.HEIGHT)) {
-				ConstantNumberBlockModel model = new ConstantNumberBlockModel(BigDecimal.valueOf(0));
-				ConstantNumberBlock block = new ConstantNumberBlock(model, x, y);
-				project.addBlock(block);
-				canvasPane.redraw();
-			}
-			break;
-		case CONSTANT_BOOLEAN:
-			if (project.canPlace(x, y, ConstantBooleanBlockView.WIDTH, ConstantBooleanBlockView.HEIGHT)) {
-				ConstantBooleanBlockModel model = new ConstantBooleanBlockModel(false);
-				ConstantBooleanBlock block = new ConstantBooleanBlock(model, x, y);
-				project.addBlock(block);
-				canvasPane.redraw();
-			}
-			break;
-		case CONSTANT_STRING:
-			if (project.canPlace(x, y, ConstantStringBlockView.WIDTH, ConstantStringBlockView.HEIGHT)) {
-				ConstantStringBlockModel model = new ConstantStringBlockModel("text");
-				ConstantStringBlock block = new ConstantStringBlock(model, x, y);
-				project.addBlock(block);
-				canvasPane.redraw();
-			}
-			break;
-		case SUM:
-			// TODO: implement sum block
-			break;
-		case PRINT:
-			// TODO:
-			break;
-		}
-	}
+	private CursorTool selectedCursorTool;
+	private BlockListElement selectedBlock;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -95,6 +50,47 @@ public class MainWindow extends Application {
 			project.forEachBlockView(blockView -> {
 				blockView.drawBlock(graphicsContext);
 			});
+			Rectangle placingRectangle = project.getSelectingBlockPlacingRectangle();
+			if (placingRectangle != null) {
+				if (project.isSelectedBlockPlaceble()) {
+					graphicsContext.setStroke(Color.GREEN);
+				} else {
+					graphicsContext.setStroke(Color.RED);
+				}
+				double x = placingRectangle.getX();
+				double y = placingRectangle.getY();
+				double w = placingRectangle.getWidth();
+				double h = placingRectangle.getHeight();
+				graphicsContext.strokeRect(x + 0.5, y + 0.5, w, h);
+			}
+			Rectangle dragSelectionRectangle = project.getDragSelectionRectangle();
+			if (dragSelectionRectangle != null) {
+				graphicsContext.setStroke(Color.GRAY);
+				double dragX = dragSelectionRectangle.getX();
+				double dragY = dragSelectionRectangle.getY();
+				double dragW = dragSelectionRectangle.getWidth();
+				double dragH = dragSelectionRectangle.getHeight();
+				graphicsContext.strokeRect(dragX + 0.5, dragY + 0.5, dragW, dragH);
+			}
+		});
+		canvasPane.setOnMouseMoved(event -> {
+			double x = event.getX();
+			double y = event.getY();
+
+			switch (selectedCursorTool) {
+			case PAN:
+				break;
+			case SELECT:
+				break;
+			case PLACE:
+				project.hoverSelectedBlockPlaceble(x, y, selectedBlock);
+				break;
+			case MOVE:
+				break;
+			case WIRE:
+				break;
+			}
+			canvasPane.redraw();
 		});
 		canvasPane.setOnMousePressed(event -> {
 			double x = event.getX();
@@ -105,18 +101,75 @@ public class MainWindow extends Application {
 			case PAN:
 				break;
 			case SELECT:
-				project.selectBlock(x, y, controlDown);
-				canvasPane.redraw();
+				project.pressSelectBlock(x, y, controlDown);
 				break;
 			case PLACE:
-				placeBlock(x, y);
+				project.placeBlock(x, y, selectedBlock);
+				project.hoverSelectedBlockPlaceble(x, y, selectedBlock);
 				break;
 			case MOVE:
+				project.pressMoveBlock(x, y);
 				break;
 			case WIRE:
 				break;
 			}
+			
+			canvasPane.redraw();
 		});
+		canvasPane.setOnMouseReleased(event -> {
+			double x = event.getX();
+			double y = event.getY();
+			boolean controlDown = event.isControlDown();
+
+			switch (selectedCursorTool) {
+			case PAN:
+				break;
+			case SELECT:
+				project.releaseSelectBlock(x, y, controlDown);
+				break;
+			case PLACE:
+				project.hoverSelectedBlockPlaceble(x, y, selectedBlock);
+				break;
+			case MOVE:
+				project.releaseMoveBlock();
+				break;
+			case WIRE:
+				break;
+			}
+			
+			canvasPane.redraw();
+		});
+		canvasPane.setOnMouseDragged(event -> {
+			double x = event.getX();
+			double y = event.getY();
+			boolean controlDown = event.isControlDown();
+
+			switch (selectedCursorTool) {
+			case PAN:
+				break;
+			case SELECT:
+				project.dragSelectBlock(x, y, controlDown);
+				break;
+			case PLACE:
+				project.hoverSelectedBlockPlaceble(x, y, selectedBlock);
+				break;
+			case MOVE:
+				project.dragMoveBlock(x, y);
+				break;
+			case WIRE:
+				break;
+			}
+			canvasPane.redraw();
+		});
+		canvasPane.setOnMouseEntered(event -> {
+			project.resetDisplayingContext();
+			canvasPane.redraw();
+		});
+		canvasPane.setOnMouseExited(event -> {
+			project.resetDisplayingContext();
+			canvasPane.redraw();
+		});
+
 
 		// Block selection pane
 		BorderPane blockSelectionPane = new BorderPane();
@@ -275,6 +328,8 @@ public class MainWindow extends Application {
 		toolPanToolBarItem.getStyleClass().add("toggle-button");
 		toolPanToolBarItem.setOnAction(event -> {
 			selectedCursorTool = CursorTool.PAN;
+			project.resetDisplayingContext();
+			canvasPane.redraw();
 		});
 		toolPanToolBarItem.fire();
 		// ToolBar place tool
@@ -282,24 +337,33 @@ public class MainWindow extends Application {
 		toolPlaceToolBarItem.getStyleClass().add("toggle-button");
 		toolPlaceToolBarItem.setOnAction(event -> {
 			selectedCursorTool = CursorTool.PLACE;
+			project.resetDisplayingContext();
+			project.startDisplayingPlacing();
+			canvasPane.redraw();
 		});
 		// ToolBar select tool
 		toolSelectToolBarItem.getStyleClass().remove("radio-button");
 		toolSelectToolBarItem.getStyleClass().add("toggle-button");
 		toolSelectToolBarItem.setOnAction(event -> {
 			selectedCursorTool = CursorTool.SELECT;
+			project.resetDisplayingContext();
+			canvasPane.redraw();
 		});
 		// ToolBar move tool
 		toolMoveToolBarItem.getStyleClass().remove("radio-button");
 		toolMoveToolBarItem.getStyleClass().add("toggle-button");
 		toolMoveToolBarItem.setOnAction(event -> {
 			selectedCursorTool = CursorTool.MOVE;
+			project.resetDisplayingContext();
+			canvasPane.redraw();
 		});
 		// ToolBar wire tool
 		toolWireToolBarItem.getStyleClass().remove("radio-button");
 		toolWireToolBarItem.getStyleClass().add("toggle-button");
 		toolWireToolBarItem.setOnAction(event -> {
 			selectedCursorTool = CursorTool.WIRE;
+			project.resetDisplayingContext();
+			canvasPane.redraw();
 		});
 
 		// Tool menu items
