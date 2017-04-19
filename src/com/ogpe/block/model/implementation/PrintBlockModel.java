@@ -1,21 +1,25 @@
 package com.ogpe.block.model.implementation;
 
 import com.ogpe.block.model.BlockModel;
+import com.ogpe.block.wire.WireNodeTarget;
+import com.ogpe.block.wire.WireNodeTargetType;
 import com.ogpe.requester.Requester;
 
 public class PrintBlockModel extends BlockModel {
 
-	private Requester<?> printValueRequester;
+	private WireNodeTarget<? extends Object> printValueWireNodeTarget;
 
-	public PrintBlockModel(Requester<?> printValueRequester) {
-		this.printValueRequester = printValueRequester;
+	public PrintBlockModel() {
+		super();
+		printValueWireNodeTarget = new WireNodeTarget<>(WireNodeTargetType.DESTINATION);
+		addWireNodeTarget(printValueWireNodeTarget);
 	}
 
-	public Requester<?> getPrintValueRequester() {
-		return printValueRequester;
+	public WireNodeTarget<? extends Object> getPrintValueWireNodeTarget() {
+		return printValueWireNodeTarget;
 	}
 
-	public void setPrintValueRequester(Requester<?> printValueRequester) {
-		this.printValueRequester = printValueRequester;
+	public Requester<? extends Object> getPrintValueRequester() {
+		return printValueWireNodeTarget.getRequester();
 	}
 }

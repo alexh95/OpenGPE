@@ -15,9 +15,7 @@ public class BlockTest {
 	@Test
 	public void testConstantNumberBlock() {
 		BigDecimal constantNumberValue = BigDecimal.valueOf(5);
-		ConstantBlockModel<BigDecimal> constantNumberBlockModel = new ConstantBlockModel<BigDecimal>(
-				constantNumberValue);
-		ConstantNumberBlock constantNumberBlock = new ConstantNumberBlock(constantNumberBlockModel, 0, 0);
+		ConstantNumberBlock constantNumberBlock = new ConstantNumberBlock(0, 0);
 		BigDecimal returnedValue = constantNumberBlock.makeBlockBehavior().getOutputRequester().request();
 		Assert.assertEquals(constantNumberValue, returnedValue);
 	}

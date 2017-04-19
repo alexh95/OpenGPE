@@ -12,6 +12,7 @@ public abstract class Block<M extends BlockModel, B extends BlockBehavior<M>, V 
 	public Block(M blockModel, V blockView) {
 		this.blockModel = blockModel;
 		this.blockView = blockView;
+		blockView.setBlockModel(blockModel);
 	}
 
 	public M getBlockModel() {

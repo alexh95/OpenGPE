@@ -2,7 +2,6 @@ package com.ogpe.block.view.implementation;
 
 import java.math.BigDecimal;
 
-import com.ogpe.block.model.implementation.ConstantBlockModel;
 import com.ogpe.observable.Observable;
 
 import javafx.geometry.VPos;
@@ -20,8 +19,8 @@ public class ConstantNumberBlockView extends ConstantBlockView<BigDecimal> {
 	public static final double WIDTH = 45;
 	public static final double HEIGHT = 20;
 
-	public ConstantNumberBlockView(ConstantBlockModel<BigDecimal> constantBlockModel, double x, double y) {
-		super(constantBlockModel, x, y, WIDTH, HEIGHT);
+	public ConstantNumberBlockView(double x, double y) {
+		super(x, y, WIDTH, HEIGHT);
 	}
 
 	@Override
@@ -89,5 +88,11 @@ public class ConstantNumberBlockView extends ConstantBlockView<BigDecimal> {
 			observable.updateObservers();
 		});
 		return editingPane;
+	}
+
+	@Override
+	protected void setupNodeWireTargetViews() {
+		getBlockModel().getConstantValueNodeTarget().initWireNodeTargetView(getX() + Math.round(getW() / 2),
+				getY() + getH() - 2.5);
 	}
 }

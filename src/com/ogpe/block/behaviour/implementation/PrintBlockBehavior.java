@@ -14,7 +14,8 @@ public class PrintBlockBehavior extends BlockBehavior<PrintBlockModel> {
 		addInputPort(printValueInputPort);
 	}
 
-	public void execute() {
+	@Override
+	public void run() {
 		String printValue = printValueInputPort.request();
 		System.out.println(printValue);
 	}

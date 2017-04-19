@@ -19,8 +19,7 @@ public abstract class BlockView<M extends BlockModel> {
 	private boolean selected;
 	private boolean moving;
 
-	public BlockView(M blockModel, double x, double y, double w, double h) {
-		this.blockModel = blockModel;
+	public BlockView(double x, double y, double w, double h) {
 		this.x = x;
 		this.y = y;
 		this.w = w;
@@ -51,6 +50,13 @@ public abstract class BlockView<M extends BlockModel> {
 		return this.x <= x + w && this.x + this.w >= x && this.y <= y + h && this.y + this.h >= y;
 	}
 
+	protected abstract void setupNodeWireTargetViews();
+	
+	public void setBlockModel(M blockModel) {
+		this.blockModel = blockModel;
+		setupNodeWireTargetViews();
+	}
+	
 	public M getBlockModel() {
 		return blockModel;
 	}

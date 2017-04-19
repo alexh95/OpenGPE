@@ -1,6 +1,5 @@
 package com.ogpe.block.view.implementation;
 
-import com.ogpe.block.model.implementation.ConstantBlockModel;
 import com.ogpe.observable.Observable;
 
 import javafx.geometry.VPos;
@@ -18,8 +17,8 @@ public class ConstantStringBlockView extends ConstantBlockView<String> {
 	public static final double WIDTH = 63;
 	public static final double HEIGHT = 20;
 
-	public ConstantStringBlockView(ConstantBlockModel<String> constantBlockModel, double x, double y) {
-		super(constantBlockModel, x, y, WIDTH, HEIGHT);
+	public ConstantStringBlockView(double x, double y) {
+		super(x, y, WIDTH, HEIGHT);
 	}
 
 	@Override
@@ -80,5 +79,10 @@ public class ConstantStringBlockView extends ConstantBlockView<String> {
 			observable.updateObservers();
 		});
 		return editingPane;
+	}
+
+	@Override
+	protected void setupNodeWireTargetViews() {
+		getBlockModel().getConstantValueNodeTarget().initWireNodeTargetView(getX() + Math.round(getW() / 2), getY() + getH() - 2.5);
 	}
 }

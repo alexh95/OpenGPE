@@ -30,6 +30,10 @@ public abstract class BlockBehavior<M extends BlockModel> {
 		inputPorts.forEach(valueCacher -> valueCacher.setCachedValueSet(false));
 		inputPorts.forEach(valueCacher -> valueCacher.setCachedValueSet(false));
 	}
+	
+	public void run() {
+		
+	}
 
 	public M getBlockModel() {
 		return blockModel;

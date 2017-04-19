@@ -1,44 +1,40 @@
 package com.ogpe.block.wire;
 
-import com.ogpe.block.model.BlockModel;
+import com.ogpe.requester.Requester;
 
-public class WireNodeTarget {
+public class WireNodeTarget<T> {
 
-	private BlockModel blockModel;
+	private WireNodeTargetView wireNodeTargetView;
+	private WireNodeTargetType wireNodeTargetType;
 
-	private double x;
-	private double y;
+	private Requester<T> requester;
 
-	private boolean highlight;
-
-	public WireNodeTarget(double x, double y) {
-		this.x = x;
-		this.y = y;
-
-		highlight = false;
+	public WireNodeTarget(WireNodeTargetType wireNodeTargetType) {
+		this.wireNodeTargetType = wireNodeTargetType;
+		requester = null;
 	}
 
-	public double getX() {
-		return x;
+	public WireNode<T> makeWireNode() {
+		return new WireNode<>(this);
 	}
 
-	public void setX(double x) {
-		this.x = x;
+	public void initWireNodeTargetView(double x, double y) {
+		wireNodeTargetView = new WireNodeTargetView(x, y);
 	}
 
-	public double getY() {
-		return y;
+	public WireNodeTargetView getWireNodeTargetView() {
+		return wireNodeTargetView;
 	}
 
-	public void setY(double y) {
-		this.y = y;
+	public WireNodeTargetType getWireNodeTargetType() {
+		return wireNodeTargetType;
+	}
+	
+	public void setRequester(Requester<T> requester) {
+		this.requester = requester;
 	}
 
-	public boolean isHighlight() {
-		return highlight;
-	}
-
-	public void setHighlight(boolean highlight) {
-		this.highlight = highlight;
+	public Requester<T> getRequester() {
+		return requester;
 	}
 }

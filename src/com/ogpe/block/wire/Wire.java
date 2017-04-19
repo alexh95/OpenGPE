@@ -1,23 +1,20 @@
 package com.ogpe.block.wire;
 
-import com.ogpe.block.wire.model.WireModel;
-import com.ogpe.block.wire.view.WireView;
+public class Wire<T> {
 
-public class Wire {
+	private WireModel<T> wireModel;
+	private WireView<T> wireView;
 
-	private WireModel wireModel;
-	private WireView wireView;
-	
-	public Wire(WireModel wireModel) {
-		this.wireModel = wireModel;
-		wireView = new WireView(this.wireModel);
+	public Wire() {
+		wireModel = new WireModel<>();
+		wireView = new WireView<T>(wireModel);
 	}
-	
-	public WireModel getWireModel() {
+
+	public WireModel<T> getWireModel() {
 		return wireModel;
 	}
-	
-	public WireView getWireView() {
+
+	public WireView<T> getWireView() {
 		return wireView;
 	}
 }

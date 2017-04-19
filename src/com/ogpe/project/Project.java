@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.ogpe.block.Block;
+import com.ogpe.block.behaviour.BlockBehavior;
 import com.ogpe.block.implementation.AdditionBlock;
 import com.ogpe.block.implementation.ConstantBooleanBlock;
 import com.ogpe.block.implementation.ConstantNumberBlock;
@@ -23,8 +24,8 @@ import com.ogpe.block.view.implementation.ConstantNumberBlockView;
 import com.ogpe.block.view.implementation.ConstantStringBlockView;
 import com.ogpe.block.view.implementation.PrintBlockView;
 import com.ogpe.block.wire.Wire;
+import com.ogpe.block.wire.WireNode;
 import com.ogpe.block.wire.WireNodeTarget;
-import com.ogpe.block.wire.model.WireNode;
 import com.ogpe.fx.BlockSelection;
 import com.ogpe.observable.Observable;
 
@@ -82,7 +83,7 @@ public class Project {
 		deselectAllBlocks();
 		releaseMoveBlock();
 		if (hoverClosestWireNodeTarget != null) {
-			hoverClosestWireNodeTarget.setHighlight(false);
+			//hoverClosestWireNodeTarget.setHighlight(false);
 		}
 	}
 
@@ -97,19 +98,19 @@ public class Project {
 			Block<?, ?, ?> block = null;
 			switch (selectedBlock) {
 			case CONSTANT_NUMBER:
-				block = new ConstantNumberBlock(new ConstantBlockModel<BigDecimal>(BigDecimal.valueOf(0)), x, y);
+				block = new ConstantNumberBlock(x, y);
 				break;
 			case CONSTANT_BOOLEAN:
-				block = new ConstantBooleanBlock(new ConstantBlockModel<Boolean>(false), x, y);
+				block = new ConstantBooleanBlock(x, y);
 				break;
 			case CONSTANT_STRING:
-				block = new ConstantStringBlock(new ConstantBlockModel<String>("text"), x, y);
+				block = new ConstantStringBlock(x, y);
 				break;
 			case ADDITION_BLOCK:
 				block = new AdditionBlock(new AdditionBlockModel(), x, y);
 				break;
 			case PRINT:
-				block = new PrintBlock(new PrintBlockModel(() -> "printed"), x, y);
+				block = new PrintBlock(x, y);
 				break;
 			}
 			if (block != null) {
@@ -293,7 +294,7 @@ public class Project {
 	private WireNodeTarget hoverClosestWireNodeTarget;
 	
 	public void hoverWire(double x, double y) {
-		List<WireNodeTarget> wireNodeTargets = new ArrayList<>();
+		/*List<WireNodeTarget> wireNodeTargets = new ArrayList<>();
 		blocks.stream().map(block -> block.getBlockModel().getWireNodeTargets()).forEach(wireNodeTargets::addAll);
 		// Add Non-Terminal Nodes (in air)
 		hoverClosestWireNodeTarget = null;
@@ -310,7 +311,7 @@ public class Project {
 		if (hoverClosestWireNodeTarget != null) {
 			hoverClosestWireNodeTarget.setHighlight(true);
 		}
-
+*/
 	}
 
 	public void pressWire(double x, double y) {
@@ -324,6 +325,12 @@ public class Project {
 		// start wiring from the target node and add that node and choose as
 		// current wiring node
 		// else check if the target node is valid
+		
+		Block<?, ?, ?> targetBlock = new ConstantStringBlock(x, y); // Closest block (< maximal distance)
+		WireNodeTarget<?> wireNodeTarget = targetBlock.getBlockModel().getWireNodeTarget(x, y);
+		Wire<Object> wire = new Wire<>();
+		
+		wire.getWireModel().addWireNode((WireNode<Object>) wireNodeTarget.makeWireNode());
 	}
 
 	public void releaseWire(double x, double y) {
@@ -332,5 +339,11 @@ public class Project {
 
 	public void dragWire(double x, double y) {
 
+	}
+	
+	// Run
+	public void run() {
+		List<BlockBehavior<? extends BlockModel>> blockBehaviors = blocks.stream().map(block -> block.makeBlockBehavior()).collect(Collectors.toList());
+		blockBehaviors.forEach(blockBehavior -> blockBehavior.run());
 	}
 }
