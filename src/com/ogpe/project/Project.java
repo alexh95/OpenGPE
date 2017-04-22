@@ -2,13 +2,12 @@ package com.ogpe.project;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.ogpe.block.Block;
 import com.ogpe.block.factory.BlockFactory;
-import com.ogpe.block.model.BlockModel;
-import com.ogpe.block.view.BlockView;
+import com.ogpe.block.network.NetworkNode;
+import com.ogpe.block.network.NetworkNodeHighlight;
 import com.ogpe.block.view.implementation.AdditionBlockView;
 import com.ogpe.block.view.implementation.ConstantBooleanBlockView;
 import com.ogpe.block.view.implementation.ConstantNumberBlockView;
@@ -18,15 +17,19 @@ import com.ogpe.fx.BlockSelection;
 import com.ogpe.observable.Observable;
 
 import javafx.scene.Group;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class Project {
 
 	private BlockFactory blockFactory;
-	
+
 	private List<Block<?, ?>> blocks;
 
-	private boolean displayPlacing = false;
+	public List<NetworkNode<?>> networkNodes;
+
+	private boolean isDisplayPlacing = false;
 	private boolean selectedBlockPlaceble = false;
 	private Rectangle selectingBlockPlacingRectangle;
 
@@ -43,12 +46,52 @@ public class Project {
 	public Project() {
 		blockFactory = new BlockFactory();
 		blocks = new ArrayList<>();
+		networkNodes = new ArrayList<>();
+
 		selectedBlocks = new ArrayList<>();
 		movingBlock = null;
 	}
 
-	public void forEachBlockView(Consumer<? super BlockView<? extends BlockModel>> action) {
-		blocks.stream().map(block -> block.getBlockView()).forEach(action);
+	public void drawCanvas(GraphicsContext graphicsContext) {
+		blocks.forEach(block -> {
+			block.getBlockView().drawBlock(graphicsContext);
+		});
+
+		networkNodes.forEach(node -> {
+			node.drawNode(graphicsContext);
+			node.drawWire(graphicsContext);
+		});
+
+		if (isDisplayPlacing && selectingBlockPlacingRectangle != null) {
+			if (isSelectedBlockPlaceble()) {
+				graphicsContext.setStroke(Color.GREEN);
+			} else {
+				graphicsContext.setStroke(Color.RED);
+			}
+			double x = selectingBlockPlacingRectangle.getX();
+			double y = selectingBlockPlacingRectangle.getY();
+			double w = selectingBlockPlacingRectangle.getWidth();
+			double h = selectingBlockPlacingRectangle.getHeight();
+			graphicsContext.strokeRect(x + 0.5, y + 0.5, w, h);
+		}
+
+		if (isDragSelecting && dragSelectionRectangle != null) {
+			graphicsContext.setStroke(Color.GRAY);
+			double dragX = dragSelectionRectangle.getX();
+			double dragY = dragSelectionRectangle.getY();
+			double dragW = dragSelectionRectangle.getWidth();
+			double dragH = dragSelectionRectangle.getHeight();
+			graphicsContext.strokeRect(dragX + 0.5, dragY + 0.5, dragW, dragH);
+		}
+
+		if (wiring) {
+			graphicsContext.setStroke(Color.GREEN);
+			double wireX1 = Math.round(wiringStartX) - 0.5;
+			double wireY1 = Math.round(wiringStartY) - 0.5;
+			double wireX2 = Math.round(wireX) - 0.5;
+			double wireY2 = Math.round(wireY) - 0.5;
+			graphicsContext.strokeLine(wireX1, wireY1, wireX2, wireY2);
+		}
 	}
 
 	private boolean canPlace(double x, double y, double w, double h) {
@@ -62,15 +105,20 @@ public class Project {
 	}
 
 	public void resetDisplayingContext() {
-		displayPlacing = false;
+		isDisplayPlacing = false;
 		isDragSelecting = false;
 		deselectAllBlocks();
 		releaseMoveBlock();
+		networkNodes.forEach(networkNode -> {
+			if (networkNode.getHighlight() == NetworkNodeHighlight.HOVER) {
+				networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+			}
+		});
 	}
 
 	// Block Placement
 	public void startDisplayingPlacing() {
-		displayPlacing = true;
+		isDisplayPlacing = true;
 	}
 
 	public void placeBlock(double x, double y, BlockSelection selectedBlock) {
@@ -95,13 +143,14 @@ public class Project {
 				break;
 			}
 			if (block != null) {
+				networkNodes.addAll(block.getBlockModel().getNetworkNodes());
 				blocks.add(block);
 			}
 		}
 	}
 
 	public void hoverSelectedBlockPlaceble(double x, double y, BlockSelection selectedBlock) {
-		displayPlacing = true;
+		isDisplayPlacing = true;
 
 		switch (selectedBlock) {
 		case CONSTANT_NUMBER:
@@ -132,14 +181,6 @@ public class Project {
 
 	public boolean isSelectedBlockPlaceble() {
 		return selectedBlockPlaceble;
-	}
-
-	public Rectangle getSelectingBlockPlacingRectangle() {
-		if (displayPlacing) {
-			return selectingBlockPlacingRectangle;
-		} else {
-			return null;
-		}
 	}
 
 	// Block Selection
@@ -211,18 +252,11 @@ public class Project {
 	}
 
 	public void deleteSelected() {
+		blocks.forEach(block -> networkNodes.removeAll(block.getBlockModel().getNetworkNodes()));
 		blocks.removeAll(selectedBlocks);
 	}
 
-	public Rectangle getDragSelectionRectangle() {
-		if (isDragSelecting) {
-			return dragSelectionRectangle;
-		} else {
-			return null;
-		}
-	}
-
-	public void editBlock(double x, double y, Observable observable, Group panel) {
+	public void editBlock(double x, double y, Observable<?> observable, Group panel) {
 		List<Block<?, ?>> targetBlocks = blocks.stream().filter(block -> block.getBlockView().isInside(x, y))
 				.collect(Collectors.toList());
 		if (targetBlocks.size() == 1) {
@@ -272,23 +306,94 @@ public class Project {
 	}
 
 	// Wire
-	public void hoverWire(double x, double y) {
-
+	private NetworkNode<?> getClosestNetworkNode(double x, double y) {
+		double maximumDistance = 16;
+		NetworkNode<?> closestNetworkNode = null;
+		double closestNetworkNodedistance = 0;
+		for (NetworkNode<?> networkNode : networkNodes) {
+			double dx = x - networkNode.getX();
+			double dy = y - networkNode.getY();
+			double distance = Math.sqrt(dx * dx + dy * dy);
+			if (distance <= maximumDistance && (closestNetworkNode == null || distance < closestNetworkNodedistance)) {
+				closestNetworkNode = networkNode;
+				distance = closestNetworkNodedistance;
+			}
+		}
+		return closestNetworkNode;
 	}
 
+	private boolean wiring;
+	private NetworkNode<?> wiringNetworkNode;
+	private double wiringStartX;
+	private double wiringStartY;
+	private double wireX = 0;
+	private double wireY = 0;
+
+	public void hoverWire(double x, double y) {
+		networkNodes.forEach(networkNode -> {
+			switch (networkNode.getHighlight()) {
+			case HOVER:
+				networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+				break;
+			case HOVER_VALID_WIRING:
+				networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+				break;
+			default:
+				break;
+			}
+		});
+
+		NetworkNode<?> closestNetworkNode = getClosestNetworkNode(x, y);
+		if (closestNetworkNode != null) {
+			if (wiring) {
+				if (closestNetworkNode.getHighlight() == NetworkNodeHighlight.UNSET) {
+					closestNetworkNode.setHighlighted(NetworkNodeHighlight.HOVER_VALID_WIRING);
+				}
+			} else {
+				if (closestNetworkNode.getHighlight() == NetworkNodeHighlight.UNSET) {
+					closestNetworkNode.setHighlighted(NetworkNodeHighlight.HOVER);
+				}
+			}
+		}
+	}
 
 	public void pressWire(double x, double y) {
-		
+		hoverWire(x, y);
+		wiringNetworkNode = getClosestNetworkNode(x, y);
+		if (wiringNetworkNode != null) {
+			wiringNetworkNode.setHighlighted(NetworkNodeHighlight.WIRING);
+			
+			wiring = true;
+			wiringStartX = wiringNetworkNode.getX();
+			wiringStartY = wiringNetworkNode.getY();
+			dragWire(x, y);
+		}
 	}
 
 	public void releaseWire(double x, double y) {
-
+		hoverWire(x, y);
+		if (wiring) {
+			NetworkNode<?> closestNetworkNode = getClosestNetworkNode(x, y);
+			if (closestNetworkNode != null) {
+				closestNetworkNode.setNetworkNode(wiringNetworkNode);
+				wiringNetworkNode.setHighlighted(NetworkNodeHighlight.SET);
+				closestNetworkNode.setHighlighted(NetworkNodeHighlight.SET);
+			}
+			wiring = false;
+			wiringStartX = 0;
+			wiringStartY = 0;
+			wiringNetworkNode = null;
+		}
 	}
 
 	public void dragWire(double x, double y) {
-
+		hoverWire(x, y);
+		if (wiring) {
+			wireX = x;
+			wireY = y;
+		}
 	}
-	
+
 	// Run
 	public void run() {
 		blocks.forEach(block -> block.run());

@@ -12,6 +12,7 @@ import com.ogpe.block.implementation.ConstantNumberBlock;
 import com.ogpe.block.implementation.ConstantStringBlock;
 import com.ogpe.block.implementation.PrintBlock;
 import com.ogpe.block.network.InputNetworkNode;
+import com.ogpe.block.type.DataType;
 
 public class BlockTest {
 
@@ -59,8 +60,8 @@ public class BlockTest {
 
 		BlockFactory blockFactory = new BlockFactory();
 		AdditionBlock additionBlock = blockFactory.makeAdditionBlock(0, 0);
-		additionBlock.getBlockModel().setFirstOperandNetworkNode(new InputNetworkNode<>(() -> firstOperand));
-		additionBlock.getBlockModel().setSecondOperandNetworkNode(new InputNetworkNode<>(() -> secondOperand));
+		additionBlock.getBlockModel().setFirstOperandNetworkNode(new InputNetworkNode<>(DataType.NUMBER, () -> firstOperand));
+		additionBlock.getBlockModel().setSecondOperandNetworkNode(new InputNetworkNode<>(DataType.NUMBER, () -> secondOperand));
 		BigDecimal returnedValue = additionBlock.getBlockModel().getResultInputNetworkNode().getValue();
 		
 		Assert.assertEquals(additionResult, returnedValue);
@@ -72,7 +73,7 @@ public class BlockTest {
 
 		BlockFactory blockFactory = new BlockFactory();
 		PrintBlock printBlock = blockFactory.makePrintBlock(0, 0);
-		printBlock.getBlockModel().setPrintValueNetworkNode(new InputNetworkNode<>(() -> printValue));
+		printBlock.getBlockModel().setPrintValueNetworkNode(new InputNetworkNode<>(DataType.NUMBER, () -> printValue));
 		Object returnedValue = printBlock.getBlockModel().getPrintValueNetworkNode().getValue();
 		
 		Assert.assertEquals(printValue, returnedValue);

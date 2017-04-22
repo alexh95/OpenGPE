@@ -5,39 +5,46 @@ import java.math.BigDecimal;
 import com.ogpe.block.model.BlockModel;
 import com.ogpe.block.network.InputNetworkNode;
 import com.ogpe.block.network.NetworkNode;
+import com.ogpe.block.network.OutputNetworkNode;
+import com.ogpe.block.type.DataType;
 
 public class AdditionBlockModel extends BlockModel {
 
-	private NetworkNode<BigDecimal> firstOperandNetworkNode;
-	private NetworkNode<BigDecimal> secondOperandNetworkNode;
+	private OutputNetworkNode<BigDecimal> firstOperandOutputNetworkNode;
+	private OutputNetworkNode<BigDecimal> secondOperandOutputNetworkNode;
 
 	private InputNetworkNode<BigDecimal> resultInputNetworkNode;
 
 	public AdditionBlockModel() {
 		super();
-		resultInputNetworkNode = new InputNetworkNode<>(() -> getResult());
+		firstOperandOutputNetworkNode = new OutputNetworkNode<>(DataType.NUMBER);
+		secondOperandOutputNetworkNode = new OutputNetworkNode<>(DataType.NUMBER);
+		resultInputNetworkNode = new InputNetworkNode<>(DataType.NUMBER, () -> getResult());
+		addNetworkNode(firstOperandOutputNetworkNode);
+		addNetworkNode(secondOperandOutputNetworkNode);
+		addNetworkNode(resultInputNetworkNode);
 	}
 
 	private BigDecimal getResult() {
-		BigDecimal firstOperand = firstOperandNetworkNode.getValue();
-		BigDecimal secondOperand = secondOperandNetworkNode.getValue();
+		BigDecimal firstOperand = firstOperandOutputNetworkNode.getValue();
+		BigDecimal secondOperand = secondOperandOutputNetworkNode.getValue();
 		return firstOperand.add(secondOperand);
 	}
 
-	public NetworkNode<BigDecimal> getFirstOperandNetworkNode() {
-		return firstOperandNetworkNode;
+	public OutputNetworkNode<BigDecimal> getFirstOperandNetworkNode() {
+		return firstOperandOutputNetworkNode;
 	}
 
 	public void setFirstOperandNetworkNode(NetworkNode<BigDecimal> firstOperandNetworkNode) {
-		this.firstOperandNetworkNode = firstOperandNetworkNode;
+		firstOperandOutputNetworkNode.setNetworkNode(firstOperandNetworkNode);
 	}
 
-	public NetworkNode<BigDecimal> getSecondOperandNetworkNode() {
-		return secondOperandNetworkNode;
+	public OutputNetworkNode<BigDecimal> getSecondOperandNetworkNode() {
+		return secondOperandOutputNetworkNode;
 	}
 
 	public void setSecondOperandNetworkNode(NetworkNode<BigDecimal> secondOperandNetworkNode) {
-		this.secondOperandNetworkNode = secondOperandNetworkNode;
+		secondOperandOutputNetworkNode.setNetworkNode(secondOperandNetworkNode);
 	}
 
 	public InputNetworkNode<BigDecimal> getResultInputNetworkNode() {

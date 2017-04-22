@@ -13,11 +13,21 @@ import javafx.scene.text.TextAlignment;
 
 public class AdditionBlockView extends BlockView<AdditionBlockModel> {
 
-	public static final double WIDTH = 25;
-	public static final double HEIGHT = 20;
+	public static final double WIDTH = 26;
+	public static final double HEIGHT = 21;
 
 	public AdditionBlockView(AdditionBlockModel additionBlockModel) {
 		super(additionBlockModel, WIDTH, HEIGHT);
+		addXObserver(x -> {
+			getBlockModel().getFirstOperandNetworkNode().setX(x + getEW() / 4);
+			getBlockModel().getSecondOperandNetworkNode().setX(x + 3 * getEW() / 4);
+			getBlockModel().getResultInputNetworkNode().setX(x + getEW() / 2);
+		});
+		addYObserver(y -> {
+			getBlockModel().getFirstOperandNetworkNode().setY(y + 2.5);
+			getBlockModel().getSecondOperandNetworkNode().setY(y + 2.5);
+			getBlockModel().getResultInputNetworkNode().setY(y + getEH() - 2.5);
+		});
 	}
 
 	@Override
@@ -79,7 +89,7 @@ public class AdditionBlockView extends BlockView<AdditionBlockModel> {
 	}
 
 	@Override
-	protected Node getEditingPane(Observable observable) {
+	protected Node getEditingPane(Observable<?> observable) {
 		VBox editingPane = new VBox();
 		return editingPane;
 	}

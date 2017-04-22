@@ -2,6 +2,7 @@ package com.ogpe.block.view;
 
 import com.ogpe.block.model.BlockModel;
 import com.ogpe.observable.Observable;
+import com.ogpe.observable.Observer;
 
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -10,6 +11,9 @@ import javafx.scene.canvas.GraphicsContext;
 public abstract class BlockView<M extends BlockModel> {
 
 	private M blockModel;
+
+	private Observable<Double> xObservable;
+	private Observable<Double> yObservable;
 
 	private double x;
 	private double y;
@@ -21,6 +25,8 @@ public abstract class BlockView<M extends BlockModel> {
 
 	public BlockView(M blockModel, double w, double h) {
 		this.blockModel = blockModel;
+		xObservable = new Observable<>();
+		yObservable = new Observable<>();
 		setX(0);
 		setY(0);
 		setW(w);
@@ -35,13 +41,13 @@ public abstract class BlockView<M extends BlockModel> {
 		panel.getChildren().clear();
 	}
 
-	public void populateEditPanel(Observable observable, Group panel) {
+	public void populateEditPanel(Observable<?> observable, Group panel) {
 		Node editingPanel = getEditingPane(observable);
 		clearEditPanel(panel);
 		panel.getChildren().add(editingPanel);
 	};
 
-	protected abstract Node getEditingPane(Observable observable);
+	protected abstract Node getEditingPane(Observable<?> observable);
 
 	public boolean isInside(double x, double y) {
 		return this.x <= x && x <= this.x + this.w && this.y <= y && y <= this.y + this.h;
@@ -55,12 +61,21 @@ public abstract class BlockView<M extends BlockModel> {
 		return blockModel;
 	}
 
+	public void addXObserver(Observer<Double> observer) {
+		xObservable.addObserver(observer);
+	}
+
+	public void addYObserver(Observer<Double> observer) {
+		yObservable.addObserver(observer);
+	}
+
 	public double getX() {
 		return x;
 	}
 
 	public void setX(double x) {
 		this.x = x;
+		xObservable.updateObservers(x);
 	}
 
 	public double getY() {
@@ -69,10 +84,15 @@ public abstract class BlockView<M extends BlockModel> {
 
 	public void setY(double y) {
 		this.y = y;
+		yObservable.updateObservers(y);
 	}
 
 	public double getW() {
 		return w;
+	}
+	
+	public double getEW() {
+		return w + 1;
 	}
 
 	public void setW(double w) {
@@ -81,6 +101,10 @@ public abstract class BlockView<M extends BlockModel> {
 
 	public double getH() {
 		return h;
+	}
+	
+	public double getEH() {
+		return h + 1;
 	}
 
 	public void setH(double h) {

@@ -2,24 +2,29 @@ package com.ogpe.block.model.implementation;
 
 import com.ogpe.block.model.BlockModel;
 import com.ogpe.block.network.NetworkNode;
+import com.ogpe.block.network.OutputNetworkNode;
+import com.ogpe.block.type.DataType;
 
 public class PrintBlockModel extends BlockModel {
 
-	private NetworkNode<? extends Object> printValueNetworkNode;
+	private OutputNetworkNode<Object> printValueOutputNetworkNode;
 
 	public PrintBlockModel() {
 		super();
+		printValueOutputNetworkNode = new OutputNetworkNode<>(DataType.ANY);
+		addNetworkNode(printValueOutputNetworkNode);
 	}
 
 	public Object getPrintValue() {
-		return printValueNetworkNode.getValue();
+		return printValueOutputNetworkNode.getValue();
 	}
 
-	public NetworkNode<? extends Object> getPrintValueNetworkNode() {
-		return printValueNetworkNode;
+	public OutputNetworkNode<Object> getPrintValueNetworkNode() {
+		return printValueOutputNetworkNode;
 	}
 
-	public void setPrintValueNetworkNode(NetworkNode<? extends Object> printValueNetworkNode) {
-		this.printValueNetworkNode = printValueNetworkNode;
+	@SuppressWarnings("unchecked")
+	public void setPrintValueNetworkNode(NetworkNode<?> printValueNetworkNode) {
+		printValueOutputNetworkNode.setNetworkNode((NetworkNode<Object>) printValueNetworkNode);
 	}
 }

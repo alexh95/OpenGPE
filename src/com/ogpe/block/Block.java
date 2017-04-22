@@ -11,6 +11,7 @@ public abstract class Block<M extends BlockModel, V extends BlockView<M>> {
 	public Block(M blockModel, V blockView) {
 		this.blockModel = blockModel;
 		this.blockView = blockView;
+
 	}
 
 	public M getBlockModel() {
@@ -20,7 +21,7 @@ public abstract class Block<M extends BlockModel, V extends BlockView<M>> {
 	public V getBlockView() {
 		return blockView;
 	}
-	
+
 	public void run() {
 	}
 }

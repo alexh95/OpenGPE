@@ -24,8 +24,6 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class MainWindow extends Application {
@@ -60,35 +58,9 @@ public class MainWindow extends Application {
 		canvasPane = new CanvasPane();
 		root.setCenter(canvasPane);
 		project = new Project();
-		canvasPane.setDrawer(graphicsContext -> {
-			project.forEachBlockView(blockView -> {
-				blockView.drawBlock(graphicsContext);
-			});
-			Rectangle placingRectangle = project.getSelectingBlockPlacingRectangle();
-			if (placingRectangle != null) {
-				if (project.isSelectedBlockPlaceble()) {
-					graphicsContext.setStroke(Color.GREEN);
-				} else {
-					graphicsContext.setStroke(Color.RED);
-				}
-				double x = placingRectangle.getX();
-				double y = placingRectangle.getY();
-				double w = placingRectangle.getWidth();
-				double h = placingRectangle.getHeight();
-				graphicsContext.strokeRect(x + 0.5, y + 0.5, w, h);
-			}
-			Rectangle dragSelectionRectangle = project.getDragSelectionRectangle();
-			if (dragSelectionRectangle != null) {
-				graphicsContext.setStroke(Color.GRAY);
-				double dragX = dragSelectionRectangle.getX();
-				double dragY = dragSelectionRectangle.getY();
-				double dragW = dragSelectionRectangle.getWidth();
-				double dragH = dragSelectionRectangle.getHeight();
-				graphicsContext.strokeRect(dragX + 0.5, dragY + 0.5, dragW, dragH);
-			}
-		});
-		Observable canvasPaneObservable = new Observable();
-		canvasPaneObservable.addObserver(() -> canvasPane.redraw());
+		canvasPane.setDrawer(project::drawCanvas);
+		Observable<?> canvasPaneObservable = new Observable<>();
+		canvasPaneObservable.addObserver(value -> canvasPane.redraw());
 		canvasPane.setOnMouseMoved(event -> {
 			double x = event.getX();
 			double y = event.getY();

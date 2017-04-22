@@ -15,8 +15,8 @@ import javafx.scene.text.TextAlignment;
 
 public class ConstantBooleanBlockView extends ConstantBlockView<Boolean> {
 
-	public static final double WIDTH = 19;
-	public static final double HEIGHT = 20;
+	public static final double WIDTH = 20;
+	public static final double HEIGHT = 22;
 
 	public ConstantBooleanBlockView(ConstantBlockModel<Boolean> constantBlockModel) {
 		super(constantBlockModel, WIDTH, HEIGHT);
@@ -70,7 +70,7 @@ public class ConstantBooleanBlockView extends ConstantBlockView<Boolean> {
 	}
 
 	@Override
-	protected Node getEditingPane(Observable observable) {
+	protected Node getEditingPane(Observable<?> observable) {
 		VBox editingPane = new VBox();
 		Label booleanValueLabel = new Label("Value:");
 		ComboBox<Boolean> booleanValueComboBox = new ComboBox<>();
@@ -86,7 +86,7 @@ public class ConstantBooleanBlockView extends ConstantBlockView<Boolean> {
 		updateButton.setOnAction(event -> {
 			Boolean value = booleanValueComboBox.getValue();
 			getBlockModel().setConstantValue(value);
-			observable.updateObservers();
+			observable.updateObservers(null);
 		});
 		return editingPane;
 	}

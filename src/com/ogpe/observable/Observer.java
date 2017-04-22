@@ -1,6 +1,6 @@
 package com.ogpe.observable;
 
 @FunctionalInterface
-public interface Observer {
-	void update();
+public interface Observer<T> {
+	void update(T value);
 }

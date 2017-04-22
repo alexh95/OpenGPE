@@ -17,8 +17,8 @@ import javafx.scene.text.TextAlignment;
 
 public class ConstantNumberBlockView extends ConstantBlockView<BigDecimal> {
 
-	public static final double WIDTH = 45;
-	public static final double HEIGHT = 20;
+	public static final double WIDTH = 46;
+	public static final double HEIGHT = 21;
 
 	public ConstantNumberBlockView(ConstantNumberBlockModel constantNumberBlockModel) {
 		super(constantNumberBlockModel, WIDTH, HEIGHT);
@@ -65,7 +65,7 @@ public class ConstantNumberBlockView extends ConstantBlockView<BigDecimal> {
 	}
 
 	@Override
-	protected Node getEditingPane(Observable observable) {
+	protected Node getEditingPane(Observable<?> observable) {
 		VBox editingPane = new VBox();
 		Label numberValueLabel = new Label("Value:");
 		TextField numberValueTextField = new TextField();
@@ -86,7 +86,7 @@ public class ConstantNumberBlockView extends ConstantBlockView<BigDecimal> {
 			} catch (NumberFormatException e) {
 				numberValueResultLabel.setText("Invalid value");
 			}
-			observable.updateObservers();
+			observable.updateObservers(null);
 		});
 		return editingPane;
 	}

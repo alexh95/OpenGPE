@@ -10,6 +10,8 @@ import com.ogpe.block.implementation.AdditionBlock;
 import com.ogpe.block.implementation.ConstantNumberBlock;
 import com.ogpe.block.implementation.ConstantStringBlock;
 import com.ogpe.block.implementation.PrintBlock;
+import com.ogpe.block.network.ThroughputNetworkNode;
+import com.ogpe.block.type.DataType;
 
 public class NetworkTest {
 
@@ -39,15 +41,24 @@ public class NetworkTest {
 		ConstantNumberBlock firstOperandConstantNumberBlock = blockFactory.makeConstantNumberBlock(0, 0);
 		firstOperandConstantNumberBlock.getBlockModel().setConstantValue(firstOperand);
 		
+		ThroughputNetworkNode<BigDecimal> firstOperandNode = new ThroughputNetworkNode<>(DataType.NUMBER);
+		firstOperandNode.setNetworkNode(firstOperandConstantNumberBlock.getBlockModel().getConstantValueInputNetworkNode());
+		
 		ConstantNumberBlock secondOperandConstantNumberBlock = blockFactory.makeConstantNumberBlock(0, 0);
 		secondOperandConstantNumberBlock.getBlockModel().setConstantValue(secondOperand);
 		
+		ThroughputNetworkNode<BigDecimal> secondOperandNode = new ThroughputNetworkNode<>(DataType.NUMBER);
+		secondOperandNode.setNetworkNode(secondOperandConstantNumberBlock.getBlockModel().getConstantValueInputNetworkNode());
+		
 		AdditionBlock additionBlock = blockFactory.makeAdditionBlock(0, 0);
-		additionBlock.getBlockModel().setFirstOperandNetworkNode(firstOperandConstantNumberBlock.getBlockModel().getConstantValueInputNetworkNode());
-		additionBlock.getBlockModel().setSecondOperandNetworkNode(secondOperandConstantNumberBlock.getBlockModel().getConstantValueInputNetworkNode());
+		additionBlock.getBlockModel().setFirstOperandNetworkNode(firstOperandNode.getNetworkNode());
+		additionBlock.getBlockModel().setSecondOperandNetworkNode(secondOperandNode.getNetworkNode());
+		
+		ThroughputNetworkNode<BigDecimal> resultNode = new ThroughputNetworkNode<>(DataType.NUMBER);
+		resultNode.setNetworkNode(additionBlock.getBlockModel().getResultInputNetworkNode());
 		
 		PrintBlock printBlock = blockFactory.makePrintBlock(0, 0);
-		printBlock.getBlockModel().setPrintValueNetworkNode(additionBlock.getBlockModel().getResultInputNetworkNode());
+		printBlock.getBlockModel().setPrintValueNetworkNode(resultNode.getNetworkNode());
 		BigDecimal returnedValue = (BigDecimal) printBlock.getBlockModel().getPrintValue();
 		
 		Assert.assertEquals(additionResult, returnedValue);
@@ -63,15 +74,24 @@ public class NetworkTest {
 		ConstantNumberBlock firstOperandConstantNumberBlock = blockFactory.makeConstantNumberBlock(0, 0);
 		firstOperandConstantNumberBlock.getBlockModel().setConstantValue(firstOperand);
 		
+		ThroughputNetworkNode<BigDecimal> firstOperandNode = new ThroughputNetworkNode<>(DataType.NUMBER);
+		firstOperandNode.setNetworkNode(firstOperandConstantNumberBlock.getBlockModel().getConstantValueInputNetworkNode());
+		
 		ConstantNumberBlock secondOperandConstantNumberBlock = blockFactory.makeConstantNumberBlock(0, 0);
 		secondOperandConstantNumberBlock.getBlockModel().setConstantValue(secondOperand);
 		
+		ThroughputNetworkNode<BigDecimal> secondOperandNode = new ThroughputNetworkNode<>(DataType.NUMBER);
+		secondOperandNode.setNetworkNode(secondOperandConstantNumberBlock.getBlockModel().getConstantValueInputNetworkNode());
+		
 		AdditionBlock additionBlock = blockFactory.makeAdditionBlock(0, 0);
-		additionBlock.getBlockModel().setFirstOperandNetworkNode(firstOperandConstantNumberBlock.getBlockModel().getConstantValueInputNetworkNode());
-		additionBlock.getBlockModel().setSecondOperandNetworkNode(secondOperandConstantNumberBlock.getBlockModel().getConstantValueInputNetworkNode());
+		additionBlock.getBlockModel().setFirstOperandNetworkNode(firstOperandNode.getNetworkNode());
+		additionBlock.getBlockModel().setSecondOperandNetworkNode(secondOperandNode.getNetworkNode());
+		
+		ThroughputNetworkNode<BigDecimal> resultNode = new ThroughputNetworkNode<>(DataType.NUMBER);
+		resultNode.setNetworkNode(additionBlock.getBlockModel().getResultInputNetworkNode());
 		
 		PrintBlock printBlock = blockFactory.makePrintBlock(0, 0);
-		printBlock.getBlockModel().setPrintValueNetworkNode(additionBlock.getBlockModel().getResultInputNetworkNode());
+		printBlock.getBlockModel().setPrintValueNetworkNode(resultNode.getNetworkNode());
 		
 		printBlock.run();
 	}

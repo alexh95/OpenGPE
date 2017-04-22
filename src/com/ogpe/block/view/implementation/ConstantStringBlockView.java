@@ -15,8 +15,8 @@ import javafx.scene.text.TextAlignment;
 
 public class ConstantStringBlockView extends ConstantBlockView<String> {
 
-	public static final double WIDTH = 63;
-	public static final double HEIGHT = 20;
+	public static final double WIDTH = 64;
+	public static final double HEIGHT = 21;
 
 	public ConstantStringBlockView(ConstantStringBlockModel constantStringBlockModel) {
 		super(constantStringBlockModel, WIDTH, HEIGHT);
@@ -63,7 +63,7 @@ public class ConstantStringBlockView extends ConstantBlockView<String> {
 	}
 
 	@Override
-	protected Node getEditingPane(Observable observable) {
+	protected Node getEditingPane(Observable<?> observable) {
 		VBox editingPane = new VBox();
 		Label stringValueLabel = new Label("Value:");
 		TextField stringValueTextField = new TextField();
@@ -77,7 +77,7 @@ public class ConstantStringBlockView extends ConstantBlockView<String> {
 		updateButton.setOnAction(event -> {
 			String value = stringValueTextField.getText();
 			getBlockModel().setConstantValue(value);
-			observable.updateObservers();
+			observable.updateObservers(null);
 		});
 		return editingPane;
 	}

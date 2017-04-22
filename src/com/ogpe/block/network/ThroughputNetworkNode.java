@@ -1,23 +1,30 @@
 package com.ogpe.block.network;
 
+import com.ogpe.block.type.DataType;
+
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+
 public class ThroughputNetworkNode<T> extends NetworkNode<T> {
 
-	private NetworkNode<T> networkNode;
-
-	public ThroughputNetworkNode() {
-		super();
+	public ThroughputNetworkNode(DataType dataType) {
+		super(dataType);
 	}
-	
+
 	@Override
 	public T getValue() {
-		return networkNode.getValue();
-	}
-	
-	public NetworkNode<T> getNetworkNode() {
-		return networkNode;
+		return getNetworkNode().getValue();
 	}
 
-	public void setNetworkNode(NetworkNode<T> networkNode) {
-		this.networkNode = networkNode;
+	@Override
+	public void drawNode(GraphicsContext graphicsContext) {
+		graphicsContext.setFill(getHighlight().getColor());
+
+		graphicsContext.setFill(Color.RED);
+		double nodeX = getX() - 2;
+		double nodeY = getY() - 2;
+		double nodeW = 2;
+		double nodeH = 2;
+		graphicsContext.fillOval(nodeX, nodeY, nodeW, nodeH);
 	}
 }

@@ -7,5 +7,7 @@ public abstract class ConstantBlockView<T> extends BlockView<ConstantBlockModel<
 
 	public ConstantBlockView(ConstantBlockModel<T> constantBlockModel, double w, double h) {
 		super(constantBlockModel, w, h);
+		addXObserver(x -> getBlockModel().getConstantValueInputNetworkNode().setX(x + getEW() / 2));
+		addYObserver(y -> getBlockModel().getConstantValueInputNetworkNode().setY(y + getEH() - 2.5));
 	}
 }

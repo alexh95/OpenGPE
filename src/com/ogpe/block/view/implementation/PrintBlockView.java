@@ -13,11 +13,13 @@ import javafx.scene.text.TextAlignment;
 
 public class PrintBlockView extends BlockView<PrintBlockModel> {
 
-	public static final double WIDTH = 41;
-	public static final double HEIGHT = 21;
+	public static final double WIDTH = 42;
+	public static final double HEIGHT = 22;
 
 	public PrintBlockView(PrintBlockModel printBlockModel) {
 		super(printBlockModel, WIDTH, HEIGHT);
+		addXObserver(x -> getBlockModel().getPrintValueNetworkNode().setX(x + getEW() / 2));
+		addYObserver(y -> getBlockModel().getPrintValueNetworkNode().setY(y + 2.5));
 	}
 
 	@Override
@@ -64,7 +66,7 @@ public class PrintBlockView extends BlockView<PrintBlockModel> {
 	}
 
 	@Override
-	protected Node getEditingPane(Observable observable) {
+	protected Node getEditingPane(Observable<?> observable) {
 		VBox editingPane = new VBox();
 		return editingPane;
 	}

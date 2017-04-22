@@ -2,6 +2,7 @@ package com.ogpe.block.model.implementation;
 
 import com.ogpe.block.model.BlockModel;
 import com.ogpe.block.network.InputNetworkNode;
+import com.ogpe.block.type.DataType;
 
 public abstract class ConstantBlockModel<T> extends BlockModel {
 
@@ -9,10 +10,11 @@ public abstract class ConstantBlockModel<T> extends BlockModel {
 
 	private InputNetworkNode<T> constantValueInputNetworkNode;
 
-	public ConstantBlockModel(T constantValue) {
+	public ConstantBlockModel(DataType dataType, T constantValue) {
 		super();
 		setConstantValue(constantValue);
-		constantValueInputNetworkNode = new InputNetworkNode<>(() -> getConstantValue());
+		constantValueInputNetworkNode = new InputNetworkNode<>(dataType, () -> getConstantValue());
+		addNetworkNode(constantValueInputNetworkNode);
 	}
 
 	public T getConstantValue() {
