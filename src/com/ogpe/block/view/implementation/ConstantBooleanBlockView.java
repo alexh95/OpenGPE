@@ -18,8 +18,8 @@ public class ConstantBooleanBlockView extends ConstantBlockView<Boolean> {
 	public static final double WIDTH = 19;
 	public static final double HEIGHT = 20;
 
-	public ConstantBooleanBlockView(ConstantBlockModel<Boolean> constantBlockModel, double x, double y) {
-		super(constantBlockModel, x, y, WIDTH, HEIGHT);
+	public ConstantBooleanBlockView(ConstantBlockModel<Boolean> constantBlockModel) {
+		super(constantBlockModel, WIDTH, HEIGHT);
 	}
 
 	@Override

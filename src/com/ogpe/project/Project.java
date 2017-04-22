@@ -1,31 +1,19 @@
 package com.ogpe.project;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.ogpe.block.Block;
-import com.ogpe.block.behaviour.BlockBehavior;
-import com.ogpe.block.implementation.AdditionBlock;
-import com.ogpe.block.implementation.ConstantBooleanBlock;
-import com.ogpe.block.implementation.ConstantNumberBlock;
-import com.ogpe.block.implementation.ConstantStringBlock;
-import com.ogpe.block.implementation.PrintBlock;
+import com.ogpe.block.factory.BlockFactory;
 import com.ogpe.block.model.BlockModel;
-import com.ogpe.block.model.implementation.AdditionBlockModel;
-import com.ogpe.block.model.implementation.ConstantBlockModel;
-import com.ogpe.block.model.implementation.PrintBlockModel;
 import com.ogpe.block.view.BlockView;
 import com.ogpe.block.view.implementation.AdditionBlockView;
 import com.ogpe.block.view.implementation.ConstantBooleanBlockView;
 import com.ogpe.block.view.implementation.ConstantNumberBlockView;
 import com.ogpe.block.view.implementation.ConstantStringBlockView;
 import com.ogpe.block.view.implementation.PrintBlockView;
-import com.ogpe.block.wire.Wire;
-import com.ogpe.block.wire.WireNode;
-import com.ogpe.block.wire.WireNodeTarget;
 import com.ogpe.fx.BlockSelection;
 import com.ogpe.observable.Observable;
 
@@ -34,33 +22,29 @@ import javafx.scene.shape.Rectangle;
 
 public class Project {
 
-	private List<Block<?, ?, ?>> blocks;
+	private BlockFactory blockFactory;
+	
+	private List<Block<?, ?>> blocks;
 
 	private boolean displayPlacing = false;
 	private boolean selectedBlockPlaceble = false;
 	private Rectangle selectingBlockPlacingRectangle;
 
-	private List<Block<?, ?, ?>> selectedBlocks;
+	private List<Block<?, ?>> selectedBlocks;
 	private boolean isDragSelecting = false;
 	private double startDragSelectionX;
 	private double startDragSelectionY;
 	private Rectangle dragSelectionRectangle;
 
-	private Block<?, ?, ?> movingBlock;
+	private Block<?, ?> movingBlock;
 	private double movingBlockOffsetX;
 	private double movingBlockOffsetY;
 
-	private List<Wire> wires;
-	private boolean currentlyWiring = false;
-	private Wire currentWire;
-	private WireNode currentWireNode;
-
 	public Project() {
+		blockFactory = new BlockFactory();
 		blocks = new ArrayList<>();
 		selectedBlocks = new ArrayList<>();
 		movingBlock = null;
-
-		wires = new ArrayList<>();
 	}
 
 	public void forEachBlockView(Consumer<? super BlockView<? extends BlockModel>> action) {
@@ -69,7 +53,7 @@ public class Project {
 
 	private boolean canPlace(double x, double y, double w, double h) {
 		boolean intersects = false;
-		for (Block<?, ?, ?> block : blocks) {
+		for (Block<?, ?> block : blocks) {
 			if (!block.getBlockView().isMoving()) {
 				intersects |= block.getBlockView().intersects(x, y, w, h);
 			}
@@ -82,9 +66,6 @@ public class Project {
 		isDragSelecting = false;
 		deselectAllBlocks();
 		releaseMoveBlock();
-		if (hoverClosestWireNodeTarget != null) {
-			//hoverClosestWireNodeTarget.setHighlight(false);
-		}
 	}
 
 	// Block Placement
@@ -95,22 +76,22 @@ public class Project {
 	public void placeBlock(double x, double y, BlockSelection selectedBlock) {
 		hoverSelectedBlockPlaceble(x, y, selectedBlock);
 		if (selectedBlockPlaceble) {
-			Block<?, ?, ?> block = null;
+			Block<?, ?> block = null;
 			switch (selectedBlock) {
 			case CONSTANT_NUMBER:
-				block = new ConstantNumberBlock(x, y);
+				block = blockFactory.makeConstantNumberBlock(x, y);
 				break;
 			case CONSTANT_BOOLEAN:
-				block = new ConstantBooleanBlock(x, y);
+				block = blockFactory.makeConstantBooleanBlock(x, y);
 				break;
 			case CONSTANT_STRING:
-				block = new ConstantStringBlock(x, y);
+				block = blockFactory.makeConstantStringBlock(x, y);
 				break;
 			case ADDITION_BLOCK:
-				block = new AdditionBlock(new AdditionBlockModel(), x, y);
+				block = blockFactory.makeAdditionBlock(x, y);
 				break;
 			case PRINT:
-				block = new PrintBlock(x, y);
+				block = blockFactory.makePrintBlock(x, y);
 				break;
 			}
 			if (block != null) {
@@ -162,14 +143,14 @@ public class Project {
 	}
 
 	// Block Selection
-	private void selectBlock(Block<?, ?, ?> block) {
+	private void selectBlock(Block<?, ?> block) {
 		if (!selectedBlocks.contains(block)) {
 			selectedBlocks.add(block);
 			block.getBlockView().setSelected(true);
 		}
 	}
 
-	private void deselectBlock(Block<?, ?, ?> block) {
+	private void deselectBlock(Block<?, ?> block) {
 		if (selectedBlocks.contains(block)) {
 			selectedBlocks.remove(block);
 			block.getBlockView().setSelected(false);
@@ -192,7 +173,7 @@ public class Project {
 
 	public void releaseSelectBlock(double x, double y, boolean multipleSelection) {
 		if (!isDragSelecting) {
-			List<Block<?, ?, ?>> targetBlocks = blocks.stream().filter(block -> block.getBlockView().isInside(x, y))
+			List<Block<?, ?>> targetBlocks = blocks.stream().filter(block -> block.getBlockView().isInside(x, y))
 					.collect(Collectors.toList());
 
 			if (multipleSelection) {
@@ -219,7 +200,7 @@ public class Project {
 		double dragW = Math.abs(startDragSelectionX - x);
 		double dragH = Math.abs(startDragSelectionY - y);
 		dragSelectionRectangle = new Rectangle(dragX, dragY, dragW, dragH);
-		List<Block<?, ?, ?>> targetBlocks = blocks.stream()
+		List<Block<?, ?>> targetBlocks = blocks.stream()
 				.filter(block -> block.getBlockView().intersects(dragX, dragY, dragW, dragH))
 				.collect(Collectors.toList());
 
@@ -242,10 +223,10 @@ public class Project {
 	}
 
 	public void editBlock(double x, double y, Observable observable, Group panel) {
-		List<Block<?, ?, ?>> targetBlocks = blocks.stream().filter(block -> block.getBlockView().isInside(x, y))
+		List<Block<?, ?>> targetBlocks = blocks.stream().filter(block -> block.getBlockView().isInside(x, y))
 				.collect(Collectors.toList());
 		if (targetBlocks.size() == 1) {
-			Block<?, ?, ?> targetBlock = targetBlocks.get(0);
+			Block<?, ?> targetBlock = targetBlocks.get(0);
 			targetBlock.getBlockView().populateEditPanel(observable, panel);
 		} else {
 			panel.getChildren().clear();
@@ -254,8 +235,8 @@ public class Project {
 
 	// Block Move
 	public void pressMoveBlock(double x, double y) {
-		Block<?, ?, ?> selectedBlock = null;
-		for (Block<?, ?, ?> block : blocks) {
+		Block<?, ?> selectedBlock = null;
+		for (Block<?, ?> block : blocks) {
 			if (block.getBlockView().isInside(x, y)) {
 				selectedBlock = block;
 			}
@@ -291,46 +272,13 @@ public class Project {
 	}
 
 	// Wire
-	private WireNodeTarget hoverClosestWireNodeTarget;
-	
 	public void hoverWire(double x, double y) {
-		/*List<WireNodeTarget> wireNodeTargets = new ArrayList<>();
-		blocks.stream().map(block -> block.getBlockModel().getWireNodeTargets()).forEach(wireNodeTargets::addAll);
-		// Add Non-Terminal Nodes (in air)
-		hoverClosestWireNodeTarget = null;
-		double closestWireNodeTargetDistance = 0;
-		for (WireNodeTarget wireNodeTarget : wireNodeTargets) {
-			double dx = wireNodeTarget.getX() - x;
-			double dy = wireNodeTarget.getY() - y;
-			double distance = Math.sqrt(dx * dx + dy * dy);
-			if (hoverClosestWireNodeTarget == null || closestWireNodeTargetDistance > distance) {
-				hoverClosestWireNodeTarget = wireNodeTarget;
-				closestWireNodeTargetDistance = distance;
-			}
-		}
-		if (hoverClosestWireNodeTarget != null) {
-			hoverClosestWireNodeTarget.setHighlight(true);
-		}
-*/
+
 	}
 
+
 	public void pressWire(double x, double y) {
-		if (!currentlyWiring) {
-
-		} else {
-
-		}
-
-		// if not already wiring
-		// start wiring from the target node and add that node and choose as
-		// current wiring node
-		// else check if the target node is valid
 		
-		Block<?, ?, ?> targetBlock = new ConstantStringBlock(x, y); // Closest block (< maximal distance)
-		WireNodeTarget<?> wireNodeTarget = targetBlock.getBlockModel().getWireNodeTarget(x, y);
-		Wire<Object> wire = new Wire<>();
-		
-		wire.getWireModel().addWireNode((WireNode<Object>) wireNodeTarget.makeWireNode());
 	}
 
 	public void releaseWire(double x, double y) {
@@ -343,7 +291,6 @@ public class Project {
 	
 	// Run
 	public void run() {
-		List<BlockBehavior<? extends BlockModel>> blockBehaviors = blocks.stream().map(block -> block.makeBlockBehavior()).collect(Collectors.toList());
-		blockBehaviors.forEach(blockBehavior -> blockBehavior.run());
+		blocks.forEach(block -> block.run());
 	}
 }

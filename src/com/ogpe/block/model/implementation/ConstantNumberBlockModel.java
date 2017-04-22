@@ -1,10 +1,10 @@
 package com.ogpe.block.model.implementation;
 
-import java.math.BigInteger;
+import java.math.BigDecimal;
 
-public class ConstantNumberBlockModel extends ConstantBlockModel<BigInteger> {
+public class ConstantNumberBlockModel extends ConstantBlockModel<BigDecimal> {
 
 	public ConstantNumberBlockModel() {
-		super(BigInteger.valueOf(0));
+		super(BigDecimal.valueOf(0));
 	}
 }

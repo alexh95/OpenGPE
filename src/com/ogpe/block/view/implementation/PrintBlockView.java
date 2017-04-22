@@ -16,8 +16,8 @@ public class PrintBlockView extends BlockView<PrintBlockModel> {
 	public static final double WIDTH = 41;
 	public static final double HEIGHT = 21;
 
-	public PrintBlockView(double x, double y) {
-		super(x, y, WIDTH, HEIGHT);
+	public PrintBlockView(PrintBlockModel printBlockModel) {
+		super(printBlockModel, WIDTH, HEIGHT);
 	}
 
 	@Override
@@ -67,11 +67,5 @@ public class PrintBlockView extends BlockView<PrintBlockModel> {
 	protected Node getEditingPane(Observable observable) {
 		VBox editingPane = new VBox();
 		return editingPane;
-	}
-
-	@Override
-	protected void setupNodeWireTargetViews() {
-		getBlockModel().getPrintValueWireNodeTarget().initWireNodeTargetView(getX() + getW() / 2, getY());
-
 	}
 }

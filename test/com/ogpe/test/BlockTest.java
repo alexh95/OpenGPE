@@ -5,36 +5,76 @@ import java.math.BigDecimal;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.ogpe.block.factory.BlockFactory;
+import com.ogpe.block.implementation.AdditionBlock;
 import com.ogpe.block.implementation.ConstantBooleanBlock;
 import com.ogpe.block.implementation.ConstantNumberBlock;
 import com.ogpe.block.implementation.ConstantStringBlock;
-import com.ogpe.block.model.implementation.ConstantBlockModel;
+import com.ogpe.block.implementation.PrintBlock;
+import com.ogpe.block.network.InputNetworkNode;
 
 public class BlockTest {
 
 	@Test
-	public void testConstantNumberBlock() {
-		BigDecimal constantNumberValue = BigDecimal.valueOf(5);
-		ConstantNumberBlock constantNumberBlock = new ConstantNumberBlock(0, 0);
-		BigDecimal returnedValue = constantNumberBlock.makeBlockBehavior().getOutputRequester().request();
-		Assert.assertEquals(constantNumberValue, returnedValue);
+	public void testConstantBooleanBlock() {
+		Boolean constantBooleanValue = true;
+
+		BlockFactory blockFactory = new BlockFactory();
+		ConstantBooleanBlock constantBooleanBlock = blockFactory.makeConstantBooleanBlock(0, 0);
+		constantBooleanBlock.getBlockModel().setConstantValue(constantBooleanValue);
+		Boolean returnedValue = constantBooleanBlock.getBlockModel().getConstantValueInputNetworkNode().getValue();
+		
+		Assert.assertEquals(constantBooleanValue, returnedValue);
 	}
 
 	@Test
-	public void testConstantBooleanBlock() {
-		Boolean constantBooleanValue = true;
-		ConstantBlockModel<Boolean> constantBooleanBlockModel = new ConstantBlockModel<Boolean>(constantBooleanValue);
-		ConstantBooleanBlock constantBooleanBlock = new ConstantBooleanBlock(constantBooleanBlockModel, 0, 0);
-		Boolean returnedValue = constantBooleanBlock.makeBlockBehavior().getOutputRequester().request();
-		Assert.assertEquals(constantBooleanValue, returnedValue);
+	public void testConstantNumberBlock() {
+		BigDecimal constantNumberValue = BigDecimal.valueOf(5);
+
+		BlockFactory blockFactory = new BlockFactory();
+		ConstantNumberBlock constantNumberBlock = blockFactory.makeConstantNumberBlock(0, 0);
+		constantNumberBlock.getBlockModel().setConstantValue(constantNumberValue);
+		BigDecimal returnedValue = constantNumberBlock.getBlockModel().getConstantValueInputNetworkNode().getValue();
+		
+		Assert.assertEquals(constantNumberValue, returnedValue);
 	}
 
 	@Test
 	public void testConstantStringBlock() {
 		String constantStringValue = "test string";
-		ConstantBlockModel<String> constantStringBlockModel = new ConstantBlockModel<String>(constantStringValue);
-		ConstantStringBlock constantStringBlock = new ConstantStringBlock(constantStringBlockModel, 0, 0);
-		String returnedValue = constantStringBlock.makeBlockBehavior().getOutputRequester().request();
+
+		BlockFactory blockFactory = new BlockFactory();
+		ConstantStringBlock constantStringBlock = blockFactory.makeConstantStringBlock(0, 0);
+		constantStringBlock.getBlockModel().setConstantValue(constantStringValue);
+		String returnedValue = constantStringBlock.getBlockModel().getConstantValueInputNetworkNode().getValue();
+		
 		Assert.assertEquals(constantStringValue, returnedValue);
+	}
+
+	@Test
+	public void testAdditionBlock() {
+		BigDecimal firstOperand = BigDecimal.valueOf(3.4);
+		BigDecimal secondOperand = BigDecimal.valueOf(-1.2);
+		BigDecimal additionResult = firstOperand.add(secondOperand);
+
+		BlockFactory blockFactory = new BlockFactory();
+		AdditionBlock additionBlock = blockFactory.makeAdditionBlock(0, 0);
+		additionBlock.getBlockModel().setFirstOperandNetworkNode(new InputNetworkNode<>(() -> firstOperand));
+		additionBlock.getBlockModel().setSecondOperandNetworkNode(new InputNetworkNode<>(() -> secondOperand));
+		BigDecimal returnedValue = additionBlock.getBlockModel().getResultInputNetworkNode().getValue();
+		
+		Assert.assertEquals(additionResult, returnedValue);
+	}
+
+	@Test
+	public void testPrintBlock() {
+		String printValue = "test print value";
+
+		BlockFactory blockFactory = new BlockFactory();
+		PrintBlock printBlock = blockFactory.makePrintBlock(0, 0);
+		printBlock.getBlockModel().setPrintValueNetworkNode(new InputNetworkNode<>(() -> printValue));
+		Object returnedValue = printBlock.getBlockModel().getPrintValueNetworkNode().getValue();
+		
+		Assert.assertEquals(printValue, returnedValue);
 	}
 }

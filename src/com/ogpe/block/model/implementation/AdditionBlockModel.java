@@ -3,30 +3,44 @@ package com.ogpe.block.model.implementation;
 import java.math.BigDecimal;
 
 import com.ogpe.block.model.BlockModel;
-import com.ogpe.requester.Requester;
+import com.ogpe.block.network.InputNetworkNode;
+import com.ogpe.block.network.NetworkNode;
 
 public class AdditionBlockModel extends BlockModel {
 
-	private Requester<BigDecimal> firstOperandRequester;
-	private Requester<BigDecimal> secondOperandRequester;
-	
+	private NetworkNode<BigDecimal> firstOperandNetworkNode;
+	private NetworkNode<BigDecimal> secondOperandNetworkNode;
+
+	private InputNetworkNode<BigDecimal> resultInputNetworkNode;
+
 	public AdditionBlockModel() {
 		super();
+		resultInputNetworkNode = new InputNetworkNode<>(() -> getResult());
 	}
 
-	public Requester<BigDecimal> getFirstOperandRequester() {
-		return firstOperandRequester;
+	private BigDecimal getResult() {
+		BigDecimal firstOperand = firstOperandNetworkNode.getValue();
+		BigDecimal secondOperand = secondOperandNetworkNode.getValue();
+		return firstOperand.add(secondOperand);
 	}
 
-	public void setFirstOperandRequester(Requester<BigDecimal> firstOperandRequester) {
-		this.firstOperandRequester = firstOperandRequester;
+	public NetworkNode<BigDecimal> getFirstOperandNetworkNode() {
+		return firstOperandNetworkNode;
 	}
 
-	public Requester<BigDecimal> getSecondOperandRequester() {
-		return secondOperandRequester;
+	public void setFirstOperandNetworkNode(NetworkNode<BigDecimal> firstOperandNetworkNode) {
+		this.firstOperandNetworkNode = firstOperandNetworkNode;
 	}
 
-	public void setSecondOperandRequester(Requester<BigDecimal> secondOperandRequester) {
-		this.secondOperandRequester = secondOperandRequester;
+	public NetworkNode<BigDecimal> getSecondOperandNetworkNode() {
+		return secondOperandNetworkNode;
+	}
+
+	public void setSecondOperandNetworkNode(NetworkNode<BigDecimal> secondOperandNetworkNode) {
+		this.secondOperandNetworkNode = secondOperandNetworkNode;
+	}
+
+	public InputNetworkNode<BigDecimal> getResultInputNetworkNode() {
+		return resultInputNetworkNode;
 	}
 }

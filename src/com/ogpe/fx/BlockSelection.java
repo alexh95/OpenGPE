@@ -1,8 +1,8 @@
 package com.ogpe.fx;
 
 public enum BlockSelection {
-	CONSTANT_NUMBER("Constant Number Block"),
 	CONSTANT_BOOLEAN("Constant Boolean Block"), 
+	CONSTANT_NUMBER("Constant Number Block"),
 	CONSTANT_STRING("Constant String Block"), 
 	ADDITION_BLOCK("Addition Block"), 
 	PRINT("Print Block");

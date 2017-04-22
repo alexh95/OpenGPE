@@ -15,9 +15,9 @@ public class AdditionBlockView extends BlockView<AdditionBlockModel> {
 
 	public static final double WIDTH = 25;
 	public static final double HEIGHT = 20;
-	
-	public AdditionBlockView(AdditionBlockModel additionBlockModel, double x, double y) {
-		super(additionBlockModel, x, y, WIDTH, HEIGHT);
+
+	public AdditionBlockView(AdditionBlockModel additionBlockModel) {
+		super(additionBlockModel, WIDTH, HEIGHT);
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class AdditionBlockView extends BlockView<AdditionBlockModel> {
 		double inPort1Y3 = getY();
 		graphicsContext.strokePolyline(new double[] { inPort1X1 + 0.5, inPort1X2 + 0.5, inPort1X3 + 0.5 },
 				new double[] { inPort1Y1 + 0.5, inPort1Y2 + 0.5, inPort1Y3 + 0.5 }, 3);
-		
+
 		double inPort2X1 = getX() + Math.round(3 * getW() / 4) - 5;
 		double inPort2Y1 = getY();
 		double inPort2X2 = getX() + Math.round(3 * getW() / 4);
@@ -62,7 +62,7 @@ public class AdditionBlockView extends BlockView<AdditionBlockModel> {
 		double inPort2Y3 = getY();
 		graphicsContext.strokePolyline(new double[] { inPort2X1 + 0.5, inPort2X2 + 0.5, inPort2X3 + 0.5 },
 				new double[] { inPort2Y1 + 0.5, inPort2Y2 + 0.5, inPort2Y3 + 0.5 }, 3);
-		
+
 		double outPortX = getX() + Math.round(getW() / 2) - 5;
 		double outPortY = getY() + getH() - 5;
 		double outPortW = 10;
