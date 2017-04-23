@@ -7,7 +7,7 @@ import javafx.scene.canvas.GraphicsContext;
 public class OutputNetworkNode<T> extends NetworkNode<T> {
 
 	public OutputNetworkNode(DataType dataType) {
-		super(dataType);
+		super(dataType, NetworkNodeType.OUTPUT);
 	}
 
 	@Override

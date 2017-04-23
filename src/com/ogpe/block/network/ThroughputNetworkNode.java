@@ -8,7 +8,7 @@ import javafx.scene.paint.Color;
 public class ThroughputNetworkNode<T> extends NetworkNode<T> {
 
 	public ThroughputNetworkNode(DataType dataType) {
-		super(dataType);
+		super(dataType, NetworkNodeType.OUTPUT);
 	}
 
 	@Override

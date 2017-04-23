@@ -297,7 +297,7 @@ public class MainWindow extends Application {
 
 		// Run -> Run
 		runRunMenuItem.setOnAction(event -> {
-
+			project.run();
 		});
 		// Run -> Run Continuously
 		runContinuouslyRunMenuItem.setOnAction(event -> {

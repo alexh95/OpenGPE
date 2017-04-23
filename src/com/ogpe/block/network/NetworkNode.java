@@ -8,25 +8,30 @@ import javafx.scene.paint.Color;
 public abstract class NetworkNode<T> {
 
 	private DataType dataType;
+	private NetworkNodeType nodeType;
 
 	private NetworkNode<T> networkNode;
 
 	private double x;
 	private double y;
 
+	private boolean nodeSet;
+
 	private NetworkNodeHighlight highlight;
 
-	public NetworkNode(DataType dataType) {
+	public NetworkNode(DataType dataType, NetworkNodeType nodeType) {
 		this.dataType = dataType;
+		this.nodeType = nodeType;
 		setX(0);
 		setY(0);
 		setHighlighted(NetworkNodeHighlight.UNSET);
+		setNodeSet(false);
 	}
 
 	public abstract T getValue();
 
 	public abstract void drawNode(GraphicsContext graphicsContext);
-	
+
 	public void drawWire(GraphicsContext graphicsContext) {
 		if (networkNode != null) {
 			graphicsContext.setStroke(Color.BLACK);
@@ -42,17 +47,24 @@ public abstract class NetworkNode<T> {
 		return networkNode;
 	}
 
-	public boolean isAssignable(NetworkNode<?> networkNode) {
-		return dataType.assignable(networkNode.dataType);
+	public NetworkNodeType getNodeType() {
+		return nodeType;
 	}
 
 	@SuppressWarnings("unchecked")
 	public void setNetworkNode(NetworkNode<?> networkNode) {
-		if (isAssignable(networkNode)) {
+		if (networkNode == null) {
+			this.networkNode = null;
+		} else if (isAssignable(networkNode)) {
 			this.networkNode = (NetworkNode<T>) networkNode;
 		} else {
 			throw new RuntimeException("Incompatible DataType");
 		}
+	}
+
+	public boolean isAssignable(NetworkNode<?> networkNode) {
+		return dataType.isAssignable(networkNode.dataType)
+				&& nodeType.isAssignable(networkNode.nodeType);
 	}
 
 	public double getX() {
@@ -69,6 +81,14 @@ public abstract class NetworkNode<T> {
 
 	public void setY(double y) {
 		this.y = y;
+	}
+
+	public boolean isNodeSet() {
+		return nodeSet;
+	}
+
+	public void setNodeSet(boolean nodeSet) {
+		this.nodeSet = nodeSet;
 	}
 
 	public NetworkNodeHighlight getHighlight() {

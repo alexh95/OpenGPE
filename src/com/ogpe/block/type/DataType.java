@@ -6,7 +6,7 @@ public enum DataType {
 	NUMBER,
 	STRING;
 	
-	public boolean assignable(DataType that) {
-		return (this == ANY) || (this.equals(that));
+	public boolean isAssignable(DataType that) {
+		return equals(ANY) || that.equals(ANY) || equals(that);
 	}
 }

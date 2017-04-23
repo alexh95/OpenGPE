@@ -10,7 +10,7 @@ public class InputNetworkNode<T> extends NetworkNode<T> {
 	private Requester<T> valueRequester;
 
 	public InputNetworkNode(DataType dataType, Requester<T> valueRequester) {
-		super(dataType);
+		super(dataType, NetworkNodeType.INPUT);
 		this.valueRequester = valueRequester;
 	}
 

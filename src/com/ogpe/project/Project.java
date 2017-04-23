@@ -8,6 +8,7 @@ import com.ogpe.block.Block;
 import com.ogpe.block.factory.BlockFactory;
 import com.ogpe.block.network.NetworkNode;
 import com.ogpe.block.network.NetworkNodeHighlight;
+import com.ogpe.block.network.NetworkNodeType;
 import com.ogpe.block.view.implementation.AdditionBlockView;
 import com.ogpe.block.view.implementation.ConstantBooleanBlockView;
 import com.ogpe.block.view.implementation.ConstantNumberBlockView;
@@ -42,6 +43,13 @@ public class Project {
 	private Block<?, ?> movingBlock;
 	private double movingBlockOffsetX;
 	private double movingBlockOffsetY;
+	
+	private boolean wiring;
+	private NetworkNode<?> wiringNetworkNode;
+	private double wiringStartX;
+	private double wiringStartY;
+	private double wireX = 0;
+	private double wireY = 0;
 
 	public Project() {
 		blockFactory = new BlockFactory();
@@ -109,9 +117,23 @@ public class Project {
 		isDragSelecting = false;
 		deselectAllBlocks();
 		releaseMoveBlock();
+		wiring = false;
 		networkNodes.forEach(networkNode -> {
-			if (networkNode.getHighlight() == NetworkNodeHighlight.HOVER) {
+			switch (networkNode.getHighlight()) {
+			case HOVER:
 				networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+				break;
+			case WIRING:
+				networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+				break;
+			case HOVER_VALID_WIRING:
+				networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+				break;
+			case HOVER_INVALID_WIRING:
+				networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+				break;
+			default:
+				break;
 			}
 		});
 	}
@@ -252,7 +274,31 @@ public class Project {
 	}
 
 	public void deleteSelected() {
-		blocks.forEach(block -> networkNodes.removeAll(block.getBlockModel().getNetworkNodes()));
+		selectedBlocks.forEach(selectedBlock -> {
+			// The nodes that are about to be deleted
+			List<NetworkNode<?>> deletingNetworkNodes = selectedBlock.getBlockModel().getNetworkNodes();
+
+			// Reset the nodes contained by those nodes
+			deletingNetworkNodes.forEach(deletingNetworkNode -> {
+				NetworkNode<?> containedNetworkNode = deletingNetworkNode.getNetworkNode();
+				if (containedNetworkNode != null) {
+					containedNetworkNode.setNodeSet(false);
+					containedNetworkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+				}
+			});
+
+			// Reset the nodes containing those nodes
+			networkNodes.forEach(networkNode -> {
+				if (deletingNetworkNodes.contains(networkNode.getNetworkNode())) {
+					networkNode.setNetworkNode(null);
+					networkNode.setNodeSet(false);
+					networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+				}
+			});
+
+			// Remove those nodes
+			networkNodes.removeAll(deletingNetworkNodes);
+		});
 		blocks.removeAll(selectedBlocks);
 	}
 
@@ -322,20 +368,11 @@ public class Project {
 		return closestNetworkNode;
 	}
 
-	private boolean wiring;
-	private NetworkNode<?> wiringNetworkNode;
-	private double wiringStartX;
-	private double wiringStartY;
-	private double wireX = 0;
-	private double wireY = 0;
-
 	public void hoverWire(double x, double y) {
+		// Reset Highlight
 		networkNodes.forEach(networkNode -> {
 			switch (networkNode.getHighlight()) {
 			case HOVER:
-				networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
-				break;
-			case HOVER_VALID_WIRING:
 				networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
 				break;
 			default:
@@ -343,42 +380,59 @@ public class Project {
 			}
 		});
 
+		// Highlight
 		NetworkNode<?> closestNetworkNode = getClosestNetworkNode(x, y);
 		if (closestNetworkNode != null) {
-			if (wiring) {
-				if (closestNetworkNode.getHighlight() == NetworkNodeHighlight.UNSET) {
-					closestNetworkNode.setHighlighted(NetworkNodeHighlight.HOVER_VALID_WIRING);
-				}
-			} else {
-				if (closestNetworkNode.getHighlight() == NetworkNodeHighlight.UNSET) {
-					closestNetworkNode.setHighlighted(NetworkNodeHighlight.HOVER);
-				}
+			switch (closestNetworkNode.getHighlight()) {
+			case UNSET:
+				closestNetworkNode.setHighlighted(NetworkNodeHighlight.HOVER);
+				break;
+			default:
+				break;
 			}
 		}
 	}
 
 	public void pressWire(double x, double y) {
-		hoverWire(x, y);
 		wiringNetworkNode = getClosestNetworkNode(x, y);
-		if (wiringNetworkNode != null) {
+		if (wiringNetworkNode != null && !wiringNetworkNode.isNodeSet()) {
+			wiringNetworkNode.setNodeSet(true);
 			wiringNetworkNode.setHighlighted(NetworkNodeHighlight.WIRING);
-			
+
 			wiring = true;
 			wiringStartX = wiringNetworkNode.getX();
 			wiringStartY = wiringNetworkNode.getY();
-			dragWire(x, y);
+			wireX = x;
+			wireY = y;
 		}
 	}
 
+	private boolean isValidNodeForWiring(NetworkNode<?> networkNode) {
+		return !networkNode.isNodeSet() && wiringNetworkNode.isAssignable(networkNode);
+	}
+
 	public void releaseWire(double x, double y) {
-		hoverWire(x, y);
 		if (wiring) {
 			NetworkNode<?> closestNetworkNode = getClosestNetworkNode(x, y);
-			if (closestNetworkNode != null) {
-				closestNetworkNode.setNetworkNode(wiringNetworkNode);
-				wiringNetworkNode.setHighlighted(NetworkNodeHighlight.SET);
-				closestNetworkNode.setHighlighted(NetworkNodeHighlight.SET);
+			if (closestNetworkNode != null && closestNetworkNode != wiringNetworkNode) {
+				if (isValidNodeForWiring(closestNetworkNode)) {
+					closestNetworkNode.setNodeSet(true);
+					if (closestNetworkNode.getNodeType() == NetworkNodeType.OUTPUT) {
+						closestNetworkNode.setNetworkNode(wiringNetworkNode);
+					} else {
+						wiringNetworkNode.setNetworkNode(closestNetworkNode);
+					}
+					wiringNetworkNode.setHighlighted(NetworkNodeHighlight.SET);
+					closestNetworkNode.setHighlighted(NetworkNodeHighlight.SET);
+				} else {
+					wiringNetworkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+					wiringNetworkNode.setNodeSet(false);
+				}
+			} else {
+				wiringNetworkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+				wiringNetworkNode.setNodeSet(false);
 			}
+
 			wiring = false;
 			wiringStartX = 0;
 			wiringStartY = 0;
@@ -387,8 +441,32 @@ public class Project {
 	}
 
 	public void dragWire(double x, double y) {
-		hoverWire(x, y);
 		if (wiring) {
+			// Reset Highlight
+			networkNodes.forEach(networkNode -> {
+				switch (networkNode.getHighlight()) {
+				case HOVER_VALID_WIRING:
+					networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+					break;
+				case HOVER_INVALID_WIRING:
+					networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+					break;
+				default:
+					break;
+				}
+			});
+
+			// Highlight
+			NetworkNode<?> closestNetworkNode = getClosestNetworkNode(x, y);
+			if (closestNetworkNode != null && closestNetworkNode != wiringNetworkNode
+					&& closestNetworkNode.getHighlight().equals(NetworkNodeHighlight.UNSET)) {
+				if (isValidNodeForWiring(closestNetworkNode)) {
+					closestNetworkNode.setHighlighted(NetworkNodeHighlight.HOVER_VALID_WIRING);
+				} else {
+					closestNetworkNode.setHighlighted(NetworkNodeHighlight.HOVER_INVALID_WIRING);
+				}
+			}
+
 			wireX = x;
 			wireY = y;
 		}
