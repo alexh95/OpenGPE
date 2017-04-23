@@ -14,8 +14,6 @@ Graphical Programming Environment Project
 * Add a Print console pane
 
 ### Wire Tool:
-* Verify if wiring can begin from a node
-* Verify if a node can be wired to (both node type, data type and set - unset)
 * Fix wire dragging resetting invalid node highlights
 * Add a way to remove a wire
 
