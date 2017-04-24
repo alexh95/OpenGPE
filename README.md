@@ -6,12 +6,7 @@ Graphical Programming Environment Project
 ### Place Tool
 * ...
 
-### Block editing
-* Right clicking with the Place tool on a block should open the editing panel
-* ...
-
 ### UI
-* Add a Print console pane
 * ...
 
 ### Wire Tool:
