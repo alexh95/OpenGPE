@@ -15,21 +15,32 @@ import com.ogpe.block.view.implementation.ConstantNumberBlockView;
 import com.ogpe.block.view.implementation.ConstantStringBlockView;
 import com.ogpe.block.view.implementation.PrintBlockView;
 import com.ogpe.fx.BlockSelection;
+import com.ogpe.fx.CursorTool;
 import com.ogpe.observable.Observable;
+import com.ogpe.observable.Observer;
 
-import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class Project {
 
 	private BlockFactory blockFactory;
-
 	private List<Block<?, ?>> blocks;
+	private List<NetworkNode<?>> networkNodes;
 
-	public List<NetworkNode<?>> networkNodes;
+	private Observable<Object> redrawObservable;
+	private Observable<Node> editingPanePaneObservable;
+	private Observable<String> consoleOutputObservable;
 
+	private CursorTool cursorTool;
+
+	private Block<?, ?> editingBlock;
+
+	private BlockSelection selectedPlacingBlock;
 	private boolean isDisplayPlacing = false;
 	private boolean selectedBlockPlaceble = false;
 	private Rectangle selectingBlockPlacingRectangle;
@@ -43,7 +54,7 @@ public class Project {
 	private Block<?, ?> movingBlock;
 	private double movingBlockOffsetX;
 	private double movingBlockOffsetY;
-	
+
 	private boolean wiring;
 	private NetworkNode<?> wiringNetworkNode;
 	private double wiringStartX;
@@ -51,13 +62,21 @@ public class Project {
 	private double wireX = 0;
 	private double wireY = 0;
 
-	public Project() {
+	public Project(Observer<Object> redrawObserver, Observer<Node> editingPanePaneObserver) {
 		blockFactory = new BlockFactory();
 		blocks = new ArrayList<>();
 		networkNodes = new ArrayList<>();
 
 		selectedBlocks = new ArrayList<>();
 		movingBlock = null;
+
+		redrawObservable = new Observable<>();
+		redrawObservable.addObserver(redrawObserver);
+		editingPanePaneObservable = new Observable<>();
+		editingPanePaneObservable.addObserver(editingPanePaneObserver);
+		consoleOutputObservable = new Observable<>();
+
+		editingBlock = null;
 	}
 
 	public void drawCanvas(GraphicsContext graphicsContext) {
@@ -71,7 +90,7 @@ public class Project {
 		});
 
 		if (isDisplayPlacing && selectingBlockPlacingRectangle != null) {
-			if (isSelectedBlockPlaceble()) {
+			if (selectedBlockPlaceble) {
 				graphicsContext.setStroke(Color.GREEN);
 			} else {
 				graphicsContext.setStroke(Color.RED);
@@ -102,19 +121,143 @@ public class Project {
 		}
 	}
 
-	private boolean canPlace(double x, double y, double w, double h) {
-		boolean intersects = false;
-		for (Block<?, ?> block : blocks) {
-			if (!block.getBlockView().isMoving()) {
-				intersects |= block.getBlockView().intersects(x, y, w, h);
-			}
+	public void onMouseMoved(MouseEvent mouseEvent) {
+		double x = mouseEvent.getX();
+		double y = mouseEvent.getY();
+		MouseButton mouseButton = mouseEvent.getButton();
+
+		switch (cursorTool) {
+		case PAN:
+			break;
+		case SELECT:
+			break;
+		case PLACE:
+			movePlace(x, y, mouseButton);
+			break;
+		case MOVE:
+			break;
+		case WIRE:
+			moveWire(x, y);
+			break;
 		}
-		return !intersects;
+		redrawObservable.updateObservers(null);
 	}
 
-	public void resetDisplayingContext() {
+	public void onMousePressed(MouseEvent mouseEvent) {
+		double x = mouseEvent.getX();
+		double y = mouseEvent.getY();
+		boolean controlDown = mouseEvent.isControlDown();
+		MouseButton mouseButton = mouseEvent.getButton();
+
+		switch (cursorTool) {
+		case PAN:
+			break;
+		case SELECT:
+			if (mouseButton == MouseButton.PRIMARY) {
+				pressSelectBlock(x, y, controlDown);
+			}
+			break;
+		case PLACE:
+			pressPlace(x, y, mouseButton);
+			break;
+		case MOVE:
+			if (mouseButton == MouseButton.PRIMARY) {
+				pressMoveBlock(x, y);
+			}
+			break;
+		case WIRE:
+			if (mouseButton == MouseButton.PRIMARY) {
+				pressWire(x, y);
+			}
+			break;
+		}
+		redrawObservable.updateObservers(null);
+	}
+
+	public void onMouseRelease(MouseEvent mouseEvent) {
+		double x = mouseEvent.getX();
+		double y = mouseEvent.getY();
+		boolean controlDown = mouseEvent.isControlDown();
+		MouseButton mouseButton = mouseEvent.getButton();
+
+		switch (cursorTool) {
+		case PAN:
+			break;
+		case SELECT:
+			if (mouseButton == MouseButton.PRIMARY) {
+				releaseSelectBlock(x, y, controlDown);
+			}
+			break;
+		case PLACE:
+			releasePlace(x, y, mouseButton);
+			break;
+		case MOVE:
+			if (mouseButton == MouseButton.PRIMARY) {
+				releaseMoveBlock();
+			}
+			break;
+		case WIRE:
+			if (mouseButton == MouseButton.PRIMARY) {
+				releaseWire(x, y);
+			}
+			break;
+		}
+		redrawObservable.updateObservers(null);
+	}
+
+	public void onMouseDragged(MouseEvent mouseEvent) {
+		double x = mouseEvent.getX();
+		double y = mouseEvent.getY();
+		boolean controlDown = mouseEvent.isControlDown();
+		MouseButton mouseButton = mouseEvent.getButton();
+
+		switch (cursorTool) {
+		case PAN:
+			break;
+		case SELECT:
+			if (mouseButton == MouseButton.PRIMARY) {
+				dragSelectBlock(x, y, controlDown);
+			}
+			break;
+		case PLACE:
+			dragPlace(x, y, mouseButton);
+			break;
+		case MOVE:
+			if (mouseButton == MouseButton.PRIMARY) {
+				dragMoveBlock(x, y);
+			}
+			break;
+		case WIRE:
+			if (mouseButton == MouseButton.PRIMARY) {
+				dragWire(x, y);
+			}
+			break;
+		}
+		redrawObservable.updateObservers(null);
+	}
+
+	public void onMouseEntered(MouseEvent mouseEvent) {
+		softResetDisplayingContext();
+		redrawObservable.updateObservers(null);
+	}
+
+	public void onMouseExited(MouseEvent mouseEvent) {
+		softResetDisplayingContext();
+		redrawObservable.updateObservers(null);
+	}
+	
+	public void addConsoleOutputObserver(Observer<String> consoleOutputObserver) {
+		consoleOutputObservable.addObserver(consoleOutputObserver);
+	}
+
+	private void softResetDisplayingContext() {
 		isDisplayPlacing = false;
 		isDragSelecting = false;
+	}
+
+	private void hardResetDisplayingContext() {
+		softResetDisplayingContext();
+		unsetEditingBlock();
 		deselectAllBlocks();
 		releaseMoveBlock();
 		wiring = false;
@@ -138,43 +281,76 @@ public class Project {
 		});
 	}
 
-	// Block Placement
-	public void startDisplayingPlacing() {
-		isDisplayPlacing = true;
-	}
+	public void changeCursorTool(CursorTool newCursorTool) {
+		hardResetDisplayingContext();
 
-	public void placeBlock(double x, double y, BlockSelection selectedBlock) {
-		hoverSelectedBlockPlaceble(x, y, selectedBlock);
-		if (selectedBlockPlaceble) {
-			Block<?, ?> block = null;
-			switch (selectedBlock) {
-			case CONSTANT_NUMBER:
-				block = blockFactory.makeConstantNumberBlock(x, y);
-				break;
-			case CONSTANT_BOOLEAN:
-				block = blockFactory.makeConstantBooleanBlock(x, y);
-				break;
-			case CONSTANT_STRING:
-				block = blockFactory.makeConstantStringBlock(x, y);
-				break;
-			case ADDITION_BLOCK:
-				block = blockFactory.makeAdditionBlock(x, y);
-				break;
-			case PRINT:
-				block = blockFactory.makePrintBlock(x, y);
-				break;
-			}
-			if (block != null) {
-				networkNodes.addAll(block.getBlockModel().getNetworkNodes());
-				blocks.add(block);
-			}
+		this.cursorTool = newCursorTool;
+		switch (newCursorTool) {
+		case PAN:
+			break;
+		case PLACE:
+			isDisplayPlacing = true;
+			break;
+		case SELECT:
+			break;
+		case MOVE:
+			break;
+		case WIRE:
+			break;
 		}
 	}
 
-	public void hoverSelectedBlockPlaceble(double x, double y, BlockSelection selectedBlock) {
+	private boolean canPlace(double x, double y, double w, double h) {
+		boolean intersects = false;
+		for (Block<?, ?> block : blocks) {
+			if (!block.getBlockView().isMoving()) {
+				intersects |= block.getBlockView().intersects(x, y, w, h);
+			}
+		}
+		return !intersects;
+	}
+
+	private Block<?, ?> findBlock(double x, double y) {
+		List<Block<?, ?>> foundBlocks = blocks.stream().filter(block -> block.getBlockView().isInside(x, y))
+				.collect(Collectors.toList());
+		if (foundBlocks.size() == 1) {
+			return foundBlocks.get(0);
+		} else {
+			return null;
+		}
+	}
+
+	// Block Placement
+	public BlockSelection getSelectedPlacingBlock() {
+		return selectedPlacingBlock;
+	}
+
+	public void setSelectedPlacingBlock(BlockSelection selectedPlacingBlock) {
+		this.selectedPlacingBlock = selectedPlacingBlock;
+	}
+
+	private void setEditingBlock(Block<?, ?> block) {
+		unsetEditingBlock();
+		if (block != null) {
+			editingBlock = block;
+			editingBlock.getBlockView().setEdited(true);
+			Node editingPane = editingBlock.getBlockView().getEditingPane(redrawObservable);
+			editingPanePaneObservable.updateObservers(editingPane);
+		}
+	}
+
+	private void unsetEditingBlock() {
+		if (editingBlock != null) {
+			editingBlock.getBlockView().setEdited(false);
+			editingPanePaneObservable.updateObservers(null);
+			editingBlock = null;
+		}
+	}
+
+	public void movePlace(double x, double y, MouseButton mouseButton) {
 		isDisplayPlacing = true;
 
-		switch (selectedBlock) {
+		switch (selectedPlacingBlock) {
 		case CONSTANT_NUMBER:
 			selectedBlockPlaceble = canPlace(x, y, ConstantNumberBlockView.WIDTH, ConstantNumberBlockView.HEIGHT);
 			selectingBlockPlacingRectangle = new Rectangle(x, y, ConstantNumberBlockView.WIDTH,
@@ -201,8 +377,46 @@ public class Project {
 		}
 	}
 
-	public boolean isSelectedBlockPlaceble() {
-		return selectedBlockPlaceble;
+	public void pressPlace(double x, double y, MouseButton mouseButton) {
+		if (mouseButton == MouseButton.PRIMARY) {
+			isDisplayPlacing = false;
+			if (selectedBlockPlaceble) {
+				Block<?, ?> block = null;
+				switch (selectedPlacingBlock) {
+				case CONSTANT_NUMBER:
+					block = blockFactory.makeConstantNumberBlock(x, y);
+					break;
+				case CONSTANT_BOOLEAN:
+					block = blockFactory.makeConstantBooleanBlock(x, y);
+					break;
+				case CONSTANT_STRING:
+					block = blockFactory.makeConstantStringBlock(x, y);
+					break;
+				case ADDITION_BLOCK:
+					block = blockFactory.makeAdditionBlock(x, y);
+					break;
+				case PRINT:
+					block = blockFactory.makePrintBlock(x, y);
+					break;
+				}
+				if (block != null) {
+					networkNodes.addAll(block.getBlockModel().getNetworkNodes());
+					blocks.add(block);
+					setEditingBlock(block);
+				}
+			}
+		} else if (mouseButton == MouseButton.SECONDARY) {
+			Block<?, ?> foundBlock = findBlock(x, y);
+			setEditingBlock(foundBlock);
+		}
+	}
+
+	public void releasePlace(double x, double y, MouseButton mouseButton) {
+
+	}
+
+	public void dragPlace(double x, double y, MouseButton mouseButton) {
+
 	}
 
 	// Block Selection
@@ -220,7 +434,7 @@ public class Project {
 		}
 	}
 
-	public void deselectAllBlocks() {
+	private void deselectAllBlocks() {
 		selectedBlocks.forEach(block -> block.getBlockView().setSelected(false));
 		selectedBlocks.clear();
 	}
@@ -302,17 +516,6 @@ public class Project {
 		blocks.removeAll(selectedBlocks);
 	}
 
-	public void editBlock(double x, double y, Observable<?> observable, Group panel) {
-		List<Block<?, ?>> targetBlocks = blocks.stream().filter(block -> block.getBlockView().isInside(x, y))
-				.collect(Collectors.toList());
-		if (targetBlocks.size() == 1) {
-			Block<?, ?> targetBlock = targetBlocks.get(0);
-			targetBlock.getBlockView().populateEditPanel(observable, panel);
-		} else {
-			panel.getChildren().clear();
-		}
-	}
-
 	// Block Move
 	public void pressMoveBlock(double x, double y) {
 		Block<?, ?> selectedBlock = null;
@@ -368,7 +571,7 @@ public class Project {
 		return closestNetworkNode;
 	}
 
-	public void hoverWire(double x, double y) {
+	public void moveWire(double x, double y) {
 		// Reset Highlight
 		networkNodes.forEach(networkNode -> {
 			switch (networkNode.getHighlight()) {
@@ -474,6 +677,6 @@ public class Project {
 
 	// Run
 	public void run() {
-		blocks.forEach(block -> block.run());
+		blocks.forEach(block -> block.run(consoleOutputObservable));
 	}
 }

@@ -56,11 +56,15 @@ public class ConstantBooleanBlockView extends ConstantBlockView<Boolean> {
 		Boolean value = getBlockModel().getConstantValue();
 		String text;
 		if (value) {
-			graphicsContext.setFill(Color.GREEN);
 			text = "T";
 		} else {
-			graphicsContext.setFill(Color.BLUE);
 			text = "F";
+		}
+		
+		if (isEdited()) {
+			graphicsContext.setFill(Color.FUCHSIA);
+		} else {
+			graphicsContext.setFill(Color.BLACK);
 		}
 		graphicsContext.setTextAlign(TextAlignment.CENTER);
 		graphicsContext.setTextBaseline(VPos.CENTER);
@@ -70,7 +74,7 @@ public class ConstantBooleanBlockView extends ConstantBlockView<Boolean> {
 	}
 
 	@Override
-	protected Node getEditingPane(Observable<?> observable) {
+	public Node getEditingPane(Observable<?> redrawObservable) {
 		VBox editingPane = new VBox();
 		Label booleanValueLabel = new Label("Value:");
 		ComboBox<Boolean> booleanValueComboBox = new ComboBox<>();
@@ -86,7 +90,7 @@ public class ConstantBooleanBlockView extends ConstantBlockView<Boolean> {
 		updateButton.setOnAction(event -> {
 			Boolean value = booleanValueComboBox.getValue();
 			getBlockModel().setConstantValue(value);
-			observable.updateObservers(null);
+			redrawObservable.updateObservers(null);
 		});
 		return editingPane;
 	}

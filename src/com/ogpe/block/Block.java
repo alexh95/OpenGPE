@@ -2,6 +2,7 @@ package com.ogpe.block;
 
 import com.ogpe.block.model.BlockModel;
 import com.ogpe.block.view.BlockView;
+import com.ogpe.observable.Observable;
 
 public abstract class Block<M extends BlockModel, V extends BlockView<M>> {
 
@@ -22,6 +23,6 @@ public abstract class Block<M extends BlockModel, V extends BlockView<M>> {
 		return blockView;
 	}
 
-	public void run() {
+	public void run(Observable<String> consoleOutputObservable) {
 	}
 }

@@ -12,6 +12,7 @@ import com.ogpe.block.implementation.ConstantStringBlock;
 import com.ogpe.block.implementation.PrintBlock;
 import com.ogpe.block.network.ThroughputNetworkNode;
 import com.ogpe.block.type.DataType;
+import com.ogpe.observable.Observable;
 
 public class NetworkTest {
 
@@ -93,6 +94,6 @@ public class NetworkTest {
 		PrintBlock printBlock = blockFactory.makePrintBlock(0, 0);
 		printBlock.getBlockModel().setPrintValueNetworkNode(resultNode.getNetworkNode());
 		
-		printBlock.run();
+		printBlock.run(new Observable<>());
 	}
 }

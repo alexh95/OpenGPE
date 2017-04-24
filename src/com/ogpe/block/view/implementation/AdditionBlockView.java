@@ -79,7 +79,7 @@ public class AdditionBlockView extends BlockView<AdditionBlockModel> {
 		double outPortH = 5;
 		graphicsContext.strokeRect(outPortX + 0.5, outPortY + 0.5, outPortW, outPortH);
 
-		graphicsContext.setFill(graphicsContext.getStroke());
+		graphicsContext.setFill(Color.BLACK);
 		graphicsContext.setTextAlign(TextAlignment.CENTER);
 		graphicsContext.setTextBaseline(VPos.CENTER);
 		String text = "+";
@@ -89,7 +89,7 @@ public class AdditionBlockView extends BlockView<AdditionBlockModel> {
 	}
 
 	@Override
-	protected Node getEditingPane(Observable<?> observable) {
+	public Node getEditingPane(Observable<?> redrawObservable) {
 		VBox editingPane = new VBox();
 		return editingPane;
 	}

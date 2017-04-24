@@ -55,7 +55,11 @@ public class ConstantNumberBlockView extends ConstantBlockView<BigDecimal> {
 		double portH = 5;
 		graphicsContext.strokeRect(portX + 0.5, portY + 0.5, portW, portH);
 
-		graphicsContext.setFill(graphicsContext.getStroke());
+		if (isEdited()) {
+			graphicsContext.setFill(Color.FUCHSIA);
+		} else {
+			graphicsContext.setFill(Color.BLACK);
+		}
 		graphicsContext.setTextAlign(TextAlignment.CENTER);
 		graphicsContext.setTextBaseline(VPos.CENTER);
 		String text = getBlockModel().getConstantValue().toString();
@@ -65,7 +69,7 @@ public class ConstantNumberBlockView extends ConstantBlockView<BigDecimal> {
 	}
 
 	@Override
-	protected Node getEditingPane(Observable<?> observable) {
+	public Node getEditingPane(Observable<?> redrawObservable) {
 		VBox editingPane = new VBox();
 		Label numberValueLabel = new Label("Value:");
 		TextField numberValueTextField = new TextField();
@@ -86,7 +90,7 @@ public class ConstantNumberBlockView extends ConstantBlockView<BigDecimal> {
 			} catch (NumberFormatException e) {
 				numberValueResultLabel.setText("Invalid value");
 			}
-			observable.updateObservers(null);
+			redrawObservable.updateObservers(null);
 		});
 		return editingPane;
 	}

@@ -1,11 +1,12 @@
 package com.ogpe.fx;
 
-import com.ogpe.observable.Observable;
+import com.ogpe.observable.Observer;
 import com.ogpe.project.Project;
 import com.sun.glass.ui.Screen;
 
 import javafx.application.Application;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -21,7 +22,6 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -37,7 +37,6 @@ public class MainWindow extends Application {
 	private CanvasPane canvasPane;
 
 	private CursorTool selectedCursorTool;
-	private BlockSelection selectedBlock;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -57,138 +56,23 @@ public class MainWindow extends Application {
 		// Canvas
 		canvasPane = new CanvasPane();
 		root.setCenter(canvasPane);
-		project = new Project();
+		
+		Observer<Object> canvasRedrawObserver = value -> canvasPane.redraw();
+		Observer<Node> editingPaneObserver = editingPane -> {
+			blockEditingPaneCenter.getChildren().clear();
+			if (editingPane != null) {
+				blockEditingPaneCenter.getChildren().add(editingPane);
+			}
+			canvasPane.redraw();
+		};
+		project = new Project(canvasRedrawObserver, editingPaneObserver);
 		canvasPane.setDrawer(project::drawCanvas);
-		Observable<?> canvasPaneObservable = new Observable<>();
-		canvasPaneObservable.addObserver(value -> canvasPane.redraw());
-		canvasPane.setOnMouseMoved(event -> {
-			double x = event.getX();
-			double y = event.getY();
-			//MouseButton mouseButton = event.getButton();
-
-			switch (selectedCursorTool) {
-			case PAN:
-				break;
-			case SELECT:
-				break;
-			case PLACE:
-				project.hoverSelectedBlockPlaceble(x, y, selectedBlock);
-				break;
-			case MOVE:
-				break;
-			case WIRE:
-				project.hoverWire(x, y);
-				break;
-			}
-			canvasPane.redraw();
-		});
-		canvasPane.setOnMousePressed(event -> {
-			double x = event.getX();
-			double y = event.getY();
-			boolean controlDown = event.isControlDown();
-			MouseButton mouseButton = event.getButton();
-
-			switch (selectedCursorTool) {
-			case PAN:
-				break;
-			case SELECT:
-				if (mouseButton == MouseButton.PRIMARY) {
-					project.pressSelectBlock(x, y, controlDown);
-				}
-				break;
-			case PLACE:
-				if (mouseButton == MouseButton.PRIMARY) {
-					project.placeBlock(x, y, selectedBlock);
-					project.hoverSelectedBlockPlaceble(x, y, selectedBlock);
-				}
-				break;
-			case MOVE:
-				if (mouseButton == MouseButton.PRIMARY) {
-					project.pressMoveBlock(x, y);
-				}
-				break;
-			case WIRE:
-				if (mouseButton == MouseButton.PRIMARY) {
-					project.pressWire(x, y);
-				}
-				break;
-			}
-			canvasPane.redraw();
-		});
-		canvasPane.setOnMouseReleased(event -> {
-			double x = event.getX();
-			double y = event.getY();
-			boolean controlDown = event.isControlDown();
-			MouseButton mouseButton = event.getButton();
-
-			switch (selectedCursorTool) {
-			case PAN:
-				break;
-			case SELECT:
-				if (mouseButton == MouseButton.PRIMARY) {
-					project.releaseSelectBlock(x, y, controlDown);
-				} else if (mouseButton == MouseButton.SECONDARY) {
-					project.editBlock(x, y, canvasPaneObservable, blockEditingPaneCenter);
-				}
-				break;
-			case PLACE:
-				if (mouseButton == MouseButton.PRIMARY) {
-					project.hoverSelectedBlockPlaceble(x, y, selectedBlock);
-				}
-				break;
-			case MOVE:
-				if (mouseButton == MouseButton.PRIMARY) {
-					project.releaseMoveBlock();
-				}
-				break;
-			case WIRE:
-				if (mouseButton == MouseButton.PRIMARY) {
-					project.releaseWire(x, y);
-				}
-				break;
-			}
-			canvasPane.redraw();
-		});
-		canvasPane.setOnMouseDragged(event -> {
-			double x = event.getX();
-			double y = event.getY();
-			boolean controlDown = event.isControlDown();
-			MouseButton mouseButton = event.getButton();
-
-			switch (selectedCursorTool) {
-			case PAN:
-				break;
-			case SELECT:
-				if (mouseButton == MouseButton.PRIMARY) {
-					project.dragSelectBlock(x, y, controlDown);
-				}
-				break;
-			case PLACE:
-				if (mouseButton == MouseButton.PRIMARY) {
-					project.hoverSelectedBlockPlaceble(x, y, selectedBlock);
-				}
-				break;
-			case MOVE:
-				if (mouseButton == MouseButton.PRIMARY) {
-					project.dragMoveBlock(x, y);
-				}
-				break;
-			case WIRE:
-				if (mouseButton == MouseButton.PRIMARY) {
-					project.dragWire(x, y);
-				}
-				break;
-			}
-			canvasPane.redraw();
-		});
-		canvasPane.setOnMouseEntered(event -> {
-			project.resetDisplayingContext();
-			canvasPane.redraw();
-		});
-		canvasPane.setOnMouseExited(event -> {
-			project.resetDisplayingContext();
-			canvasPane.redraw();
-		});
+		canvasPane.setOnMouseMoved(project::onMouseMoved);
+		canvasPane.setOnMousePressed(project::onMousePressed);
+		canvasPane.setOnMouseReleased(project::onMouseRelease);
+		canvasPane.setOnMouseDragged(project::onMouseDragged);
+		canvasPane.setOnMouseEntered(project::onMouseEntered);
+		canvasPane.setOnMouseExited(project::onMouseExited);
 
 		// Block selection pane
 		BorderPane blockSelectionPane = new BorderPane();
@@ -204,10 +88,16 @@ public class MainWindow extends Application {
 			blockSelectionList.getItems().add(block.getDisplayName());
 		}
 		blockSelectionList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			selectedBlock = BlockSelection.valueOfDisplayName(newValue);
+			project.setSelectedPlacingBlock(BlockSelection.valueOfDisplayName(newValue));
 			selectedBlockLabel.setText("Selected: " + newValue);
 		});
 		blockSelectionList.getSelectionModel().select(0);
+
+		// Console Pane
+		ConsoleOutputPane consoleOutputPane = new ConsoleOutputPane();
+		root.setBottom(consoleOutputPane);
+		Observer<String> consoleOutputObserver = text -> consoleOutputPane.appendText(text);
+		project.addConsoleOutputObserver(consoleOutputObserver);
 
 		// Top menu
 		VBox topContaioner = new VBox();
@@ -347,7 +237,7 @@ public class MainWindow extends Application {
 		toolPanToolBarItem.getStyleClass().add("toggle-button");
 		toolPanToolBarItem.setOnAction(event -> {
 			selectedCursorTool = CursorTool.PAN;
-			project.resetDisplayingContext();
+			project.changeCursorTool(selectedCursorTool);
 			canvasPane.redraw();
 		});
 		toolPanToolBarItem.fire();
@@ -356,8 +246,7 @@ public class MainWindow extends Application {
 		toolPlaceToolBarItem.getStyleClass().add("toggle-button");
 		toolPlaceToolBarItem.setOnAction(event -> {
 			selectedCursorTool = CursorTool.PLACE;
-			project.resetDisplayingContext();
-			project.startDisplayingPlacing();
+			project.changeCursorTool(selectedCursorTool);
 			canvasPane.redraw();
 		});
 		// ToolBar select tool
@@ -365,7 +254,7 @@ public class MainWindow extends Application {
 		toolSelectToolBarItem.getStyleClass().add("toggle-button");
 		toolSelectToolBarItem.setOnAction(event -> {
 			selectedCursorTool = CursorTool.SELECT;
-			project.resetDisplayingContext();
+			project.changeCursorTool(selectedCursorTool);
 			canvasPane.redraw();
 		});
 		// ToolBar move tool
@@ -373,7 +262,7 @@ public class MainWindow extends Application {
 		toolMoveToolBarItem.getStyleClass().add("toggle-button");
 		toolMoveToolBarItem.setOnAction(event -> {
 			selectedCursorTool = CursorTool.MOVE;
-			project.resetDisplayingContext();
+			project.changeCursorTool(selectedCursorTool);
 			canvasPane.redraw();
 		});
 		// ToolBar wire tool
@@ -381,7 +270,7 @@ public class MainWindow extends Application {
 		toolWireToolBarItem.getStyleClass().add("toggle-button");
 		toolWireToolBarItem.setOnAction(event -> {
 			selectedCursorTool = CursorTool.WIRE;
-			project.resetDisplayingContext();
+			project.changeCursorTool(selectedCursorTool);
 			canvasPane.redraw();
 		});
 

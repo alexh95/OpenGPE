@@ -22,6 +22,7 @@ public abstract class BlockView<M extends BlockModel> {
 
 	private boolean selected;
 	private boolean moving;
+	private boolean edited;
 
 	public BlockView(M blockModel, double w, double h) {
 		this.blockModel = blockModel;
@@ -33,6 +34,7 @@ public abstract class BlockView<M extends BlockModel> {
 		setH(h);
 		setSelected(false);
 		setMoving(false);
+		setEdited(false);
 	}
 
 	public abstract void drawBlock(GraphicsContext graphicsContext);
@@ -41,13 +43,7 @@ public abstract class BlockView<M extends BlockModel> {
 		panel.getChildren().clear();
 	}
 
-	public void populateEditPanel(Observable<?> observable, Group panel) {
-		Node editingPanel = getEditingPane(observable);
-		clearEditPanel(panel);
-		panel.getChildren().add(editingPanel);
-	};
-
-	protected abstract Node getEditingPane(Observable<?> observable);
+	public abstract Node getEditingPane(Observable<?> redrawObservable);
 
 	public boolean isInside(double x, double y) {
 		return this.x <= x && x <= this.x + this.w && this.y <= y && y <= this.y + this.h;
@@ -125,5 +121,13 @@ public abstract class BlockView<M extends BlockModel> {
 
 	public void setMoving(boolean moving) {
 		this.moving = moving;
+	}
+
+	public boolean isEdited() {
+		return edited;
+	}
+
+	public void setEdited(boolean edited) {
+		this.edited = edited;
 	}
 }

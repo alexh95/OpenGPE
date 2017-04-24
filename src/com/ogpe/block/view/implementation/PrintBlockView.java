@@ -56,7 +56,7 @@ public class PrintBlockView extends BlockView<PrintBlockModel> {
 		graphicsContext.strokePolyline(new double[] { portX1 + 0.5, portX2 + 0.5, portX3 + 0.5 },
 				new double[] { portY1 + 0.5, portY2 + 0.5, portY3 + 0.5 }, 3);
 
-		graphicsContext.setFill(graphicsContext.getStroke());
+		graphicsContext.setFill(Color.BLACK);
 		graphicsContext.setTextAlign(TextAlignment.CENTER);
 		graphicsContext.setTextBaseline(VPos.CENTER);
 		String text = "Print";
@@ -66,7 +66,7 @@ public class PrintBlockView extends BlockView<PrintBlockModel> {
 	}
 
 	@Override
-	protected Node getEditingPane(Observable<?> observable) {
+	public Node getEditingPane(Observable<?> redrawObservable) {
 		VBox editingPane = new VBox();
 		return editingPane;
 	}

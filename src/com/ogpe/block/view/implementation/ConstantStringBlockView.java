@@ -53,7 +53,11 @@ public class ConstantStringBlockView extends ConstantBlockView<String> {
 		double portH = 5;
 		graphicsContext.strokeRect(portX + 0.5, portY + 0.5, portW, portH);
 
-		graphicsContext.setFill(Color.BLACK);
+		if (isEdited()) {
+			graphicsContext.setFill(Color.FUCHSIA);
+		} else {
+			graphicsContext.setFill(Color.BLACK);
+		}
 		graphicsContext.setTextAlign(TextAlignment.CENTER);
 		graphicsContext.setTextBaseline(VPos.CENTER);
 		String text = "\"" + getBlockModel().getConstantValue() + "\"";
@@ -63,7 +67,7 @@ public class ConstantStringBlockView extends ConstantBlockView<String> {
 	}
 
 	@Override
-	protected Node getEditingPane(Observable<?> observable) {
+	public Node getEditingPane(Observable<?> redrawObservable) {
 		VBox editingPane = new VBox();
 		Label stringValueLabel = new Label("Value:");
 		TextField stringValueTextField = new TextField();
@@ -77,7 +81,7 @@ public class ConstantStringBlockView extends ConstantBlockView<String> {
 		updateButton.setOnAction(event -> {
 			String value = stringValueTextField.getText();
 			getBlockModel().setConstantValue(value);
-			observable.updateObservers(null);
+			redrawObservable.updateObservers(null);
 		});
 		return editingPane;
 	}
