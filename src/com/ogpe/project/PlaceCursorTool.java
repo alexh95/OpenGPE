@@ -14,7 +14,7 @@ import javafx.scene.shape.Rectangle;
 public class PlaceCursorTool extends CursorTool {
 
 	public PlaceCursorTool(ProjectModel projectModel) {
-		super(projectModel);
+		super(projectModel, CursorToolSelection.PLACE);
 	}
 
 	@Override

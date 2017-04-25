@@ -76,7 +76,7 @@ public class MainWindow extends Application {
 		canvasPane.setDrawer(project::drawCanvas);
 		canvasPane.setOnMouseMoved(project::onMouseMoved);
 		canvasPane.setOnMousePressed(project::onMousePressed);
-		canvasPane.setOnMouseReleased(project::onMouseRelease);
+		canvasPane.setOnMouseReleased(project::onMouseReleased);
 		canvasPane.setOnMouseDragged(project::onMouseDragged);
 		canvasPane.setOnMouseEntered(project::onMouseEntered);
 		canvasPane.setOnMouseExited(project::onMouseExited);

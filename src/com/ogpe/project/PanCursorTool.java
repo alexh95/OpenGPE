@@ -5,7 +5,7 @@ import javafx.scene.input.MouseEvent;
 public class PanCursorTool extends CursorTool {
 
 	public PanCursorTool(ProjectModel projectModel) {
-		super(projectModel);
+		super(projectModel, CursorToolSelection.PAN);
 	}
 
 	@Override

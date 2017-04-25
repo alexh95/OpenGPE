@@ -9,8 +9,7 @@ import javafx.scene.input.MouseEvent;
 public class WireCursorTool extends CursorTool {
 
 	public WireCursorTool(ProjectModel projectModel) {
-		super(projectModel);
-		// TODO Auto-generated constructor stub
+		super(projectModel, CursorToolSelection.WIRE);
 	}
 
 	@Override

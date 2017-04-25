@@ -7,8 +7,7 @@ import javafx.scene.input.MouseEvent;
 public class MoveCursorTool extends CursorTool {
 
 	public MoveCursorTool(ProjectModel projectModel) {
-		super(projectModel);
-		// TODO Auto-generated constructor stub
+		super(projectModel, CursorToolSelection.MOVE);
 	}
 
 	@Override

@@ -12,7 +12,7 @@ import javafx.scene.shape.Rectangle;
 public class SelectCursorTool extends CursorTool {
 
 	public SelectCursorTool(ProjectModel projectModel) {
-		super(projectModel);
+		super(projectModel, CursorToolSelection.SELECT);
 	}
 
 	@Override

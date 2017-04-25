@@ -5,9 +5,12 @@ import javafx.scene.input.MouseEvent;
 public abstract class CursorTool {
 
 	private ProjectModel projectModel;
+	
+	private CursorToolSelection cursorToolSelection;
 
-	public CursorTool(ProjectModel projectModel) {
+	public CursorTool(ProjectModel projectModel, CursorToolSelection cursorToolSelection) {
 		this.projectModel = projectModel;
+		this.cursorToolSelection = cursorToolSelection;
 	}
 
 	public abstract void softResetDisplayingContext();
@@ -26,5 +29,9 @@ public abstract class CursorTool {
 
 	protected ProjectModel getProjectModel() {
 		return projectModel;
+	}
+
+	public CursorToolSelection getCursorToolSelection() {
+		return cursorToolSelection;
 	}
 }
