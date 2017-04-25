@@ -7,6 +7,7 @@ Graphical Programming Environment Project
 * ...
 
 ### UI
+* Add cut, copy and paste for selected blocks
 * ...
 
 ### Wire Tool:
@@ -20,11 +21,9 @@ Graphical Programming Environment Project
 
 ### Move Tool
 * Check canvas bounds
-* Hover effect on blocks
 * ...
 
 ### Select Tool
-* Hover effect on blocks
 * ...
 
 ### Run

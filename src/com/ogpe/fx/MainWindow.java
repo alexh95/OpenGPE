@@ -1,6 +1,8 @@
 package com.ogpe.fx;
 
 import com.ogpe.observable.Observer;
+import com.ogpe.project.BlockSelection;
+import com.ogpe.project.CursorToolSelection;
 import com.ogpe.project.Project;
 import com.sun.glass.ui.Screen;
 
@@ -36,7 +38,7 @@ public class MainWindow extends Application {
 
 	private CanvasPane canvasPane;
 
-	private CursorTool selectedCursorTool;
+	private CursorToolSelection selectedCursorTool;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -53,10 +55,15 @@ public class MainWindow extends Application {
 		Group blockEditingPaneCenter = new Group();
 		blockEditingPane.setCenter(new ScrollPane(blockEditingPaneCenter));
 
+		// Console Pane
+		ConsoleOutputPane consoleOutputPane = new ConsoleOutputPane();
+		root.setBottom(consoleOutputPane);
+		Observer<String> consoleOutputObserver = text -> consoleOutputPane.appendText(text);
+
 		// Canvas
 		canvasPane = new CanvasPane();
 		root.setCenter(canvasPane);
-		
+
 		Observer<Object> canvasRedrawObserver = value -> canvasPane.redraw();
 		Observer<Node> editingPaneObserver = editingPane -> {
 			blockEditingPaneCenter.getChildren().clear();
@@ -65,7 +72,7 @@ public class MainWindow extends Application {
 			}
 			canvasPane.redraw();
 		};
-		project = new Project(canvasRedrawObserver, editingPaneObserver);
+		project = new Project(canvasRedrawObserver, editingPaneObserver, consoleOutputObserver);
 		canvasPane.setDrawer(project::drawCanvas);
 		canvasPane.setOnMouseMoved(project::onMouseMoved);
 		canvasPane.setOnMousePressed(project::onMousePressed);
@@ -88,16 +95,10 @@ public class MainWindow extends Application {
 			blockSelectionList.getItems().add(block.getDisplayName());
 		}
 		blockSelectionList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			project.setSelectedPlacingBlock(BlockSelection.valueOfDisplayName(newValue));
+			project.getProjectModel().setPlacingBlockSelection(BlockSelection.valueOfDisplayName(newValue));
 			selectedBlockLabel.setText("Selected: " + newValue);
 		});
 		blockSelectionList.getSelectionModel().select(0);
-
-		// Console Pane
-		ConsoleOutputPane consoleOutputPane = new ConsoleOutputPane();
-		root.setBottom(consoleOutputPane);
-		Observer<String> consoleOutputObserver = text -> consoleOutputPane.appendText(text);
-		project.addConsoleOutputObserver(consoleOutputObserver);
 
 		// Top menu
 		VBox topContaioner = new VBox();
@@ -175,7 +176,7 @@ public class MainWindow extends Application {
 		pasteEditMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.V, KeyCodeCombination.CONTROL_DOWN));
 		// Edit -> Delete
 		deleteEditMenuItem.setOnAction(event -> {
-			project.deleteSelected();
+			project.getProjectModel().deleteSelected();
 			canvasPane.redraw();
 		});
 		deleteEditMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.D, KeyCodeCombination.CONTROL_DOWN));
@@ -236,7 +237,7 @@ public class MainWindow extends Application {
 		toolPanToolBarItem.getStyleClass().remove("radio-button");
 		toolPanToolBarItem.getStyleClass().add("toggle-button");
 		toolPanToolBarItem.setOnAction(event -> {
-			selectedCursorTool = CursorTool.PAN;
+			selectedCursorTool = CursorToolSelection.PAN;
 			project.changeCursorTool(selectedCursorTool);
 			canvasPane.redraw();
 		});
@@ -245,7 +246,7 @@ public class MainWindow extends Application {
 		toolPlaceToolBarItem.getStyleClass().remove("radio-button");
 		toolPlaceToolBarItem.getStyleClass().add("toggle-button");
 		toolPlaceToolBarItem.setOnAction(event -> {
-			selectedCursorTool = CursorTool.PLACE;
+			selectedCursorTool = CursorToolSelection.PLACE;
 			project.changeCursorTool(selectedCursorTool);
 			canvasPane.redraw();
 		});
@@ -253,7 +254,7 @@ public class MainWindow extends Application {
 		toolSelectToolBarItem.getStyleClass().remove("radio-button");
 		toolSelectToolBarItem.getStyleClass().add("toggle-button");
 		toolSelectToolBarItem.setOnAction(event -> {
-			selectedCursorTool = CursorTool.SELECT;
+			selectedCursorTool = CursorToolSelection.SELECT;
 			project.changeCursorTool(selectedCursorTool);
 			canvasPane.redraw();
 		});
@@ -261,7 +262,7 @@ public class MainWindow extends Application {
 		toolMoveToolBarItem.getStyleClass().remove("radio-button");
 		toolMoveToolBarItem.getStyleClass().add("toggle-button");
 		toolMoveToolBarItem.setOnAction(event -> {
-			selectedCursorTool = CursorTool.MOVE;
+			selectedCursorTool = CursorToolSelection.MOVE;
 			project.changeCursorTool(selectedCursorTool);
 			canvasPane.redraw();
 		});
@@ -269,7 +270,7 @@ public class MainWindow extends Application {
 		toolWireToolBarItem.getStyleClass().remove("radio-button");
 		toolWireToolBarItem.getStyleClass().add("toggle-button");
 		toolWireToolBarItem.setOnAction(event -> {
-			selectedCursorTool = CursorTool.WIRE;
+			selectedCursorTool = CursorToolSelection.WIRE;
 			project.changeCursorTool(selectedCursorTool);
 			canvasPane.redraw();
 		});

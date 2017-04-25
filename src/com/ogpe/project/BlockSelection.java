@@ -1,4 +1,4 @@
-package com.ogpe.fx;
+package com.ogpe.project;
 
 public enum BlockSelection {
 	CONSTANT_BOOLEAN("Constant Boolean Block"), 
