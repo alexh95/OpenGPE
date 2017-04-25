@@ -2,7 +2,6 @@ package com.ogpe.fx;
 
 import com.ogpe.observable.Observer;
 import com.ogpe.project.BlockSelection;
-import com.ogpe.project.CursorToolSelection;
 import com.ogpe.project.Project;
 import com.sun.glass.ui.Screen;
 
@@ -36,9 +35,14 @@ public class MainWindow extends Application {
 
 	private Project project;
 
-	private CanvasPane canvasPane;
+	ConsoleOutputPane consoleOutputPane;
 
-	private CursorToolSelection selectedCursorTool;
+	private RadioButton panCursorToolToolBarItem;
+	private RadioButton placeCursorToolToolBarItem;
+	private RadioButton selectCursorToolToolBarItem;
+	private RadioButton moveCursorToolToolBarItem;
+	private RadioButton wireCursorToolToolBarItem;
+	private ToggleGroup cursorToolToolBarToggleGroup;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -55,13 +59,8 @@ public class MainWindow extends Application {
 		Group blockEditingPaneCenter = new Group();
 		blockEditingPane.setCenter(new ScrollPane(blockEditingPaneCenter));
 
-		// Console Pane
-		ConsoleOutputPane consoleOutputPane = new ConsoleOutputPane();
-		root.setBottom(consoleOutputPane);
-		Observer<String> consoleOutputObserver = text -> consoleOutputPane.appendText(text);
-
 		// Canvas
-		canvasPane = new CanvasPane();
+		CanvasPane canvasPane = new CanvasPane();
 		root.setCenter(canvasPane);
 
 		Observer<Object> canvasRedrawObserver = value -> canvasPane.redraw();
@@ -72,6 +71,7 @@ public class MainWindow extends Application {
 			}
 			canvasPane.redraw();
 		};
+		Observer<String> consoleOutputObserver = text -> consoleOutputPane.appendText(text);
 		project = new Project(canvasRedrawObserver, editingPaneObserver, consoleOutputObserver);
 		canvasPane.setDrawer(project::drawCanvas);
 		canvasPane.setOnMouseMoved(project::onMouseMoved);
@@ -84,21 +84,19 @@ public class MainWindow extends Application {
 		// Block selection pane
 		BorderPane blockSelectionPane = new BorderPane();
 		root.setLeft(new ScrollPane(blockSelectionPane));
-		// Block selection pane -> selected block
-		Label selectedBlockLabel = new Label();
-		blockSelectionPane.setTop(selectedBlockLabel);
 		// Block selection pane -> block selection list
-		ListView<String> blockSelectionList = new ListView<>();
+		ListView<BlockSelection> blockSelectionList = new ListView<>();
 		blockSelectionPane.setCenter(blockSelectionList);
 
 		for (BlockSelection block : BlockSelection.values()) {
-			blockSelectionList.getItems().add(block.getDisplayName());
+			blockSelectionList.getItems().add(block);
 		}
-		blockSelectionList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			project.getProjectModel().setPlacingBlockSelection(BlockSelection.valueOfDisplayName(newValue));
-			selectedBlockLabel.setText("Selected: " + newValue);
-		});
+		blockSelectionList.getSelectionModel().selectedItemProperty().addListener(project::onBlockSelectionChanged);
 		blockSelectionList.getSelectionModel().select(0);
+
+		// Console Pane
+		consoleOutputPane = new ConsoleOutputPane();
+		root.setBottom(consoleOutputPane);
 
 		// Top menu
 		VBox topContaioner = new VBox();
@@ -108,13 +106,13 @@ public class MainWindow extends Application {
 		ToolBar toolBar = new ToolBar();
 		topContaioner.getChildren().addAll(menuBar, toolBar);
 
-		// Sub-menus
+		// MenuBar
 		Menu fileMenu = new Menu("File");
-		Menu toolMenu = new Menu("Tool");
+		Menu cursorToolMenu = new Menu("Tool");
 		Menu editMenu = new Menu("Edit");
 		Menu runMenu = new Menu("Run");
 		Menu helpMenu = new Menu("Help");
-		menuBar.getMenus().addAll(fileMenu, toolMenu, editMenu, runMenu, helpMenu);
+		menuBar.getMenus().addAll(fileMenu, cursorToolMenu, editMenu, runMenu, helpMenu);
 
 		// File menu items
 		MenuItem newProjectFileMenuItem = new MenuItem("New Project");
@@ -125,34 +123,56 @@ public class MainWindow extends Application {
 				new SeparatorMenuItem(), exitFileMenuItem);
 
 		// File -> New Project
-		newProjectFileMenuItem.setOnAction(event -> {
-		});
+		newProjectFileMenuItem.setOnAction(project::newProjectFileMenuItemEventHandler);
 		newProjectFileMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCodeCombination.CONTROL_DOWN));
 		// File -> Open Project
-		openProjectFileMenuItem.setOnAction(event -> {
-		});
+		openProjectFileMenuItem.setOnAction(project::openProjectFileMenuItemEventHandler);
 		openProjectFileMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCodeCombination.CONTROL_DOWN));
 		// File -> Save Project
-		saveProjectFileMenuItem.setOnAction(event -> {
-		});
+		saveProjectFileMenuItem.setOnAction(project::saveProjectFileMenuItemEventHandler);
 		saveProjectFileMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCodeCombination.CONTROL_DOWN));
 		// File -> Exit
-		exitFileMenuItem.setOnAction(event -> {
-			// TODO: check unsaved changes and dialog stuff
-			primaryStage.close();
-		});
+		project.setOnExitFileMenuItemPressed(() -> primaryStage.close());
+		exitFileMenuItem.setOnAction(project::exitFileMenuItemEventHandler);
 		exitFileMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCodeCombination.CONTROL_DOWN));
 
-		// Tool menu items
-		MenuItem panToolMenuItem = new MenuItem("Pan Tool");
-		MenuItem placeToolMenuItem = new MenuItem("Place Tool");
-		MenuItem selectToolMenuItem = new MenuItem("Select Tool");
-		MenuItem moveToolMenuItem = new MenuItem("Move Tool");
-		MenuItem wireToolMenuItem = new MenuItem("Wire Tool");
-		toolMenu.getItems().addAll(panToolMenuItem, placeToolMenuItem, selectToolMenuItem, moveToolMenuItem,
-				wireToolMenuItem);
+		// Tool Menu
+		MenuItem panCursorToolMenuItem = new MenuItem("Pan Tool");
+		MenuItem placeCursorToolMenuItem = new MenuItem("Place Tool");
+		MenuItem selectCursorToolMenuItem = new MenuItem("Select Tool");
+		MenuItem moveCursorToolMenuItem = new MenuItem("Move Tool");
+		MenuItem wireCursorToolMenuItem = new MenuItem("Wire Tool");
+		cursorToolMenu.getItems().addAll(panCursorToolMenuItem, placeCursorToolMenuItem, selectCursorToolMenuItem,
+				moveCursorToolMenuItem, wireCursorToolMenuItem);
 
-		// Edit menu items
+		// CursorTool Menu
+		// CursorTool -> Pan Tool
+		project.setOnPanCursorToolMenuItemPressed(
+				() -> cursorToolToolBarToggleGroup.selectToggle(panCursorToolToolBarItem));
+		panCursorToolMenuItem.setOnAction(project::panCursorToolMenuItemEventHandler);
+		panCursorToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.Q));
+		// CursorTool -> Place Tool
+		project.setOnPlaceCursorToolMenuItemPressed(
+				() -> cursorToolToolBarToggleGroup.selectToggle(placeCursorToolToolBarItem));
+		placeCursorToolMenuItem.setOnAction(project::placeCursorToolMenuItemEventHandler);
+		placeCursorToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.A));
+		// CursorTool -> Select Tool
+		project.setOnSelectCursorToolMenuItemPressed(
+				() -> cursorToolToolBarToggleGroup.selectToggle(selectCursorToolToolBarItem));
+		selectCursorToolMenuItem.setOnAction(project::selectCursorToolMenuItemEventHandler);
+		selectCursorToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S));
+		// CursorTool -> Move Tool
+		project.setOnMoveCursorToolMenuItemPressed(
+				() -> cursorToolToolBarToggleGroup.selectToggle(moveCursorToolToolBarItem));
+		moveCursorToolMenuItem.setOnAction(project::moveCursorToolMenuItemEventHandler);
+		moveCursorToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.D));
+		// CursorTool -> Wire Tool
+		project.setOnWireCursorToolMenuItemPressed(
+				() -> cursorToolToolBarToggleGroup.selectToggle(wireCursorToolToolBarItem));
+		wireCursorToolMenuItem.setOnAction(project::wireCursorToolMenuItemEventHandler);
+		wireCursorToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.W));
+
+		// Edit Menu
 		MenuItem cutEditMenuItem = new MenuItem("Cut");
 		MenuItem copyEditMenuItem = new MenuItem("Copy");
 		MenuItem pasteEditMenuItem = new MenuItem("Paste");
@@ -160,151 +180,112 @@ public class MainWindow extends Application {
 		editMenu.getItems().addAll(cutEditMenuItem, copyEditMenuItem, pasteEditMenuItem, deleteEditMenuItem);
 
 		// Edit -> Cut
-		cutEditMenuItem.setOnAction(event -> {
-
-		});
+		cutEditMenuItem.setOnAction(project::cutEditMenuItemEventHandler);
 		cutEditMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.X, KeyCodeCombination.CONTROL_DOWN));
 		// Edit -> Copy
-		copyEditMenuItem.setOnAction(event -> {
-
-		});
+		copyEditMenuItem.setOnAction(project::copyEditMenuItemEventHandler);
 		copyEditMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCodeCombination.CONTROL_DOWN));
 		// Edit -> Paste
-		pasteEditMenuItem.setOnAction(event -> {
-
-		});
+		pasteEditMenuItem.setOnAction(project::pasteEditMenuItemEventHandler);
 		pasteEditMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.V, KeyCodeCombination.CONTROL_DOWN));
 		// Edit -> Delete
-		deleteEditMenuItem.setOnAction(event -> {
-			project.getProjectModel().deleteSelected();
-			canvasPane.redraw();
-		});
+		deleteEditMenuItem.setOnAction(project::deleteEditMenuItemEventHandler);
 		deleteEditMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.D, KeyCodeCombination.CONTROL_DOWN));
 
-		// Run menu items
+		// Run Menu
 		MenuItem runRunMenuItem = new MenuItem("Run");
 		MenuItem runContinuouslyRunMenuItem = new MenuItem("Run Continously");
 		runMenu.getItems().addAll(runRunMenuItem, runContinuouslyRunMenuItem);
 
 		// Run -> Run
-		runRunMenuItem.setOnAction(event -> {
-			project.run();
-		});
+		runRunMenuItem.setOnAction(project::runRunMenuItemEventHandler);
+		runRunMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCodeCombination.CONTROL_DOWN));
 		// Run -> Run Continuously
-		runContinuouslyRunMenuItem.setOnAction(event -> {
+		runContinuouslyRunMenuItem.setOnAction(project::runContinuouslyRunMenuItemEventHandler);
+		runContinuouslyRunMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCodeCombination.CONTROL_DOWN));
 
-		});
-
-		// Help menu items
+		// Help Menu
 		MenuItem tutorialHelpMenuItem = new MenuItem("Tutorial");
 		helpMenu.getItems().addAll(tutorialHelpMenuItem);
 
-		// ToolBar items
-		// ToolBar file items
-		Button newProjectToolBarItem = new Button("New");
-		Button openProjectToolBarItem = new Button("Open");
-		Button saveProjectToolBarItem = new Button("Save");
-		// ToolBar cursor items
-		RadioButton toolPanToolBarItem = new RadioButton("Pan");
-		RadioButton toolPlaceToolBarItem = new RadioButton("Place");
-		RadioButton toolSelectToolBarItem = new RadioButton("Select");
-		RadioButton toolMoveToolBarItem = new RadioButton("Move");
-		RadioButton toolWireToolBarItem = new RadioButton("Wire");
-		ToggleGroup toolToolBarToggleGroup = new ToggleGroup();
-		toolToolBarToggleGroup.getToggles().addAll(toolPanToolBarItem, toolPlaceToolBarItem, toolSelectToolBarItem,
-				toolMoveToolBarItem, toolWireToolBarItem);
-		// ToolBar edit items
-		Button cutToolBarItem = new Button("Cut");
-		Button copyToolBarItem = new Button("Copy");
-		Button pasteToolBarItem = new Button("Paste");
-		Button deleteToolBarItem = new Button("Delete");
-		// ToolBar run items
-		Button runToolBarItem = new Button("Run");
-		toolBar.getItems().addAll(newProjectToolBarItem, openProjectToolBarItem, saveProjectToolBarItem,
-				new Separator(), toolPanToolBarItem, toolPlaceToolBarItem, toolSelectToolBarItem, toolMoveToolBarItem,
-				toolWireToolBarItem, new Separator(), cutToolBarItem, copyToolBarItem, pasteToolBarItem,
-				deleteToolBarItem, new Separator(), runToolBarItem);
+		// Help -> Tutorial
+		tutorialHelpMenuItem.setOnAction(project::tutorialHelpItemEventHandler);
+		tutorialHelpMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F1));
 
-		// ToolBar file items
-		// ToolBar file new project
-		newProjectToolBarItem.setOnAction(newProjectFileMenuItem.getOnAction());
-		// ToolBar file open project
-		openProjectToolBarItem.setOnAction(openProjectFileMenuItem.getOnAction());
-		// ToolBar file save project
-		saveProjectToolBarItem.setOnAction(saveProjectFileMenuItem.getOnAction());
-		// ToolBar tool items
-		// ToolBar pan tool
-		toolPanToolBarItem.getStyleClass().remove("radio-button");
-		toolPanToolBarItem.getStyleClass().add("toggle-button");
-		toolPanToolBarItem.setOnAction(event -> {
-			selectedCursorTool = CursorToolSelection.PAN;
-			project.changeCursorTool(selectedCursorTool);
-			canvasPane.redraw();
-		});
-		toolPanToolBarItem.fire();
-		// ToolBar place tool
-		toolPlaceToolBarItem.getStyleClass().remove("radio-button");
-		toolPlaceToolBarItem.getStyleClass().add("toggle-button");
-		toolPlaceToolBarItem.setOnAction(event -> {
-			selectedCursorTool = CursorToolSelection.PLACE;
-			project.changeCursorTool(selectedCursorTool);
-			canvasPane.redraw();
-		});
-		// ToolBar select tool
-		toolSelectToolBarItem.getStyleClass().remove("radio-button");
-		toolSelectToolBarItem.getStyleClass().add("toggle-button");
-		toolSelectToolBarItem.setOnAction(event -> {
-			selectedCursorTool = CursorToolSelection.SELECT;
-			project.changeCursorTool(selectedCursorTool);
-			canvasPane.redraw();
-		});
-		// ToolBar move tool
-		toolMoveToolBarItem.getStyleClass().remove("radio-button");
-		toolMoveToolBarItem.getStyleClass().add("toggle-button");
-		toolMoveToolBarItem.setOnAction(event -> {
-			selectedCursorTool = CursorToolSelection.MOVE;
-			project.changeCursorTool(selectedCursorTool);
-			canvasPane.redraw();
-		});
-		// ToolBar wire tool
-		toolWireToolBarItem.getStyleClass().remove("radio-button");
-		toolWireToolBarItem.getStyleClass().add("toggle-button");
-		toolWireToolBarItem.setOnAction(event -> {
-			selectedCursorTool = CursorToolSelection.WIRE;
-			project.changeCursorTool(selectedCursorTool);
-			canvasPane.redraw();
-		});
+		// ToolBar
+		// File ToolBar
+		Button newProjectFileToolBarItem = new Button("New");
+		Button openProjectFileToolBarItem = new Button("Open");
+		Button saveProjectFileToolBarItem = new Button("Save");
+		// CursorTool ToolBar
+		panCursorToolToolBarItem = new RadioButton("Pan");
+		placeCursorToolToolBarItem = new RadioButton("Place");
+		selectCursorToolToolBarItem = new RadioButton("Select");
+		moveCursorToolToolBarItem = new RadioButton("Move");
+		wireCursorToolToolBarItem = new RadioButton("Wire");
+		cursorToolToolBarToggleGroup = new ToggleGroup();
+		cursorToolToolBarToggleGroup.getToggles().addAll(panCursorToolToolBarItem, placeCursorToolToolBarItem,
+				selectCursorToolToolBarItem, moveCursorToolToolBarItem, wireCursorToolToolBarItem);
+		// Edit ToolBar
+		Button cutEditToolBarItem = new Button("Cut");
+		Button copyEditToolBarItem = new Button("Copy");
+		Button pasteEditToolBarItem = new Button("Paste");
+		Button deleteEditToolBarItem = new Button("Delete");
+		// Run ToolBar
+		Button runRunToolBarItem = new Button("Run");
+		Button runContinuouslyRunToolBarItem = new Button("Run Continuously");
+		toolBar.getItems().addAll(newProjectFileToolBarItem, openProjectFileToolBarItem, saveProjectFileToolBarItem,
+				new Separator(), panCursorToolToolBarItem, placeCursorToolToolBarItem, selectCursorToolToolBarItem,
+				moveCursorToolToolBarItem, wireCursorToolToolBarItem, new Separator(), cutEditToolBarItem,
+				copyEditToolBarItem, pasteEditToolBarItem, deleteEditToolBarItem, new Separator(), runRunToolBarItem,
+				runContinuouslyRunToolBarItem);
 
-		// Tool menu items
-		// Tool -> Pan Tool
-		panToolMenuItem.setOnAction(event -> toolPanToolBarItem.fire());
-		panToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.Q));
-		// Tool -> Place Tool
-		placeToolMenuItem.setOnAction(event -> toolPlaceToolBarItem.fire());
-		placeToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.A));
-		// Tool -> Select Tool
-		selectToolMenuItem.setOnAction(event -> toolSelectToolBarItem.fire());
-		selectToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S));
-		// Tool -> Move Tool
-		moveToolMenuItem.setOnAction(event -> toolMoveToolBarItem.fire());
-		moveToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.D));
-		// Tool -> Wire Tool
-		wireToolMenuItem.setOnAction(event -> toolWireToolBarItem.fire());
-		wireToolMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.W));
+		// File ToolBar
+		// File -> New Project
+		newProjectFileToolBarItem.setOnAction(project::newProjectFileToolBarItemEventHandler);
+		// File -> Open Project
+		openProjectFileToolBarItem.setOnAction(project::openProjectFileToolBarItemEventHandler);
+		// File -> Save Project
+		saveProjectFileToolBarItem.setOnAction(project::saveProjectFileToolBarItemEventHandler);
 
-		// ToolBar edit items
-		// ToolBar edit cut
-		cutToolBarItem.setOnAction(event -> cutEditMenuItem.fire());
-		// ToolBar edit copy
-		copyToolBarItem.setOnAction(event -> copyEditMenuItem.fire());
-		// ToolBar edit paste
-		pasteToolBarItem.setOnAction(event -> pasteEditMenuItem.fire());
-		// ToolBar edit delete
-		deleteToolBarItem.setOnAction(event -> deleteEditMenuItem.fire());
+		// CursorTool ToolBar
+		// CursorTool -> Pan
+		panCursorToolToolBarItem.getStyleClass().remove("radio-button");
+		panCursorToolToolBarItem.getStyleClass().add("toggle-button");
+		panCursorToolToolBarItem.setOnAction(project::panCursorToolItemEventHandler);
+		panCursorToolToolBarItem.fire();
+		// CursorTool -> Place
+		placeCursorToolToolBarItem.getStyleClass().remove("radio-button");
+		placeCursorToolToolBarItem.getStyleClass().add("toggle-button");
+		placeCursorToolToolBarItem.setOnAction(project::placeCursorToolItemEventHandler);
+		// CursorTool -> Select
+		selectCursorToolToolBarItem.getStyleClass().remove("radio-button");
+		selectCursorToolToolBarItem.getStyleClass().add("toggle-button");
+		selectCursorToolToolBarItem.setOnAction(project::selectCursorToolItemEventHandler);
+		// CursorTool -> Move
+		moveCursorToolToolBarItem.getStyleClass().remove("radio-button");
+		moveCursorToolToolBarItem.getStyleClass().add("toggle-button");
+		moveCursorToolToolBarItem.setOnAction(project::moveCursorToolItemEventHandler);
+		// CursorTool -> Wire
+		wireCursorToolToolBarItem.getStyleClass().remove("radio-button");
+		wireCursorToolToolBarItem.getStyleClass().add("toggle-button");
+		wireCursorToolToolBarItem.setOnAction(project::wireCursorToolItemEventHandler);
 
-		// ToolBar run items
-		// ToolBar run run
-		runToolBarItem.setOnAction(event -> runRunMenuItem.fire());
+		// Edit ToolBar
+		// Edit -> Cut
+		cutEditToolBarItem.setOnAction(project::cutEditToolBarItemEventHandler);
+		// Edit -> Copy
+		copyEditToolBarItem.setOnAction(project::copyEditToolBarItemEventHandler);
+		// Edit -> Paste
+		pasteEditToolBarItem.setOnAction(project::pasteEditToolBarItemEventHandler);
+		// Edit -> Delete
+		deleteEditToolBarItem.setOnAction(project::deleteEditToolBarItemEventHandler);
+
+		// Run ToolBar
+		// Run -> Run
+		runRunToolBarItem.setOnAction(project::runRunToolBarItemEventHandler);
+		// Run -> Run Continuously
+		runContinuouslyRunToolBarItem.setOnAction(project::runContinuouslyRunToolBarItemEventHandler);
 
 		Scene primaryScene = new Scene(root);
 		primaryStage.setScene(primaryScene);

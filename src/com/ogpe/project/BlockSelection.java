@@ -7,15 +7,6 @@ public enum BlockSelection {
 	ADDITION_BLOCK("Addition Block"), 
 	PRINT("Print Block");
 
-	public static BlockSelection valueOfDisplayName(String displayName) {
-		BlockSelection blockListElement = null;
-		for (BlockSelection block : values()) {
-			if (block.getDisplayName().equals(displayName)) {
-				blockListElement = block;
-			}
-		}
-		return blockListElement;
-	}
 
 	private String displayName;
 
@@ -24,6 +15,11 @@ public enum BlockSelection {
 	}
 
 	public String getDisplayName() {
+		return displayName;
+	}
+	
+	@Override
+	public String toString() {
 		return displayName;
 	}
 }
