@@ -1,5 +1,6 @@
 package com.ogpe.project;
 
+@Deprecated
 public enum BlockSelection {
 	CONSTANT_BOOLEAN("Constant Boolean Block"), 
 	CONSTANT_NUMBER("Constant Number Block"),

@@ -1,10 +1,11 @@
 package com.ogpe.project;
 
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 
 public abstract class CursorTool {
 
-	private ProjectModel projectModel;
+	protected final ProjectModel projectModel;
 	
 	private CursorToolSelection cursorToolSelection;
 
@@ -12,6 +13,8 @@ public abstract class CursorTool {
 		this.projectModel = projectModel;
 		this.cursorToolSelection = cursorToolSelection;
 	}
+	
+	public abstract void drawDisplay(GraphicsContext context);
 
 	public abstract void softResetDisplayingContext();
 

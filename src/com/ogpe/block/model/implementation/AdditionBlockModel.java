@@ -16,7 +16,6 @@ public class AdditionBlockModel extends BlockModel {
 	private InputNetworkNode<BigDecimal> resultInputNetworkNode;
 
 	public AdditionBlockModel() {
-		super();
 		firstOperandOutputNetworkNode = new OutputNetworkNode<>(DataType.NUMBER);
 		secondOperandOutputNetworkNode = new OutputNetworkNode<>(DataType.NUMBER);
 		resultInputNetworkNode = new InputNetworkNode<>(DataType.NUMBER, () -> getResult());

@@ -1,28 +1,74 @@
 package com.ogpe.project;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.ogpe.block.Block;
+import com.ogpe.blockx.Block;
+import com.ogpe.blockx.Point;
+import com.ogpe.blockx.Rectangle;
 
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.paint.Color;
 
 public class SelectCursorTool extends CursorTool {
 
+	private List<Block> selectedBlocks;
+	private boolean dragSelecting;
+	private double startDragSelectionX;
+	private double startDragSelectionY;
+	private Rectangle dragSelectionRectangle;
+
 	public SelectCursorTool(ProjectModel projectModel) {
 		super(projectModel, CursorToolSelection.SELECT);
+		selectedBlocks = new ArrayList<>();
+	}
+
+	private void selectBlock(Block block) {
+		if (!selectedBlocks.contains(block)) {
+			selectedBlocks.add(block);
+			block.setSelected(true);
+		}
+	}
+
+	private void deselectBlock(Block block) {
+		if (selectedBlocks.contains(block)) {
+			selectedBlocks.remove(block);
+			block.setSelected(false);
+		}
+	}
+
+	private void deselectAllSelectedBlocks() {
+		selectedBlocks.forEach(block -> block.setSelected(false));
+		selectedBlocks.clear();
+	}
+
+	public void deleteSelectedBlocks() {
+		getProjectModel().removeBlock(selectedBlocks);
+	}
+
+	@Override
+	public void drawDisplay(GraphicsContext context) {
+		if (dragSelecting && dragSelectionRectangle != null) {
+			context.setStroke(Color.GRAY);
+			double dragX = dragSelectionRectangle.x;
+			double dragY = dragSelectionRectangle.y;
+			double dragW = dragSelectionRectangle.w;
+			double dragH = dragSelectionRectangle.h;
+			context.strokeRect(dragX + 0.5, dragY + 0.5, dragW, dragH);
+		}
 	}
 
 	@Override
 	public void softResetDisplayingContext() {
-		getProjectModel().setDragSelecting(false);
+		dragSelecting = false;
 	}
 
 	@Override
 	public void hardResetDisplayingContext() {
-		getProjectModel().deselectAllSelectedBlocks();
+		deselectAllSelectedBlocks();
 	}
 
 	@Override
@@ -42,18 +88,15 @@ public class SelectCursorTool extends CursorTool {
 		double x = mouseEvent.getX();
 		double y = mouseEvent.getY();
 		MouseButton mouseButton = mouseEvent.getButton();
-		boolean controlDown = mouseEvent.isControlDown(); 
-		
+		boolean controlDown = mouseEvent.isControlDown();
+
 		if (mouseButton == MouseButton.PRIMARY) {
-			getProjectModel().setDragSelecting(false);
-			getProjectModel().setStartDragSelectionX(x);
-			getProjectModel().setStartDragSelectionY(y);
+			dragSelecting = false;
+			startDragSelectionX = x;
+			startDragSelectionY = y;
 			if (!controlDown) {
-				getProjectModel().deselectAllSelectedBlocks();
+				deselectAllSelectedBlocks();
 			}
-		} else if (mouseButton == MouseButton.SECONDARY) {
-			Block<?, ?> foundBlock = getProjectModel().findBlock(x, y);
-			getProjectModel().setEditingBlock(foundBlock);
 		}
 	}
 
@@ -62,23 +105,23 @@ public class SelectCursorTool extends CursorTool {
 		double x = mouseEvent.getX();
 		double y = mouseEvent.getY();
 		MouseButton mouseButton = mouseEvent.getButton();
-		boolean controlDown = mouseEvent.isControlDown(); 
-		
+		boolean controlDown = mouseEvent.isControlDown();
+
 		if (mouseButton == MouseButton.PRIMARY) {
-			getProjectModel().setDragSelecting(true);
-			double dragX = Math.min(getProjectModel().getStartDragSelectionX(), x);
-			double dragY = Math.min(getProjectModel().getStartDragSelectionY(), y);
-			double dragW = Math.abs(getProjectModel().getStartDragSelectionX() - x);
-			double dragH = Math.abs(getProjectModel().getStartDragSelectionY() - y);
-			getProjectModel().setDragSelectionRectangle(new Rectangle(dragX, dragY, dragW, dragH));
-			List<Block<?, ?>> targetBlocks = getProjectModel().getBlocks().stream()
-					.filter(block -> block.getBlockView().intersects(dragX, dragY, dragW, dragH))
+			dragSelecting = true;
+			double dragX = Math.min(startDragSelectionX, x);
+			double dragY = Math.min(startDragSelectionY, y);
+			double dragW = Math.abs(startDragSelectionX - x);
+			double dragH = Math.abs(startDragSelectionY - y);
+			dragSelectionRectangle = new Rectangle(dragX, dragY, dragW, dragH);
+			List<Block> targetBlocks = getProjectModel().getBlocks().stream()
+					.filter(block -> block.getRectangle().intersects(new Rectangle(dragX, dragY, dragW, dragH)))
 					.collect(Collectors.toList());
 
 			if (!controlDown) {
-				getProjectModel().deselectAllSelectedBlocks();
+				deselectAllSelectedBlocks();
 			}
-			targetBlocks.forEach(block -> getProjectModel().selectBlock(block));
+			targetBlocks.forEach(block -> selectBlock(block));
 		}
 	}
 
@@ -88,26 +131,26 @@ public class SelectCursorTool extends CursorTool {
 		double y = mouseEvent.getY();
 		MouseButton mouseButton = mouseEvent.getButton();
 		boolean controlDown = mouseEvent.isControlDown();
-		
+
 		if (mouseButton == MouseButton.PRIMARY) {
-			if (!getProjectModel().isDragSelecting()) {
-				List<Block<?, ?>> targetBlocks = getProjectModel().getBlocks().stream().filter(block -> block.getBlockView().isInside(x, y))
-						.collect(Collectors.toList());
+			if (!dragSelecting) {
+				List<Block> targetBlocks = getProjectModel().getBlocks().stream()
+						.filter(block -> block.getRectangle().inside(new Point(x, y))).collect(Collectors.toList());
 
 				if (controlDown) {
 					targetBlocks.forEach(block -> {
-						if (getProjectModel().getSelectedBlocks().contains(block)) {
-							getProjectModel().deselectBlock(block);
+						if (selectedBlocks.contains(block)) {
+							deselectBlock(block);
 						} else {
-							getProjectModel().selectBlock(block);
+							selectBlock(block);
 						}
 					});
 				} else {
-					getProjectModel().deselectAllSelectedBlocks();
-					targetBlocks.forEach(block -> getProjectModel().selectBlock(block));
+					deselectAllSelectedBlocks();
+					targetBlocks.forEach(block -> selectBlock(block));
 				}
 			}
-			getProjectModel().setDragSelecting(false);
+			dragSelecting = false;
 		}
 	}
 

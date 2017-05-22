@@ -4,5 +4,7 @@ import javafx.scene.canvas.GraphicsContext;
 
 @FunctionalInterface
 public interface Drawer {
-	void draw(GraphicsContext graphicsContext);
+	
+	void draw(GraphicsContext context);
+	
 }

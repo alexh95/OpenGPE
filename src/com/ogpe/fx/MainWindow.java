@@ -1,7 +1,8 @@
 package com.ogpe.fx;
 
+import com.ogpe.blockx.BlockType;
+import com.ogpe.observable.Callback;
 import com.ogpe.observable.Observer;
-import com.ogpe.project.BlockSelection;
 import com.ogpe.project.Project;
 import com.sun.glass.ui.Screen;
 
@@ -35,7 +36,7 @@ public class MainWindow extends Application {
 
 	private Project project;
 
-	ConsoleOutputPane consoleOutputPane;
+	private ConsoleOutputPane consoleOutputPane;
 
 	private RadioButton panCursorToolToolBarItem;
 	private RadioButton placeCursorToolToolBarItem;
@@ -63,7 +64,7 @@ public class MainWindow extends Application {
 		CanvasPane canvasPane = new CanvasPane();
 		root.setCenter(canvasPane);
 
-		Observer<Object> canvasRedrawObserver = value -> canvasPane.redraw();
+		Callback canvasRedrawCallback = () -> canvasPane.redraw();
 		Observer<Node> editingPaneObserver = editingPane -> {
 			blockEditingPaneCenter.getChildren().clear();
 			if (editingPane != null) {
@@ -72,7 +73,7 @@ public class MainWindow extends Application {
 			canvasPane.redraw();
 		};
 		Observer<String> consoleOutputObserver = text -> consoleOutputPane.appendText(text);
-		project = new Project(canvasRedrawObserver, editingPaneObserver, consoleOutputObserver);
+		project = new Project(canvasRedrawCallback, editingPaneObserver, consoleOutputObserver);
 		canvasPane.setDrawer(project::drawCanvas);
 		canvasPane.setOnMouseMoved(project::onMouseMoved);
 		canvasPane.setOnMousePressed(project::onMousePressed);
@@ -85,10 +86,10 @@ public class MainWindow extends Application {
 		BorderPane blockSelectionPane = new BorderPane();
 		root.setLeft(new ScrollPane(blockSelectionPane));
 		// Block selection pane -> block selection list
-		ListView<BlockSelection> blockSelectionList = new ListView<>();
+		ListView<BlockType> blockSelectionList = new ListView<>();
 		blockSelectionPane.setCenter(blockSelectionList);
 
-		for (BlockSelection block : BlockSelection.values()) {
+		for (BlockType block : BlockType.values()) {
 			blockSelectionList.getItems().add(block);
 		}
 		blockSelectionList.getSelectionModel().selectedItemProperty().addListener(project::onBlockSelectionChanged);

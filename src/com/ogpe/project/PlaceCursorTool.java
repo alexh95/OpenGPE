@@ -1,113 +1,122 @@
 package com.ogpe.project;
 
-import com.ogpe.block.Block;
-import com.ogpe.block.view.implementation.AdditionBlockView;
-import com.ogpe.block.view.implementation.ConstantBooleanBlockView;
-import com.ogpe.block.view.implementation.ConstantNumberBlockView;
-import com.ogpe.block.view.implementation.ConstantStringBlockView;
-import com.ogpe.block.view.implementation.PrintBlockView;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import com.ogpe.blockx.Block;
+import com.ogpe.blockx.BlockType;
+import com.ogpe.blockx.Point;
+import com.ogpe.blockx.Rectangle;
+
+import javafx.scene.Node;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.paint.Color;
 
 public class PlaceCursorTool extends CursorTool {
 
+	private BlockType placingBlockSelection;
+	private boolean displayPlacing;
+	private boolean selectedBlockPlaceble;
+	private Rectangle blockPlacingRectangle;
+	private Block editingBlock;
+
 	public PlaceCursorTool(ProjectModel projectModel) {
 		super(projectModel, CursorToolSelection.PLACE);
+		placingBlockSelection = BlockType.NUMBER_VALUE;
+		displayPlacing = false;
+		selectedBlockPlaceble = false;
 	}
 
-	@Override
-	public void softResetDisplayingContext() {
-		getProjectModel().setDisplayPlacing(false);
+	public void setPlacingBlockSelection(BlockType placingBlockSelection) {
+		this.placingBlockSelection = placingBlockSelection;
 	}
 
-	@Override
-	public void hardResetDisplayingContext() {
-		getProjectModel().unsetEditingBlock();
+	private void setEditingBlock(Block block) {
+		unsetEditingBlock();
+		if (block != null) {
+			editingBlock = block;
+			editingBlock.setEditing(true);
+			Node editingPane = editingBlock.produceEditingPane(getProjectModel().getRedrawCallback());
+			getProjectModel().getEditingPanePaneObservable().updateObservers(editingPane);
+		}
 	}
 
-	@Override
-	public void selectedCursorTool() {
-		getProjectModel().setDisplayPlacing(true);
+	private void unsetEditingBlock() {
+		if (editingBlock != null) {
+			editingBlock.setEditing(false);
+			getProjectModel().getEditingPanePaneObservable().updateObservers(null);
+			editingBlock = null;
+		}
 	}
 
-	@Override
-	public void onMouseMoved(MouseEvent mouseEvent) {
-		double x = mouseEvent.getX();
-		double y = mouseEvent.getY();
-
-		getProjectModel().setDisplayPlacing(true);
-		switch (getProjectModel().getPlacingBlockSelection()) {
-		case CONSTANT_NUMBER:
-			getProjectModel().setSelectedBlockPlaceble(
-					getProjectModel().canPlace(x, y, ConstantNumberBlockView.WIDTH, ConstantNumberBlockView.HEIGHT));
-			getProjectModel().setSelectingBlockPlacingRectangle(
-					new Rectangle(x, y, ConstantNumberBlockView.WIDTH, ConstantNumberBlockView.HEIGHT));
-			break;
-		case CONSTANT_BOOLEAN:
-			getProjectModel().setSelectedBlockPlaceble(
-					getProjectModel().canPlace(x, y, ConstantBooleanBlockView.WIDTH, ConstantBooleanBlockView.HEIGHT));
-			getProjectModel().setSelectingBlockPlacingRectangle(
-					new Rectangle(x, y, ConstantBooleanBlockView.WIDTH, ConstantBooleanBlockView.HEIGHT));
-			break;
-		case CONSTANT_STRING:
-			getProjectModel().setSelectedBlockPlaceble(
-					getProjectModel().canPlace(x, y, ConstantStringBlockView.WIDTH, ConstantStringBlockView.HEIGHT));
-			getProjectModel().setSelectingBlockPlacingRectangle(
-					new Rectangle(x, y, ConstantStringBlockView.WIDTH, ConstantStringBlockView.HEIGHT));
-			break;
-		case ADDITION_BLOCK:
-			getProjectModel().setSelectedBlockPlaceble(
-					getProjectModel().canPlace(x, y, AdditionBlockView.WIDTH, AdditionBlockView.HEIGHT));
-			getProjectModel().setSelectingBlockPlacingRectangle(
-					new Rectangle(x, y, AdditionBlockView.WIDTH, AdditionBlockView.HEIGHT));
-			break;
-		case PRINT:
-			getProjectModel().setSelectedBlockPlaceble(
-					getProjectModel().canPlace(x, y, PrintBlockView.WIDTH, PrintBlockView.HEIGHT));
-			getProjectModel().setSelectingBlockPlacingRectangle(
-					new Rectangle(x, y, PrintBlockView.WIDTH, PrintBlockView.HEIGHT));
-			break;
+	private Block findBlock(Point point) {
+		List<Block> foundBlocks = getProjectModel().getBlocks().stream()
+				.filter(block -> block.getRectangle().inside(point)).collect(Collectors.toList());
+		if (foundBlocks.size() == 1) {
+			return foundBlocks.get(0);
+		} else {
+			return null;
 		}
 	}
 
 	@Override
+	public void drawDisplay(GraphicsContext context) {
+		if (displayPlacing && blockPlacingRectangle != null) {
+			if (selectedBlockPlaceble) {
+				context.setStroke(Color.GREEN);
+			} else {
+				context.setStroke(Color.RED);
+			}
+			double x = blockPlacingRectangle.x;
+			double y = blockPlacingRectangle.y;
+			double w = blockPlacingRectangle.w;
+			double h = blockPlacingRectangle.h;
+			context.strokeRect(x + 0.5, y + 0.5, w, h);
+		}
+	}
+
+	@Override
+	public void softResetDisplayingContext() {
+		displayPlacing = false;
+	}
+
+	@Override
+	public void hardResetDisplayingContext() {
+		unsetEditingBlock();
+	}
+
+	@Override
+	public void selectedCursorTool() {
+		displayPlacing = true;
+	}
+
+	@Override
+	public void onMouseMoved(MouseEvent mouseEvent) {
+		Point point = new Point(mouseEvent.getX(), mouseEvent.getY());
+
+		displayPlacing = true;
+		blockPlacingRectangle = new Rectangle(point).setSize(placingBlockSelection.getSize());
+		selectedBlockPlaceble = getProjectModel().canPlace(blockPlacingRectangle);
+	}
+
+	@Override
 	public void onMousePressed(MouseEvent mouseEvent) {
-		double x = mouseEvent.getX();
-		double y = mouseEvent.getY();
+		Point point = new Point(mouseEvent.getX(), mouseEvent.getY());
 		MouseButton mouseButton = mouseEvent.getButton();
 
 		if (mouseButton == MouseButton.PRIMARY) {
-			getProjectModel().setDisplayPlacing(false);
-			if (getProjectModel().isSelectedBlockPlaceble()) {
-				Block<?, ?> block = null;
-				switch (getProjectModel().getPlacingBlockSelection()) {
-				case CONSTANT_NUMBER:
-					block = getProjectModel().getBlockFactory().makeConstantNumberBlock(x, y);
-					break;
-				case CONSTANT_BOOLEAN:
-					block = getProjectModel().getBlockFactory().makeConstantBooleanBlock(x, y);
-					break;
-				case CONSTANT_STRING:
-					block = getProjectModel().getBlockFactory().makeConstantStringBlock(x, y);
-					break;
-				case ADDITION_BLOCK:
-					block = getProjectModel().getBlockFactory().makeAdditionBlock(x, y);
-					break;
-				case PRINT:
-					block = getProjectModel().getBlockFactory().makePrintBlock(x, y);
-					break;
-				}
-				if (block != null) {
-					getProjectModel().getNetworkNodes().addAll(block.getBlockModel().getNetworkNodes());
-					getProjectModel().getBlocks().add(block);
-					getProjectModel().setEditingBlock(block);
-				}
+			displayPlacing = false;
+			if (selectedBlockPlaceble) {
+				Block block = placingBlockSelection.makeBlock(point);
+				getProjectModel().addBlock(block);
+				setEditingBlock(block);
+
 			}
 		} else if (mouseButton == MouseButton.SECONDARY) {
-			Block<?, ?> foundBlock = getProjectModel().findBlock(x, y);
-			getProjectModel().setEditingBlock(foundBlock);
+			Block foundBlock = findBlock(point);
+			setEditingBlock(foundBlock);
 		}
 	}
 
@@ -120,4 +129,5 @@ public class PlaceCursorTool extends CursorTool {
 	public void onMouseDragged(MouseEvent mouseEvent) {
 
 	}
+
 }

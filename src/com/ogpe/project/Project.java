@@ -1,5 +1,6 @@
 package com.ogpe.project;
 
+import com.ogpe.blockx.BlockType;
 import com.ogpe.observable.Callback;
 import com.ogpe.observable.Observer;
 
@@ -8,8 +9,6 @@ import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 public class Project {
 
@@ -25,90 +24,54 @@ public class Project {
 	private Callback moveCursorToolMenuItemPressed;
 	private Callback wireCursorToolMenuItemPressed;
 
-	public Project(Observer<Object> redrawObserver, Observer<Node> editingPanePaneObserver,
+	public Project(Callback redrawCallback, Observer<Node> editingPanePaneObserver,
 			Observer<String> consoleOutputObserver) {
-		projectModel = new ProjectModel(redrawObserver, editingPanePaneObserver, consoleOutputObserver);
+		projectModel = new ProjectModel(redrawCallback, editingPanePaneObserver, consoleOutputObserver);
 		cursorTools = new CursorTools(projectModel);
 	}
 
-	public void drawCanvas(GraphicsContext graphicsContext) {
+	public void drawCanvas(GraphicsContext context) {
 		projectModel.getBlocks().forEach(block -> {
-			block.getBlockView().drawBlock(graphicsContext);
+			block.drawBlock(context);
 		});
-
-		projectModel.getNetworkNodes().forEach(node -> {
-			node.drawNode(graphicsContext);
-			node.drawWire(graphicsContext);
-		});
-
-		Rectangle selectingBlockPlacingRectangle = projectModel.getSelectingBlockPlacingRectangle();
-		if (projectModel.isDisplayPlacing() && projectModel.getSelectingBlockPlacingRectangle() != null) {
-			if (projectModel.isSelectedBlockPlaceble()) {
-				graphicsContext.setStroke(Color.GREEN);
-			} else {
-				graphicsContext.setStroke(Color.RED);
-			}
-			double x = selectingBlockPlacingRectangle.getX();
-			double y = selectingBlockPlacingRectangle.getY();
-			double w = selectingBlockPlacingRectangle.getWidth();
-			double h = selectingBlockPlacingRectangle.getHeight();
-			graphicsContext.strokeRect(x + 0.5, y + 0.5, w, h);
-		}
-
-		Rectangle dragSelectionRectangle = projectModel.getDragSelectionRectangle();
-		if (projectModel.isDragSelecting() && dragSelectionRectangle != null) {
-			graphicsContext.setStroke(Color.GRAY);
-			double dragX = dragSelectionRectangle.getX();
-			double dragY = dragSelectionRectangle.getY();
-			double dragW = dragSelectionRectangle.getWidth();
-			double dragH = dragSelectionRectangle.getHeight();
-			graphicsContext.strokeRect(dragX + 0.5, dragY + 0.5, dragW, dragH);
-		}
-
-		if (projectModel.isWiring()) {
-			graphicsContext.setStroke(Color.GREEN);
-			double wireX1 = Math.round(projectModel.getWiringStartX()) - 0.5;
-			double wireY1 = Math.round(projectModel.getWiringStartY()) - 0.5;
-			double wireX2 = Math.round(projectModel.getWireX()) - 0.5;
-			double wireY2 = Math.round(projectModel.getWireY()) - 0.5;
-			graphicsContext.strokeLine(wireX1, wireY1, wireX2, wireY2);
-		}
+		
+		cursorTools.drawDisplay(context);
 	}
 
 	// Event Handlers
 	public void onMouseMoved(MouseEvent mouseEvent) {
 		cursorTools.onMouseMoved(cursorTool, mouseEvent);
-		projectModel.updateRedrawObservable();
+		projectModel.callbackRedraw();
 	}
 
 	public void onMousePressed(MouseEvent mouseEvent) {
 		cursorTools.onMousePressed(cursorTool, mouseEvent);
-		projectModel.updateRedrawObservable();
+		projectModel.callbackRedraw();
 	}
 
 	public void onMouseDragged(MouseEvent mouseEvent) {
 		cursorTools.onMouseDragged(cursorTool, mouseEvent);
-		projectModel.updateRedrawObservable();
+		projectModel.callbackRedraw();
 	}
 
 	public void onMouseReleased(MouseEvent mouseEvent) {
 		cursorTools.onMouseReleased(cursorTool, mouseEvent);
-		projectModel.updateRedrawObservable();
+		projectModel.callbackRedraw();
 	}
 
 	public void onMouseEntered(MouseEvent mouseEvent) {
 		softResetDisplayingContext();
-		projectModel.updateRedrawObservable();
+		projectModel.callbackRedraw();
 	}
 
 	public void onMouseExited(MouseEvent mouseEvent) {
 		softResetDisplayingContext();
-		projectModel.updateRedrawObservable();
+		projectModel.callbackRedraw();
 	}
 
-	public void onBlockSelectionChanged(ObservableValue<? extends BlockSelection> observable, BlockSelection oldValue,
-			BlockSelection newValue) {
-		projectModel.setPlacingBlockSelection(newValue);
+	public void onBlockSelectionChanged(ObservableValue<? extends BlockType> observable, BlockType oldValue,
+			BlockType newValue) {
+		cursorTools.setPlacingBlockSelection(newValue);
 	}
 	
 	// Callback
@@ -139,27 +102,27 @@ public class Project {
 	// Set CursorTool
 	private void setPanCursorTool() {
 		changeCursorTool(CursorToolSelection.PAN);
-		projectModel.updateRedrawObservable();
+		projectModel.callbackRedraw();
 	}
 
 	private void setPlaceCursorTool() {
 		changeCursorTool(CursorToolSelection.PLACE);
-		projectModel.updateRedrawObservable();
+		projectModel.callbackRedraw();
 	}
 
 	private void setSelectCursorTool() {
 		changeCursorTool(CursorToolSelection.SELECT);
-		projectModel.updateRedrawObservable();
+		projectModel.callbackRedraw();
 	}
 
 	private void setMoveCursorTool() {
 		changeCursorTool(CursorToolSelection.MOVE);
-		projectModel.updateRedrawObservable();
+		projectModel.callbackRedraw();
 	}
 
 	private void setWireCursorTool() {
 		changeCursorTool(CursorToolSelection.WIRE);
-		projectModel.updateRedrawObservable();
+		projectModel.callbackRedraw();
 	}
 
 	// Menu
@@ -233,8 +196,8 @@ public class Project {
 
 	// Edit -> Delete
 	public void deleteEditMenuItemEventHandler(ActionEvent event) {
-		projectModel.deleteSelected();
-		projectModel.updateRedrawObservable();
+		cursorTools.deleteSelectedBlocks();
+		projectModel.callbackRedraw();
 	}
 
 	// Run Menu
@@ -346,6 +309,6 @@ public class Project {
 
 	// Run
 	private void run() {
-		projectModel.getBlocks().forEach(block -> block.run(projectModel.getConsoleOutputObservable()));
+		projectModel.getBlocks().forEach(block -> block.runBlock(projectModel.getConsoleOutputObservable()));
 	}
 }

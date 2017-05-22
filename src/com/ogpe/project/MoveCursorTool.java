@@ -1,13 +1,34 @@
 package com.ogpe.project;
 
-import com.ogpe.block.Block;
+import com.ogpe.blockx.Block;
+import com.ogpe.blockx.Point;
+import com.ogpe.blockx.Rectangle;
 
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 
 public class MoveCursorTool extends CursorTool {
 
+	private Block movingBlock;
+	private Point movingBlockOffset;
+
 	public MoveCursorTool(ProjectModel projectModel) {
 		super(projectModel, CursorToolSelection.MOVE);
+
+		movingBlock = null;
+		movingBlockOffset = new Point();
+	}
+
+	private void unsetMovingBlock() {
+		if (movingBlock != null) {
+			movingBlock.setMoving(false);
+			movingBlock = null;
+		}
+	}
+
+	@Override
+	public void drawDisplay(GraphicsContext context) {
+
 	}
 
 	@Override
@@ -18,7 +39,7 @@ public class MoveCursorTool extends CursorTool {
 
 	@Override
 	public void hardResetDisplayingContext() {
-		getProjectModel().unsetMovingBlock();
+		unsetMovingBlock();
 	}
 
 	@Override
@@ -35,46 +56,39 @@ public class MoveCursorTool extends CursorTool {
 
 	@Override
 	public void onMousePressed(MouseEvent mouseEvent) {
-		double x = mouseEvent.getX();
-		double y = mouseEvent.getY();
+		Point point = new Point(mouseEvent.getX(), mouseEvent.getY());
 
-		Block<?, ?> selectedBlock = null;
-		for (Block<?, ?> block : getProjectModel().getBlocks()) {
-			if (block.getBlockView().isInside(x, y)) {
+		Block selectedBlock = null;
+		for (Block block : getProjectModel().getBlocks()) {
+			if (block.getRectangle().inside(point)) {
 				selectedBlock = block;
 			}
 		}
 
 		if (selectedBlock != null) {
-			if (getProjectModel().getMovingBlock() != null) {
-				getProjectModel().getMovingBlock().getBlockView().setMoving(false);
+			if (movingBlock != null) {
+				movingBlock.setMoving(false);
 			}
-			getProjectModel().setMovingBlock(selectedBlock);
-			getProjectModel().setMovingBlockOffsetX(getProjectModel().getMovingBlock().getBlockView().getX() - x);
-			getProjectModel().setMovingBlockOffsetY(getProjectModel().getMovingBlock().getBlockView().getY() - y);
-			getProjectModel().getMovingBlock().getBlockView().setMoving(true);
+			movingBlock = selectedBlock;
+			movingBlockOffset = movingBlock.getRectangle().min.sub(point);
+			movingBlock.setMoving(true);
 		}
 	}
 
 	@Override
 	public void onMouseDragged(MouseEvent mouseEvent) {
-		double x = mouseEvent.getX();
-		double y = mouseEvent.getY();
-
-		double nextX = x + getProjectModel().getMovingBlockOffsetX();
-		double nextY = y + getProjectModel().getMovingBlockOffsetY();
-		Block<?, ?> movingBlock = getProjectModel().getMovingBlock();
+		Point point = new Point(mouseEvent.getX(), mouseEvent.getY());
 		if (movingBlock != null) {
-			if (getProjectModel().canPlace(nextX, nextY, movingBlock.getBlockView().getW(),
-					movingBlock.getBlockView().getH())) {
-				movingBlock.getBlockView().setX(nextX);
-				movingBlock.getBlockView().setY(nextY);
+			Point nextPoint = point.add(movingBlockOffset);
+			Rectangle rectangle = new Rectangle(nextPoint).setSize(movingBlock.getRectangle().getSize());
+			if (getProjectModel().canPlace(rectangle)) {
+				movingBlock.setLocation(nextPoint);
 			}
 		}
 	}
 
 	@Override
 	public void onMouseReleased(MouseEvent mouseEvent) {
-		getProjectModel().unsetMovingBlock();
+		unsetMovingBlock();
 	}
 }

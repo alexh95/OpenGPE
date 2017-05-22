@@ -1,39 +1,81 @@
 package com.ogpe.project;
 
-import com.ogpe.block.network.NetworkNode;
-import com.ogpe.block.network.NetworkNodeHighlight;
-import com.ogpe.block.network.NetworkNodeType;
+import com.ogpe.blockx.Point;
+import com.ogpe.blockx.WireNode;
+import com.ogpe.blockx.WireNodeHighlight;
+import com.ogpe.blockx.WireNodeType;
 
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 
 public class WireCursorTool extends CursorTool {
 
+	private boolean wiring;
+	private WireNode wiringNode;
+	private Point wiringStart;
+	private Point wireCurrent;
+
 	public WireCursorTool(ProjectModel projectModel) {
 		super(projectModel, CursorToolSelection.WIRE);
+
+		wiring = false;
+		wiringNode = null;
+		wiringStart = new Point();
+		wireCurrent = new Point();
+	}
+
+	private WireNode getClosestWireNode(Point point) {
+		double maximumDistance = 16;
+		WireNode closestNetworkNode = null;
+		double closestNetworkNodeDistance = 0;
+		for (WireNode networkNode : getProjectModel().getWireNodes()) {
+			double distance = point.distance(networkNode.getLocation());
+			if (distance <= maximumDistance && (closestNetworkNode == null || distance <= closestNetworkNodeDistance)) {
+				closestNetworkNode = networkNode;
+				closestNetworkNodeDistance = distance;
+			}
+		}
+		return closestNetworkNode;
+	}
+
+	private boolean isValidNodeForWiring(WireNode wireNode) {
+		return !wiringNode.isSet() && wiringNode.isValidProvider(wireNode);
+	}
+
+	@Override
+	public void drawDisplay(GraphicsContext context) {
+		if (wiring) {
+			context.setStroke(Color.GREEN);
+			double wireX1 = Math.round(wiringStart.x) - 0.5;
+			double wireY1 = Math.round(wiringStart.y) - 0.5;
+			double wireX2 = Math.round(wireCurrent.x) - 0.5;
+			double wireY2 = Math.round(wireCurrent.y) - 0.5;
+			context.strokeLine(wireX1, wireY1, wireX2, wireY2);
+		}
 	}
 
 	@Override
 	public void softResetDisplayingContext() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void hardResetDisplayingContext() {
-		getProjectModel().setWiring(false);
-		getProjectModel().getNetworkNodes().forEach(networkNode -> {
-			switch (networkNode.getHighlight()) {
-			case HOVER:
-				networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+		wiring = false;
+		getProjectModel().getWireNodes().forEach(wireNode -> {
+			switch (wireNode.getHighlight()) {
+			case HOVERING:
+				wireNode.setHighlight(WireNodeHighlight.UNSET);
 				break;
 			case WIRING:
-				networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+				wireNode.setHighlight(WireNodeHighlight.UNSET);
 				break;
-			case HOVER_VALID_WIRING:
-				networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+			case HOVERING_WIRING_VALID:
+				wireNode.setHighlight(WireNodeHighlight.UNSET);
 				break;
-			case HOVER_INVALID_WIRING:
-				networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+			case HOVERING_WIRING_INVALID:
+				wireNode.setHighlight(WireNodeHighlight.UNSET);
 				break;
 			default:
 				break;
@@ -49,14 +91,13 @@ public class WireCursorTool extends CursorTool {
 
 	@Override
 	public void onMouseMoved(MouseEvent mouseEvent) {
-		double x = mouseEvent.getX();
-		double y = mouseEvent.getY();
+		Point point = new Point(mouseEvent.getX(), mouseEvent.getY());
 
 		// Reset Highlight
-		getProjectModel().getNetworkNodes().forEach(networkNode -> {
-			switch (networkNode.getHighlight()) {
-			case HOVER:
-				networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+		getProjectModel().getWireNodes().forEach(wireNode -> {
+			switch (wireNode.getHighlight()) {
+			case HOVERING:
+				wireNode.setHighlight(WireNodeHighlight.UNSET);
 				break;
 			default:
 				break;
@@ -64,11 +105,11 @@ public class WireCursorTool extends CursorTool {
 		});
 
 		// Highlight
-		NetworkNode<?> closestNetworkNode = getProjectModel().getClosestNetworkNode(x, y);
-		if (closestNetworkNode != null) {
-			switch (closestNetworkNode.getHighlight()) {
+		WireNode closestWireNode = getClosestWireNode(point);
+		if (closestWireNode != null) {
+			switch (closestWireNode.getHighlight()) {
 			case UNSET:
-				closestNetworkNode.setHighlighted(NetworkNodeHighlight.HOVER);
+				closestWireNode.setHighlight(WireNodeHighlight.HOVERING);
 				break;
 			default:
 				break;
@@ -78,36 +119,32 @@ public class WireCursorTool extends CursorTool {
 
 	@Override
 	public void onMousePressed(MouseEvent mouseEvent) {
-		double x = mouseEvent.getX();
-		double y = mouseEvent.getY();
+		Point point = new Point(mouseEvent.getX(), mouseEvent.getY());
 
-		getProjectModel().setWiringNetworkNode(getProjectModel().getClosestNetworkNode(x, y));
-		if (getProjectModel().getWiringNetworkNode() != null && !getProjectModel().getWiringNetworkNode().isNodeSet()) {
-			getProjectModel().getWiringNetworkNode().setNodeSet(true);
-			getProjectModel().getWiringNetworkNode().setHighlighted(NetworkNodeHighlight.WIRING);
+		wiringNode = getClosestWireNode(point);
+		if (wiringNode != null && !wiringNode.isSet()) {
+			wiringNode.set();
+			wiringNode.setHighlight(WireNodeHighlight.WIRING);
 
-			getProjectModel().setWiring(true);
-			getProjectModel().setWiringStartX(getProjectModel().getWiringNetworkNode().getX());
-			getProjectModel().setWiringStartY(getProjectModel().getWiringNetworkNode().getY());
-			getProjectModel().setWireX(x);
-			getProjectModel().setWireY(y);
+			wiring = true;
+			wiringStart = wiringNode.getLocation();
+			wireCurrent = point;
 		}
 	}
 
 	@Override
 	public void onMouseDragged(MouseEvent mouseEvent) {
-		double x = mouseEvent.getX();
-		double y = mouseEvent.getY();
+		Point point = new Point(mouseEvent.getX(), mouseEvent.getY());
 
-		if (getProjectModel().isWiring()) {
+		if (wiring) {
 			// Reset Highlight
-			getProjectModel().getNetworkNodes().forEach(networkNode -> {
-				switch (networkNode.getHighlight()) {
-				case HOVER_VALID_WIRING:
-					networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+			getProjectModel().getWireNodes().forEach(wireNode -> {
+				switch (wireNode.getHighlight()) {
+				case HOVERING_WIRING_VALID:
+					wireNode.setHighlight(WireNodeHighlight.UNSET);
 					break;
-				case HOVER_INVALID_WIRING:
-					networkNode.setHighlighted(NetworkNodeHighlight.UNSET);
+				case HOVERING_WIRING_INVALID:
+					wireNode.setHighlight(WireNodeHighlight.UNSET);
 					break;
 				default:
 					break;
@@ -115,51 +152,63 @@ public class WireCursorTool extends CursorTool {
 			});
 
 			// Highlight
-			NetworkNode<?> closestNetworkNode = getProjectModel().getClosestNetworkNode(x, y);
-			if (closestNetworkNode != null && closestNetworkNode != getProjectModel().getWiringNetworkNode()
-					&& closestNetworkNode.getHighlight().equals(NetworkNodeHighlight.UNSET)) {
-				if (getProjectModel().isValidNodeForWiring(closestNetworkNode)) {
-					closestNetworkNode.setHighlighted(NetworkNodeHighlight.HOVER_VALID_WIRING);
+			WireNode closestWireNode = getClosestWireNode(point);
+			if (closestWireNode != null && closestWireNode != wiringNode
+					&& closestWireNode.getHighlight().equals(WireNodeHighlight.UNSET)) {
+				if (isValidNodeForWiring(closestWireNode)) {
+					closestWireNode.setHighlight(WireNodeHighlight.HOVERING_WIRING_VALID);
 				} else {
-					closestNetworkNode.setHighlighted(NetworkNodeHighlight.HOVER_INVALID_WIRING);
+					closestWireNode.setHighlight(WireNodeHighlight.HOVERING_WIRING_INVALID);
 				}
 			}
 
-			getProjectModel().setWireX(x);
-			getProjectModel().setWireY(y);
+			wireCurrent = point;
 		}
 	}
 
 	@Override
 	public void onMouseReleased(MouseEvent mouseEvent) {
-		double x = mouseEvent.getX();
-		double y = mouseEvent.getY();
+		Point point = new Point(mouseEvent.getX(), mouseEvent.getY());
 
-		if (getProjectModel().isWiring()) {
-			NetworkNode<?> closestNetworkNode = getProjectModel().getClosestNetworkNode(x, y);
-			if (closestNetworkNode != null && closestNetworkNode != getProjectModel().getWiringNetworkNode()) {
-				if (getProjectModel().isValidNodeForWiring(closestNetworkNode)) {
-					closestNetworkNode.setNodeSet(true);
-					if (closestNetworkNode.getNodeType() == NetworkNodeType.OUTPUT) {
-						closestNetworkNode.setNetworkNode(getProjectModel().getWiringNetworkNode());
+		if (wiring) {
+			WireNode closestWireNode = getClosestWireNode(point);
+			if (closestWireNode != null && closestWireNode != wiringNode) {
+				if (isValidNodeForWiring(closestWireNode)) {
+					closestWireNode.set();
+					if (closestWireNode.nodeType == WireNodeType.OUTPUT) {
+						closestWireNode.setProvider(wiringNode);
 					} else {
-						getProjectModel().getWiringNetworkNode().setNetworkNode(closestNetworkNode);
+						wiringNode.setProvider(closestWireNode);
 					}
-					getProjectModel().getWiringNetworkNode().setHighlighted(NetworkNodeHighlight.SET);
-					closestNetworkNode.setHighlighted(NetworkNodeHighlight.SET);
+					wiringNode.setHighlight(WireNodeHighlight.SET);
+					closestWireNode.setHighlight(WireNodeHighlight.SET);
 				} else {
-					getProjectModel().getWiringNetworkNode().setHighlighted(NetworkNodeHighlight.UNSET);
-					getProjectModel().getWiringNetworkNode().setNodeSet(false);
+					wiringNode.setHighlight(WireNodeHighlight.UNSET);
+					wiringNode.unset();
 				}
 			} else {
-				getProjectModel().getWiringNetworkNode().setHighlighted(NetworkNodeHighlight.UNSET);
-				getProjectModel().getWiringNetworkNode().setNodeSet(false);
+				wiringNode.setHighlight(WireNodeHighlight.UNSET);
+				wiringNode.unset();
 			}
 
-			getProjectModel().setWiring(false);
-			getProjectModel().setWiringStartX(0);
-			getProjectModel().setWiringStartY(0);
-			getProjectModel().setWiringNetworkNode(null);
+			// Reset Highlight
+			getProjectModel().getWireNodes().forEach(wireNode -> {
+				switch (wireNode.getHighlight()) {
+				case HOVERING_WIRING_VALID:
+					wireNode.setHighlight(WireNodeHighlight.UNSET);
+					break;
+				case HOVERING_WIRING_INVALID:
+					wireNode.setHighlight(WireNodeHighlight.UNSET);
+					break;
+				default:
+					break;
+				}
+			});
+
+			wiring = false;
+			wiringStart = new Point();
+			wiringNode = null;
 		}
 	}
+	
 }

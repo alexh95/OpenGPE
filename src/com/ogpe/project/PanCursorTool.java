@@ -1,11 +1,17 @@
 package com.ogpe.project;
 
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 
 public class PanCursorTool extends CursorTool {
 
 	public PanCursorTool(ProjectModel projectModel) {
 		super(projectModel, CursorToolSelection.PAN);
+	}
+	
+	@Override
+	public void drawDisplay(GraphicsContext context) {
+		
 	}
 
 	@Override
