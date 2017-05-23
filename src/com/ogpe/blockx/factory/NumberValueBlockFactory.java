@@ -41,7 +41,7 @@ public class NumberValueBlockFactory extends BlockFactory {
 		});
 		wireNodes.put(OUTPUT_KEY, output);
 
-		BlockRunner blockRunner = (block, console) -> {
+		BlockRunner blockRunner = (context) -> {
 
 		};
 
@@ -72,12 +72,6 @@ public class NumberValueBlockFactory extends BlockFactory {
 			double borderRectW = rect.w;
 			double borderRectH = rect.h;
 			context.strokeRect(borderRectX + 0.5, borderRectY + 0.5, borderRectW, borderRectH);
-
-			double portX = rect.x + Math.round(rect.w / 2) - 5;
-			double portY = rect.y + rect.h - 6;
-			double portW = 10;
-			double portH = 6;
-			context.strokeRect(portX + 0.5, portY + 0.5, portW, portH);
 
 			if (block.isEditing()) {
 				context.setFill(Color.FUCHSIA);

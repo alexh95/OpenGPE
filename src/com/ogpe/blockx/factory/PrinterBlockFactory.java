@@ -34,10 +34,12 @@ public class PrinterBlockFactory extends BlockFactory {
 		WireNode input = new WireNode(WireNodeType.INPUT, DataType.ANY, new Point(23.5, 3.5));
 		wireNodes.put(INPUT_KEY, input);
 
-		BlockRunner blockRunner = (block, console) -> {
-			String value = input.provide().toString();
-			console.updateObservers(value);
-			System.out.println("DEBUG: " + value);
+		BlockRunner blockRunner = (context) -> {
+			Object value = input.provide();
+			if (value != null) {
+				context.console.updateObservers(value.toString());
+				System.out.println("DEBUG: " + value.toString());
+			}
 		};
 
 		Rectangle rectangle = new Rectangle(position).setSize(SIZE);
@@ -67,15 +69,6 @@ public class PrinterBlockFactory extends BlockFactory {
 			double borderRectW = rect.w;
 			double borderRectH = rect.h;
 			context.strokeRect(borderRectX + 0.5, borderRectY + 0.5, borderRectW, borderRectH);
-
-			double portX1 = rect.x + Math.round(rect.w / 2) - 6;
-			double portY1 = rect.y;
-			double portX2 = rect.x + Math.round(rect.w / 2);
-			double portY2 = rect.y + 6;
-			double portX3 = rect.x + Math.round(rect.w / 2) + 6;
-			double portY3 = rect.y;
-			context.strokePolyline(new double[] { portX1 + 0.5, portX2 + 0.5, portX3 + 0.5 },
-					new double[] { portY1 + 0.5, portY2 + 0.5, portY3 + 0.5 }, 3);
 
 			context.setFill(Color.BLACK);
 			context.setTextAlign(TextAlignment.CENTER);

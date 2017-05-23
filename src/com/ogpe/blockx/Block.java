@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.ogpe.blockx.wire.WireNode;
 import com.ogpe.observable.Callback;
-import com.ogpe.observable.Observable;
 
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
@@ -26,7 +25,7 @@ public class Block {
 	public Block(Map<String, WireNode> wireNodes, BlockRunner blockRunner, Rectangle rectangle, BlockDrawer blockDrawer,
 			EditingPaneProducer editingPaneProducer) {
 		this.wireNodes = wireNodes;
-		this.wireNodes.values().forEach(wireNode -> wireNode.setOffsetProvider(() -> getRectangle().min));
+		this.wireNodes.values().forEach(wireNode -> wireNode.setBlockProvider(() -> this));
 		this.blockRunner = blockRunner;
 		this.rectangle = rectangle;
 		this.blockDrawer = blockDrawer;
@@ -37,8 +36,8 @@ public class Block {
 		return wireNodes;
 	}
 
-	public void runBlock(Observable<String> console) {
-		blockRunner.runBlock(this, console);
+	public void runBlock(RunningContext context) {
+		blockRunner.runBlock(context);
 	}
 
 	public Rectangle getRectangle() {

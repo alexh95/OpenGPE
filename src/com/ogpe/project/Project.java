@@ -203,7 +203,7 @@ public class Project {
 	// Run Menu
 	// Run -> Run
 	public void runRunMenuItemEventHandler(ActionEvent event) {
-		run();
+		projectModel.run();
 	}
 
 	// Run -> Run Continuously
@@ -284,7 +284,7 @@ public class Project {
 	// Run ToolBar
 	// Run -> Run
 	public void runRunToolBarItemEventHandler(ActionEvent event) {
-
+		projectModel.run();
 	}
 
 	// Run -> Run Continuously
@@ -307,8 +307,4 @@ public class Project {
 		cursorTools.hardResetDisplayingContext();
 	}
 
-	// Run
-	private void run() {
-		projectModel.getBlocks().forEach(block -> block.runBlock(projectModel.getConsoleOutputObservable()));
-	}
 }

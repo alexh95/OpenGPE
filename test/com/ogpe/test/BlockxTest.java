@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import com.ogpe.blockx.Block;
 import com.ogpe.blockx.BlockType;
+import com.ogpe.blockx.RunningContext;
 import com.ogpe.blockx.factory.NumberAdderBlockFactory;
 import com.ogpe.blockx.factory.NumberValueBlockFactory;
 import com.ogpe.blockx.factory.PrinterBlockFactory;
@@ -56,7 +57,8 @@ public class BlockxTest {
 		printerBlock.getWireNodes().get(PrinterBlockFactory.INPUT_KEY)
 				.setProvider(valueBlock.getWireNodes().get(NumberValueBlockFactory.OUTPUT_KEY));
 		
-		printerBlock.runBlock(new Observable<String>());
+		RunningContext context = new RunningContext(new Observable<String>(), 1);
+		printerBlock.runBlock(context);
 	}
 
 }
