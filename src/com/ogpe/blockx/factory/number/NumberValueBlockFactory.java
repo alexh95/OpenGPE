@@ -1,4 +1,4 @@
-package com.ogpe.blockx.factory;
+package com.ogpe.blockx.factory.number;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -7,6 +7,7 @@ import com.ogpe.blockx.Block;
 import com.ogpe.blockx.DataType;
 import com.ogpe.blockx.Point;
 import com.ogpe.blockx.Rectangle;
+import com.ogpe.blockx.factory.BlockFactory;
 import com.ogpe.blockx.wire.WireNode;
 import com.ogpe.blockx.wire.WireNodeType;
 import com.ogpe.observable.Callback;

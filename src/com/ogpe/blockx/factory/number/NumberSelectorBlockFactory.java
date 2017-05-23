@@ -1,11 +1,13 @@
-package com.ogpe.blockx.factory;
+package com.ogpe.blockx.factory.number;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import com.ogpe.blockx.Block;
 import com.ogpe.blockx.DataType;
 import com.ogpe.blockx.Point;
 import com.ogpe.blockx.Rectangle;
+import com.ogpe.blockx.factory.BlockFactory;
 import com.ogpe.blockx.wire.WireNode;
 import com.ogpe.blockx.wire.WireNodeType;
 
@@ -14,30 +16,30 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
-public class BooleanSelectorBlockFactory extends BlockFactory {
+public class NumberSelectorBlockFactory extends BlockFactory {
 
 	public static final String INPUT_KEY_1 = "input1";
 	public static final String INPUT_KEY_2 = "input2";
 	public static final String INPUT_KEY_3 = "input3";
 	public static final String OUTPUT_KEY = "output";
 
-	public BooleanSelectorBlockFactory() {
+	public NumberSelectorBlockFactory() {
 		super(new Point(64, 32));
 	}
 
 	@Override
 	protected void addWireNodes(Map<String, WireNode> wireNodes) {
 		wireNodes.put(INPUT_KEY_1, new WireNode(WireNodeType.INPUT, DataType.BOOLEAN, new Point(16.5, 3.5)));
-		wireNodes.put(INPUT_KEY_2, new WireNode(WireNodeType.INPUT, DataType.BOOLEAN, new Point(32.5, 3.5)));
-		wireNodes.put(INPUT_KEY_3, new WireNode(WireNodeType.INPUT, DataType.BOOLEAN, new Point(48.5, 3.5)));
+		wireNodes.put(INPUT_KEY_2, new WireNode(WireNodeType.INPUT, DataType.NUMBER, new Point(32.5, 3.5)));
+		wireNodes.put(INPUT_KEY_3, new WireNode(WireNodeType.INPUT, DataType.NUMBER, new Point(48.5, 3.5)));
 		wireNodes.put(OUTPUT_KEY,
 				new WireNode(WireNodeType.OUTPUT, DataType.BOOLEAN, new Point(32.5, size.y - 2.5), () -> {
 					Boolean condition = (Boolean) wireNodes.get(INPUT_KEY_1).provide();
-					Boolean result;
+					BigDecimal result;
 					if (condition) {
-						result = (Boolean) wireNodes.get(INPUT_KEY_2).provide();
+						result = (BigDecimal) wireNodes.get(INPUT_KEY_2).provide();
 					} else {
-						result = (Boolean) wireNodes.get(INPUT_KEY_3).provide();
+						result = (BigDecimal) wireNodes.get(INPUT_KEY_3).provide();
 					}
 					return result;
 				}));
@@ -53,7 +55,7 @@ public class BooleanSelectorBlockFactory extends BlockFactory {
 		double textX = rect.x + Math.round(rect.w / 2);
 		double textY = rect.y + 10;
 		context.fillText(text, textX, textY);
-		text = "Boolean";
+		text = "Number";
 		textX = rect.x + Math.round(rect.w / 2);
 		textY = rect.y + 20;
 		context.fillText(text, textX, textY);

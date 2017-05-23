@@ -9,9 +9,9 @@ import org.junit.Test;
 import com.ogpe.blockx.Block;
 import com.ogpe.blockx.BlockType;
 import com.ogpe.blockx.RunningContext;
-import com.ogpe.blockx.factory.NumberAdderBlockFactory;
-import com.ogpe.blockx.factory.NumberValueBlockFactory;
 import com.ogpe.blockx.factory.PrinterBlockFactory;
+import com.ogpe.blockx.factory.number.NumberAdderBlockFactory;
+import com.ogpe.blockx.factory.number.NumberValueBlockFactory;
 import com.ogpe.observable.Observable;
 
 public class BlockxTest {

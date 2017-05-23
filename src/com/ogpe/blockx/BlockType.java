@@ -1,29 +1,39 @@
 package com.ogpe.blockx;
 
 import com.ogpe.blockx.factory.BlockFactory;
-import com.ogpe.blockx.factory.BooleanSelectorBlockFactory;
-import com.ogpe.blockx.factory.BooleanValueBlockFactory;
-import com.ogpe.blockx.factory.NumberAdderBlockFactory;
-import com.ogpe.blockx.factory.NumberValueBlockFactory;
 import com.ogpe.blockx.factory.PrinterBlockFactory;
 import com.ogpe.blockx.factory.RunningIndexBlockFactory;
 import com.ogpe.blockx.factory.StopBlockFactory;
+import com.ogpe.blockx.factory.bool.BooleanSelectorBlockFactory;
+import com.ogpe.blockx.factory.bool.BooleanValueBlockFactory;
+import com.ogpe.blockx.factory.number.NumberAdderBlockFactory;
+import com.ogpe.blockx.factory.number.NumberEqualsBlockFactory;
+import com.ogpe.blockx.factory.number.NumberGreaterThanBlockFactory;
+import com.ogpe.blockx.factory.number.NumberInverterBlockFactory;
+import com.ogpe.blockx.factory.number.NumberLessThanBlockFactory;
+import com.ogpe.blockx.factory.number.NumberMultiplierBlockFactory;
+import com.ogpe.blockx.factory.number.NumberNegatorBlockFactory;
+import com.ogpe.blockx.factory.number.NumberSelectorBlockFactory;
+import com.ogpe.blockx.factory.number.NumberValueBlockFactory;
 
 public enum BlockType {
 
 	// Number Blocks
 	NUMBER_VALUE(new NumberValueBlockFactory(), "Number Value"),
-	//NUMBER_OPPOSITE
-	//NUMBER_INVERTER
+	NUMBER_NEGATOR(new NumberNegatorBlockFactory(), "Number Negator"),
+	NUMBER_INVERTER(new NumberInverterBlockFactory(), "Number Inverter"),
 	NUMBER_ADDER(new NumberAdderBlockFactory(), "Number Adder"),
-	//NUMBER_MULTIPLIER
-	//NUMBER_SELECTOR
+	NUMBER_MULTIPLIER(new NumberMultiplierBlockFactory(), "Number Multiplier"),
+	NUMBER_SELECTOR(new NumberSelectorBlockFactory(), "Number Selector"),
+	NUMBER_EQUALS(new NumberEqualsBlockFactory(), "Number Equals"),
+	NUMBER_LESS_THAN(new NumberLessThanBlockFactory(), "Number Less Than"),
+	NUMBER_GREATER_THAN(new NumberGreaterThanBlockFactory(), "Number Greater Than"),
 	// Boolean Blocks
 	BOOLEAN_VALUE(new BooleanValueBlockFactory(), "Boolean Value"),
-	//BOOLEAN_NOT
-	//BOOLEAN_AND
-	//BOOLEAN_OR
-	//BOOLEAN_XOR
+	//BOOLEAN_NOT,
+	//BOOLEAN_AND,
+	//BOOLEAN_OR,
+	//BOOLEAN_XOR,
 	BOOLEAN_SELECTOR(new BooleanSelectorBlockFactory(), "Boolean Selector"),
 	// Effect Blocks
 	PRINTER(new PrinterBlockFactory(), "Printer"),

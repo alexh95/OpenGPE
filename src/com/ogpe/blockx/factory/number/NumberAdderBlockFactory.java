@@ -1,4 +1,4 @@
-package com.ogpe.blockx.factory;
+package com.ogpe.blockx.factory.number;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -7,6 +7,7 @@ import com.ogpe.blockx.Block;
 import com.ogpe.blockx.DataType;
 import com.ogpe.blockx.Point;
 import com.ogpe.blockx.Rectangle;
+import com.ogpe.blockx.factory.BlockFactory;
 import com.ogpe.blockx.wire.WireNode;
 import com.ogpe.blockx.wire.WireNodeType;
 
@@ -32,7 +33,7 @@ public class NumberAdderBlockFactory extends BlockFactory {
 		wireNodes.put(OUTPUT_KEY,
 				new WireNode(WireNodeType.OUTPUT, DataType.NUMBER, new Point(13.5, size.y - 2.5), () -> {
 					BigDecimal addend = (BigDecimal) wireNodes.get(INPUT_KEY_1).provide();
-					BigDecimal augend = (BigDecimal) wireNodes.get(INPUT_KEY_1).provide();
+					BigDecimal augend = (BigDecimal) wireNodes.get(INPUT_KEY_2).provide();
 					BigDecimal result = addend.add(augend);
 					return result;
 				}));
@@ -41,7 +42,6 @@ public class NumberAdderBlockFactory extends BlockFactory {
 	@Override
 	protected void drawBlock(Block block, GraphicsContext context) {
 		Rectangle rect = block.getRectangle();
-
 		context.setFill(Color.BLACK);
 		context.setTextAlign(TextAlignment.CENTER);
 		context.setTextBaseline(VPos.CENTER);
