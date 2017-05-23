@@ -7,6 +7,7 @@ import com.ogpe.observable.Callback;
 
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 public class Block {
 
@@ -17,7 +18,7 @@ public class Block {
 	private final BlockDrawer blockDrawer;
 
 	private final EditingPaneProducer editingPaneProducer;
-	
+
 	private boolean moving;
 	private boolean selected;
 	private boolean editing;
@@ -49,10 +50,35 @@ public class Block {
 	}
 
 	public void drawBlock(GraphicsContext context) {
+		drawBlockRectangle(context);
 		blockDrawer.drawBlock(this, context);
 		wireNodes.values().forEach(wireNode -> wireNode.drawWireNode(context));
 	}
 
+	private void drawBlockRectangle(GraphicsContext context) {
+		if (moving) {
+			context.setFill(Color.YELLOW);
+		} else {
+			context.setFill(Color.YELLOWGREEN);
+		}
+		double rectX = rectangle.x;
+		double rectY = rectangle.y;
+		double rectW = rectangle.w;
+		double rectH = rectangle.h;
+		context.fillRect(rectX, rectY, rectW, rectH);
+
+		if (selected) {
+			context.setStroke(Color.RED);
+		} else {
+			context.setStroke(Color.BLACK);
+		}
+		double borderRectX = rectangle.x;
+		double borderRectY = rectangle.y;
+		double borderRectW = rectangle.w;
+		double borderRectH = rectangle.h;
+		context.strokeRect(borderRectX + 0.5, borderRectY + 0.5, borderRectW, borderRectH);
+	}
+	
 	public Node produceEditingPane(Callback redrawCallback) {
 		return editingPaneProducer.produceEditingPane(redrawCallback);
 	}

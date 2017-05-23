@@ -4,12 +4,17 @@ import com.ogpe.blockx.factory.BlockFactory;
 import com.ogpe.blockx.factory.NumberAdderBlockFactory;
 import com.ogpe.blockx.factory.NumberValueBlockFactory;
 import com.ogpe.blockx.factory.PrinterBlockFactory;
+import com.ogpe.blockx.factory.RunningIndexBlockFactory;
+import com.ogpe.blockx.factory.StopBlockFactory;
 
 public enum BlockType {
 
 	NUMBER_VALUE(new NumberValueBlockFactory(), "Number Value"),
 	NUMBER_ADDER(new NumberAdderBlockFactory(), "Number Adder"),
-	PRINTER(new PrinterBlockFactory(), "Printer");
+	PRINTER(new PrinterBlockFactory(), "Printer"),
+	RUNNING_INDEX(new RunningIndexBlockFactory(), "Running Index"),
+	STOP(new StopBlockFactory(), "Stop");
+	
 	
 	private final BlockFactory blockFactory;
 	private final String displayName;
@@ -20,7 +25,7 @@ public enum BlockType {
 	}
 	
 	public Point getSize() {
-		return blockFactory.getSize();
+		return blockFactory.size;
 	}
 	
 	public Block makeBlock(Point position) {

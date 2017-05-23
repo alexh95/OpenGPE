@@ -3,6 +3,7 @@ package com.ogpe.blockx;
 public enum DataType {
 	
 	ANY,
-	NUMBER;
+	NUMBER,
+	BOOLEAN;
 
 }

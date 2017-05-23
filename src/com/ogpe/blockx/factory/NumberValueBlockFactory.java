@@ -25,18 +25,15 @@ import javafx.scene.text.TextAlignment;
 public class NumberValueBlockFactory extends BlockFactory {
 
 	public static final String OUTPUT_KEY = "output";
-	
-	public static final Point SIZE = new Point(46, 22);
-	
-	@Override
-	public Point getSize() {
-		return SIZE;
+
+	public NumberValueBlockFactory() {
+		super(new Point(46, 22));
 	}
-	
+
 	@Override
 	public Block makeBlock(Point position) {
 		Map<String, WireNode> wireNodes = new HashMap<>();
-		WireNode output = new WireNode(WireNodeType.OUTPUT, DataType.NUMBER, new Point(23.5, SIZE.y - 2.5), () -> {
+		WireNode output = new WireNode(WireNodeType.OUTPUT, DataType.NUMBER, new Point(23.5, size.y - 2.5), () -> {
 			return BigDecimal.valueOf(0);
 		});
 		wireNodes.put(OUTPUT_KEY, output);
@@ -45,34 +42,10 @@ public class NumberValueBlockFactory extends BlockFactory {
 
 		};
 
-		Rectangle rectangle = new Rectangle(position).setSize(SIZE);
+		Rectangle rectangle = new Rectangle(position).setSize(size);
 
 		BlockDrawer blockDrawer = (block, context) -> {
 			Rectangle rect = block.getRectangle();
-
-			if (block.isMoving()) {
-				context.setFill(Color.YELLOW);
-			} else {
-				context.setFill(Color.YELLOWGREEN);
-			}
-			double rectX = rect.x;
-			double rectY = rect.y;
-			double rectW = rect.w;
-			double rectH = rect.h;
-			context.fillRect(rectX, rectY, rectW, rectH);
-
-			if (block.isSelected()) {
-				context.setStroke(Color.RED);
-			} else {
-				context.setStroke(Color.BLACK);
-			}
-
-			double borderRectX = rect.x;
-			double borderRectY = rect.y;
-			double borderRectW = rect.w;
-			double borderRectH = rect.h;
-			context.strokeRect(borderRectX + 0.5, borderRectY + 0.5, borderRectW, borderRectH);
-
 			if (block.isEditing()) {
 				context.setFill(Color.FUCHSIA);
 			} else {

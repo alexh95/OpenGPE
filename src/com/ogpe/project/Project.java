@@ -208,7 +208,7 @@ public class Project {
 
 	// Run -> Run Continuously
 	public void runContinuouslyRunMenuItemEventHandler(ActionEvent event) {
-
+		projectModel.runContinuously();
 	}
 
 	// Help Menu
@@ -289,7 +289,7 @@ public class Project {
 
 	// Run -> Run Continuously
 	public void runContinuouslyRunToolBarItemEventHandler(ActionEvent event) {
-
+		projectModel.runContinuously();
 	}
 
 	private void changeCursorTool(CursorToolSelection newCursorTool) {

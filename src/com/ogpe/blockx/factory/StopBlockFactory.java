@@ -17,25 +17,27 @@ import javafx.geometry.VPos;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
-public class PrinterBlockFactory extends BlockFactory {
+public class StopBlockFactory extends BlockFactory {
 
 	public static final String INPUT_KEY = "input";
-
-	public PrinterBlockFactory() {
-		super(new Point(46, 22));
+	
+	public StopBlockFactory() {
+		super(new Point(26, 22));
 	}
 
 	@Override
 	public Block makeBlock(Point position) {
 		Map<String, WireNode> wireNodes = new HashMap<>();
-		WireNode input = new WireNode(WireNodeType.INPUT, DataType.ANY, new Point(23.5, 3.5));
+		WireNode input = new WireNode(WireNodeType.INPUT, DataType.BOOLEAN, new Point(size.x / 2 + 0.5, 3.5));
 		wireNodes.put(INPUT_KEY, input);
 
 		BlockRunner blockRunner = (context) -> {
 			Object value = input.provide();
 			if (value != null) {
-				context.console.updateObservers(value.toString());
-				System.out.println("DEBUG: " + value.toString());
+				Boolean stop = (Boolean) value;
+				if (stop) {
+					System.out.println("DEBUG: Stopped");
+				}
 			}
 		};
 
@@ -47,15 +49,13 @@ public class PrinterBlockFactory extends BlockFactory {
 			context.setFill(Color.BLACK);
 			context.setTextAlign(TextAlignment.CENTER);
 			context.setTextBaseline(VPos.CENTER);
-			String text = "Print";
+			String text = "Stop";
 			double textX = rect.x + Math.round(rect.w / 2);
 			double textY = rect.y + Math.round(rect.h / 2) + 3;
 			context.fillText(text, textX, textY);
 		};
 
-		EditingPaneProducer editingPaneProducer = (redrawCallback) -> {
-			return null;
-		};
+		EditingPaneProducer editingPaneProducer = (redrawCallback) -> null;
 
 		return new Block(wireNodes, blockRunner, rectangle, blockDrawer, editingPaneProducer);
 	}

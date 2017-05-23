@@ -7,6 +7,7 @@ import java.util.List;
 import com.ogpe.blockx.Block;
 import com.ogpe.blockx.Rectangle;
 import com.ogpe.blockx.RunningContext;
+import com.ogpe.blockx.factory.RunningIndexBlockFactory;
 import com.ogpe.blockx.wire.WireNetwork;
 import com.ogpe.blockx.wire.WireNode;
 import com.ogpe.observable.Callback;
@@ -100,8 +101,22 @@ public class ProjectModel {
 		wireNetwork.getLinks().forEach(link -> {
 			link.getDst().setProvider(link.getSrc());
 		});
-		RunningContext context = new RunningContext(consoleOutputObservable, 1);
+		RunningContext context = new RunningContext(consoleOutputObservable);
 		blocks.forEach(block -> block.runBlock(context));
+	}
+
+	public void runContinuously() {
+		wireNetwork.getLinks().forEach(link -> {
+			link.getDst().setProvider(link.getSrc());
+		});
+		int maxRunningIndex = 10;
+		boolean stopped = false;
+		for (int runningIndex = 0; runningIndex < maxRunningIndex && !stopped; ++runningIndex) {
+			RunningContext context = new RunningContext(consoleOutputObservable);
+			RunningIndexBlockFactory.runningIndex = runningIndex;
+			blocks.forEach(block -> block.runBlock(context));
+			stopped = context.isStopped();
+		}
 	}
 
 }
