@@ -34,7 +34,7 @@ public class Project {
 		projectModel.getBlocks().forEach(block -> {
 			block.drawBlock(context);
 		});
-		
+
 		cursorTools.drawDisplay(context);
 	}
 
@@ -73,28 +73,28 @@ public class Project {
 			BlockType newValue) {
 		cursorTools.setPlacingBlockSelection(newValue);
 	}
-	
+
 	// Callback
 	public void setOnExitFileMenuItemPressed(Callback callback) {
 		exitFileMenuItemPressed = callback;
 	}
-	
+
 	public void setOnPanCursorToolMenuItemPressed(Callback callback) {
 		panCursorToolMenuItemPressed = callback;
 	}
-	
+
 	public void setOnPlaceCursorToolMenuItemPressed(Callback callback) {
 		placeCursorToolMenuItemPressed = callback;
 	}
-	
+
 	public void setOnSelectCursorToolMenuItemPressed(Callback callback) {
 		selectCursorToolMenuItemPressed = callback;
 	}
-	
+
 	public void setOnMoveCursorToolMenuItemPressed(Callback callback) {
 		moveCursorToolMenuItemPressed = callback;
 	}
-	
+
 	public void setOnWireCursorToolMenuItemPressed(Callback callback) {
 		wireCursorToolMenuItemPressed = callback;
 	}
@@ -207,7 +207,7 @@ public class Project {
 	}
 
 	// Run -> Run Continuously
-	public void runContinuouslyRunMenuItemEventHandler(ActionEvent event) {
+	public void runRunContinuouslyMenuItemEventHandler(ActionEvent event) {
 		projectModel.runContinuously();
 	}
 
@@ -288,8 +288,21 @@ public class Project {
 	}
 
 	// Run -> Run Continuously
-	public void runContinuouslyRunToolBarItemEventHandler(ActionEvent event) {
+	public void runRunContinuouslyToolBarItemEventHandler(ActionEvent event) {
 		projectModel.runContinuously();
+	}
+
+	public void runRunContinuouslyToolBarChangeListener(ObservableValue<? extends String> observable, String oldValue,
+			String newValue) {
+		if (newValue.matches("\\d*")) {
+			int newMaxRunningIterations;
+			if (newValue.isEmpty()) {
+				newMaxRunningIterations = 0;
+			} else {
+				newMaxRunningIterations = Integer.parseInt(newValue);
+			}
+			projectModel.setMaxRunnningIterations(newMaxRunningIterations);
+		}
 	}
 
 	private void changeCursorTool(CursorToolSelection newCursorTool) {

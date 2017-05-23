@@ -12,7 +12,9 @@ import javafx.scene.paint.Color;
 public class Block {
 
 	private final Map<String, WireNode> wireNodes;
+	private final BlockRunner blockPreRunner;
 	private final BlockRunner blockRunner;
+	private final BlockRunner blockPostRunner;
 
 	private Rectangle rectangle;
 	private final BlockDrawer blockDrawer;
@@ -23,11 +25,13 @@ public class Block {
 	private boolean selected;
 	private boolean editing;
 
-	public Block(Map<String, WireNode> wireNodes, BlockRunner blockRunner, Rectangle rectangle, BlockDrawer blockDrawer,
+	public Block(Map<String, WireNode> wireNodes, BlockRunner blockPreRunner, BlockRunner blockRunner, BlockRunner blockPostRunner, Rectangle rectangle, BlockDrawer blockDrawer,
 			EditingPaneProducer editingPaneProducer) {
 		this.wireNodes = wireNodes;
 		this.wireNodes.values().forEach(wireNode -> wireNode.setBlockProvider(() -> this));
+		this.blockPreRunner = blockPreRunner;
 		this.blockRunner = blockRunner;
+		this.blockPostRunner = blockPostRunner;
 		this.rectangle = rectangle;
 		this.blockDrawer = blockDrawer;
 		this.editingPaneProducer = editingPaneProducer;
@@ -37,8 +41,16 @@ public class Block {
 		return wireNodes;
 	}
 
+	public void preRunBlock(RunningContext context) {
+		blockPreRunner.runBlock(this, context);
+	}
+	
 	public void runBlock(RunningContext context) {
-		blockRunner.runBlock(context);
+		blockRunner.runBlock(this, context);
+	}
+	
+	public void postRunBlock(RunningContext context) {
+		blockPostRunner.runBlock(this, context);
 	}
 
 	public Rectangle getRectangle() {
@@ -80,7 +92,7 @@ public class Block {
 	}
 	
 	public Node produceEditingPane(Callback redrawCallback) {
-		return editingPaneProducer.produceEditingPane(redrawCallback);
+		return editingPaneProducer.produceEditingPane(this, redrawCallback);
 	}
 
 	public boolean isMoving() {

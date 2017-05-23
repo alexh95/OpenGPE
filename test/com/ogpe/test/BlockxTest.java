@@ -57,7 +57,7 @@ public class BlockxTest {
 		printerBlock.getWireNodes().get(PrinterBlockFactory.INPUT_KEY)
 				.setProvider(valueBlock.getWireNodes().get(NumberValueBlockFactory.OUTPUT_KEY));
 		
-		RunningContext context = new RunningContext(new Observable<String>());
+		RunningContext context = new RunningContext(new Observable<String>(), 1);
 		printerBlock.runBlock(context);
 	}
 

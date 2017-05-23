@@ -1,6 +1,8 @@
 package com.ogpe.blockx;
 
 import com.ogpe.blockx.factory.BlockFactory;
+import com.ogpe.blockx.factory.BooleanSelectorBlockFactory;
+import com.ogpe.blockx.factory.BooleanValueBlockFactory;
 import com.ogpe.blockx.factory.NumberAdderBlockFactory;
 import com.ogpe.blockx.factory.NumberValueBlockFactory;
 import com.ogpe.blockx.factory.PrinterBlockFactory;
@@ -9,9 +11,23 @@ import com.ogpe.blockx.factory.StopBlockFactory;
 
 public enum BlockType {
 
+	// Number Blocks
 	NUMBER_VALUE(new NumberValueBlockFactory(), "Number Value"),
+	//NUMBER_OPPOSITE
+	//NUMBER_INVERTER
 	NUMBER_ADDER(new NumberAdderBlockFactory(), "Number Adder"),
+	//NUMBER_MULTIPLIER
+	//NUMBER_SELECTOR
+	// Boolean Blocks
+	BOOLEAN_VALUE(new BooleanValueBlockFactory(), "Boolean Value"),
+	//BOOLEAN_NOT
+	//BOOLEAN_AND
+	//BOOLEAN_OR
+	//BOOLEAN_XOR
+	BOOLEAN_SELECTOR(new BooleanSelectorBlockFactory(), "Boolean Selector"),
+	// Effect Blocks
 	PRINTER(new PrinterBlockFactory(), "Printer"),
+	// Loop Blocks
 	RUNNING_INDEX(new RunningIndexBlockFactory(), "Running Index"),
 	STOP(new StopBlockFactory(), "Stop");
 	
@@ -33,7 +49,7 @@ public enum BlockType {
 	}
 	
 	public Block makeBlock() {
-		return makeBlock(new Point());
+		return blockFactory.makeBlock();
 	}
 	
 	@Override

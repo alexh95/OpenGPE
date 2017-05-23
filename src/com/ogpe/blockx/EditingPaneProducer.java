@@ -7,6 +7,6 @@ import javafx.scene.Node;
 @FunctionalInterface
 public interface EditingPaneProducer {
 
-	Node produceEditingPane(Callback redrawCallback);
+	Node produceEditingPane(Block block, Callback redrawCallback);
 	
 }

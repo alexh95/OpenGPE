@@ -20,6 +20,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyCode;
@@ -195,15 +196,15 @@ public class MainWindow extends Application {
 
 		// Run Menu
 		MenuItem runRunMenuItem = new MenuItem("Run");
-		MenuItem runContinuouslyRunMenuItem = new MenuItem("Run Continously");
-		runMenu.getItems().addAll(runRunMenuItem, runContinuouslyRunMenuItem);
+		MenuItem runRunContinuouslyMenuItem = new MenuItem("Run Continously");
+		runMenu.getItems().addAll(runRunMenuItem, runRunContinuouslyMenuItem);
 
 		// Run -> Run
 		runRunMenuItem.setOnAction(project::runRunMenuItemEventHandler);
 		runRunMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCodeCombination.CONTROL_DOWN));
 		// Run -> Run Continuously
-		runContinuouslyRunMenuItem.setOnAction(project::runContinuouslyRunMenuItemEventHandler);
-		runContinuouslyRunMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCodeCombination.CONTROL_DOWN));
+		runRunContinuouslyMenuItem.setOnAction(project::runRunContinuouslyMenuItemEventHandler);
+		runRunContinuouslyMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCodeCombination.CONTROL_DOWN));
 
 		// Help Menu
 		MenuItem tutorialHelpMenuItem = new MenuItem("Tutorial");
@@ -234,12 +235,15 @@ public class MainWindow extends Application {
 		Button deleteEditToolBarItem = new Button("Delete");
 		// Run ToolBar
 		Button runRunToolBarItem = new Button("Run");
-		Button runContinuouslyRunToolBarItem = new Button("Run Continuously");
+		Button runRunContinuouslyToolBarItem = new Button("Run Continuously");
+		Label runRunContinuouslyMaxIterationsLabel = new Label("Max iterations:");
+		TextField runRunContinuouslyMaxIterationsTextField = new TextField();
 		toolBar.getItems().addAll(newProjectFileToolBarItem, openProjectFileToolBarItem, saveProjectFileToolBarItem,
 				new Separator(), panCursorToolToolBarItem, placeCursorToolToolBarItem, selectCursorToolToolBarItem,
 				moveCursorToolToolBarItem, wireCursorToolToolBarItem, new Separator(), cutEditToolBarItem,
 				copyEditToolBarItem, pasteEditToolBarItem, deleteEditToolBarItem, new Separator(), runRunToolBarItem,
-				runContinuouslyRunToolBarItem);
+				runRunContinuouslyToolBarItem, runRunContinuouslyMaxIterationsLabel,
+				runRunContinuouslyMaxIterationsTextField, new Separator());
 
 		// File ToolBar
 		// File -> New Project
@@ -286,7 +290,11 @@ public class MainWindow extends Application {
 		// Run -> Run
 		runRunToolBarItem.setOnAction(project::runRunToolBarItemEventHandler);
 		// Run -> Run Continuously
-		runContinuouslyRunToolBarItem.setOnAction(project::runContinuouslyRunToolBarItemEventHandler);
+		runRunContinuouslyToolBarItem.setOnAction(project::runRunContinuouslyToolBarItemEventHandler);
+		// Run -> Run Continuously Max Iterations
+		runRunContinuouslyMaxIterationsTextField.textProperty()
+				.addListener(project::runRunContinuouslyToolBarChangeListener);
+		runRunContinuouslyMaxIterationsTextField.setText("1000");
 
 		Scene primaryScene = new Scene(root);
 		primaryStage.setScene(primaryScene);

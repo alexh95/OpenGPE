@@ -1,27 +1,23 @@
 package com.ogpe.blockx.factory;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.ogpe.blockx.Block;
-import com.ogpe.blockx.BlockDrawer;
-import com.ogpe.blockx.BlockRunner;
 import com.ogpe.blockx.DataType;
-import com.ogpe.blockx.EditingPaneProducer;
 import com.ogpe.blockx.Point;
 import com.ogpe.blockx.Rectangle;
+import com.ogpe.blockx.RunningContext;
 import com.ogpe.blockx.wire.WireNode;
 import com.ogpe.blockx.wire.WireNodeType;
 
 import javafx.geometry.VPos;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 
 public class RunningIndexBlockFactory extends BlockFactory {
 
-	public static int runningIndex = 0;
-	
 	public static final String OUTPUT_KEY = "output";
 
 	public RunningIndexBlockFactory() {
@@ -29,34 +25,26 @@ public class RunningIndexBlockFactory extends BlockFactory {
 	}
 
 	@Override
-	public Block makeBlock(Point position) {
-		Map<String, WireNode> wireNodes = new HashMap<>();
-		WireNode output = new WireNode(WireNodeType.OUTPUT, DataType.NUMBER, new Point(size.x / 2 + 0.5, size.y - 2.5), () -> {
-			return BigDecimal.valueOf(runningIndex);
-		});
-		wireNodes.put(OUTPUT_KEY, output);
+	protected void addWireNodes(Map<String, WireNode> wireNodes) {
+		wireNodes.put(OUTPUT_KEY,
+				new WireNode(WireNodeType.OUTPUT, DataType.NUMBER, new Point(size.x / 2 + 0.5, size.y - 2.5)));
+	}
 
-		BlockRunner blockRunner = (context) -> {
+	@Override
+	protected void blockPreRun(Block block, RunningContext context) {
+		block.getWireNodes().get(OUTPUT_KEY).setProvider(() -> BigDecimal.valueOf(context.runningIndex));
+	}
 
-		};
-
-		Rectangle rectangle = new Rectangle(position).setSize(size);
-		
-		BlockDrawer blockDrawer = (block, context) -> {
-			Rectangle rect = block.getRectangle();
-			
-			context.setFill(Color.BLACK);
-			context.setTextAlign(TextAlignment.CENTER);
-			context.setTextBaseline(VPos.CENTER);
-			String text = "i";
-			double textX = rect.x + Math.round(rect.w / 2);
-			double textY = rect.y + Math.round(rect.h / 2) - 3;
-			context.fillText(text, textX, textY);
-		};
-		
-		EditingPaneProducer editingPaneProducer = (redrawCallback) -> null;
-
-		return new Block(wireNodes, blockRunner, rectangle, blockDrawer, editingPaneProducer);
+	@Override
+	protected void drawBlock(Block block, GraphicsContext context) {
+		Rectangle rect = block.getRectangle();
+		context.setFill(Color.BLACK);
+		context.setTextAlign(TextAlignment.CENTER);
+		context.setTextBaseline(VPos.CENTER);
+		String text = "i";
+		double textX = rect.x + Math.round(rect.w / 2);
+		double textY = rect.y + Math.round(rect.h / 2) - 3;
+		context.fillText(text, textX, textY);
 	}
 
 }

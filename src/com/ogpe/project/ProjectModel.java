@@ -7,7 +7,6 @@ import java.util.List;
 import com.ogpe.blockx.Block;
 import com.ogpe.blockx.Rectangle;
 import com.ogpe.blockx.RunningContext;
-import com.ogpe.blockx.factory.RunningIndexBlockFactory;
 import com.ogpe.blockx.wire.WireNetwork;
 import com.ogpe.blockx.wire.WireNode;
 import com.ogpe.observable.Callback;
@@ -25,6 +24,8 @@ public class ProjectModel {
 	private final List<Block> blocks;
 	private final List<WireNode> wireNodes;
 	private final WireNetwork wireNetwork;
+	
+	private int maxRunnningIterations;
 
 	public ProjectModel(Callback redrawCallback, Observer<Node> editingPanePaneObserver,
 			Observer<String> consoleOutputObserver) {
@@ -37,6 +38,8 @@ public class ProjectModel {
 		blocks = new ArrayList<>();
 		wireNodes = new ArrayList<>();
 		wireNetwork = new WireNetwork();
+		
+		maxRunnningIterations = 0;
 	}
 
 	public boolean canPlace(Rectangle rectangle) {
@@ -96,25 +99,31 @@ public class ProjectModel {
 	public WireNetwork getWireNetwork() {
 		return wireNetwork;
 	}
+	
+	public void setMaxRunnningIterations(int maxRunnningIterations) {
+		this.maxRunnningIterations = maxRunnningIterations;
+	}
 
 	public void run() {
 		wireNetwork.getLinks().forEach(link -> {
 			link.getDst().setProvider(link.getSrc());
 		});
-		RunningContext context = new RunningContext(consoleOutputObservable);
+		RunningContext context = new RunningContext(consoleOutputObservable, 1);
+		blocks.forEach(block -> block.preRunBlock(context));
 		blocks.forEach(block -> block.runBlock(context));
+		blocks.forEach(block -> block.postRunBlock(context));
 	}
 
 	public void runContinuously() {
 		wireNetwork.getLinks().forEach(link -> {
 			link.getDst().setProvider(link.getSrc());
 		});
-		int maxRunningIndex = 10;
 		boolean stopped = false;
-		for (int runningIndex = 0; runningIndex < maxRunningIndex && !stopped; ++runningIndex) {
-			RunningContext context = new RunningContext(consoleOutputObservable);
-			RunningIndexBlockFactory.runningIndex = runningIndex;
+		for (int runningIndex = 1; runningIndex <= maxRunnningIterations && !stopped; ++runningIndex) {
+			RunningContext context = new RunningContext(consoleOutputObservable, runningIndex);
+			blocks.forEach(block -> block.preRunBlock(context));
 			blocks.forEach(block -> block.runBlock(context));
+			blocks.forEach(block -> block.postRunBlock(context));
 			stopped = context.isStopped();
 		}
 	}

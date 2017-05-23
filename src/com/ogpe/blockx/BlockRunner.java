@@ -3,6 +3,6 @@ package com.ogpe.blockx;
 @FunctionalInterface
 public interface BlockRunner {
 	
-	void runBlock(RunningContext context);
+	void runBlock(Block block, RunningContext context);
 	
 }

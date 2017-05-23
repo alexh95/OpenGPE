@@ -29,6 +29,10 @@ public class WireNetwork {
 		links.forEach(this::removeLink);
 	}
 	
+	public void removeLinksContaining(WireNode node) {
+		removeLink(links.stream().filter(link -> link.contains(node)).collect(Collectors.toSet()));
+	}
+	
 	public void removeNode(WireNode node) {
 		links.removeAll(links.stream().filter(link -> link.contains(node)).collect(Collectors.toSet()));
 	}
