@@ -22,7 +22,7 @@ public class NumberNegatorBlockFactory extends BlockFactory {
 	public static final String OUTPUT_KEY = "output";
 	
 	public NumberNegatorBlockFactory() {
-		super(new Point(22, 22));
+		super(new Point(22, 26));
 	}
 
 	@Override
@@ -42,9 +42,9 @@ public class NumberNegatorBlockFactory extends BlockFactory {
 		context.setFill(Color.BLACK);
 		context.setTextAlign(TextAlignment.CENTER);
 		context.setTextBaseline(VPos.CENTER);
-		String text = "-";
+		String text = "-N";
 		double textX = rect.x + 11;
-		double textY = rect.y + 9;
+		double textY = rect.y + 13;
 		context.fillText(text, textX + 0.5, textY + 0.5);
 	}
 

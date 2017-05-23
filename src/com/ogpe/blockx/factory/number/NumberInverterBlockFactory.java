@@ -23,7 +23,7 @@ public class NumberInverterBlockFactory extends BlockFactory {
 	public static final String OUTPUT_KEY = "output";
 
 	public NumberInverterBlockFactory() {
-		super(new Point(22, 22));
+		super(new Point(22, 26));
 	}
 
 	@Override
@@ -46,9 +46,9 @@ public class NumberInverterBlockFactory extends BlockFactory {
 		context.setFill(Color.BLACK);
 		context.setTextAlign(TextAlignment.CENTER);
 		context.setTextBaseline(VPos.CENTER);
-		String text = "1/x";
+		String text = "1/N";
 		double textX = rect.x + 11;
-		double textY = rect.y + 8;
+		double textY = rect.y + 13;
 		context.fillText(text, textX + 0.5, textY + 0.5);
 	}
 

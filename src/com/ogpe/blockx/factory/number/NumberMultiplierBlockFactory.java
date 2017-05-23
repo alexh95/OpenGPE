@@ -24,7 +24,7 @@ public class NumberMultiplierBlockFactory extends BlockFactory {
 	public static final String OUTPUT_KEY = "output";
 	
 	public NumberMultiplierBlockFactory() {
-		super(new Point(26, 22));
+		super(new Point(26, 26));
 	}
 
 	@Override
@@ -46,9 +46,9 @@ public class NumberMultiplierBlockFactory extends BlockFactory {
 		context.setFill(Color.BLACK);
 		context.setTextAlign(TextAlignment.CENTER);
 		context.setTextBaseline(VPos.CENTER);
-		String text = "X";
+		String text = "AxB";
 		double textX = rect.x + 13;
-		double textY = rect.y + 8;
+		double textY = rect.y + 13;
 		context.fillText(text, textX + 0.5, textY + 0.5);
 	}
 

@@ -19,15 +19,15 @@ import com.ogpe.blockx.factory.number.NumberValueBlockFactory;
 public enum BlockType {
 
 	// Number Blocks
-	NUMBER_VALUE(new NumberValueBlockFactory(), "Number Value"),
-	NUMBER_NEGATOR(new NumberNegatorBlockFactory(), "Number Negator"),
-	NUMBER_INVERTER(new NumberInverterBlockFactory(), "Number Inverter"),
-	NUMBER_ADDER(new NumberAdderBlockFactory(), "Number Adder"),
-	NUMBER_MULTIPLIER(new NumberMultiplierBlockFactory(), "Number Multiplier"),
-	NUMBER_SELECTOR(new NumberSelectorBlockFactory(), "Number Selector"),
-	NUMBER_EQUALS(new NumberEqualsBlockFactory(), "Number Equals"),
-	NUMBER_LESS_THAN(new NumberLessThanBlockFactory(), "Number Less Than"),
-	NUMBER_GREATER_THAN(new NumberGreaterThanBlockFactory(), "Number Greater Than"),
+	NUMBER_VALUE(new NumberValueBlockFactory(), "N (Number Value)"),
+	NUMBER_NEGATOR(new NumberNegatorBlockFactory(), "-N (Number Negator)"),
+	NUMBER_INVERTER(new NumberInverterBlockFactory(), "1/N (Number Inverter)"),
+	NUMBER_ADDER(new NumberAdderBlockFactory(), "A + B (Number Adder)"),
+	NUMBER_MULTIPLIER(new NumberMultiplierBlockFactory(), "A X B (Number Multiplier)"),
+	NUMBER_EQUALS(new NumberEqualsBlockFactory(), "A = B (Number Equals)"),
+	NUMBER_LESS_THAN(new NumberLessThanBlockFactory(), "A < B (Number Less Than)"),
+	NUMBER_GREATER_THAN(new NumberGreaterThanBlockFactory(), "A > B (Number Greater Than)"),
+	NUMBER_SELECTOR(new NumberSelectorBlockFactory(), "C ? A : B (Number Selector)"),
 	// Boolean Blocks
 	BOOLEAN_VALUE(new BooleanValueBlockFactory(), "Boolean Value"),
 	//BOOLEAN_NOT,

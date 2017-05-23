@@ -51,7 +51,7 @@ public class NumberSelectorBlockFactory extends BlockFactory {
 		context.setFill(Color.BLACK);
 		context.setTextAlign(TextAlignment.CENTER);
 		context.setTextBaseline(VPos.CENTER);
-		String text = "If then else";
+		String text = "C ? A: B";
 		double textX = rect.x + Math.round(rect.w / 2);
 		double textY = rect.y + 10;
 		context.fillText(text, textX, textY);
