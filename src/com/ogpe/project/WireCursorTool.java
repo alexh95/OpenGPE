@@ -187,10 +187,12 @@ public class WireCursorTool extends CursorTool {
 			getProjectModel().getWireNodes().forEach(wireNode -> {
 				switch (wireNode.getHighlight()) {
 				case HOVERING_WIRING_VALID:
-					wireNode.setHighlight(WireNodeHighlight.UNSET);
-					break;
 				case HOVERING_WIRING_INVALID:
-					wireNode.setHighlight(WireNodeHighlight.UNSET);
+					if (projectModel.getWireNetwork().contains(wireNode)) {
+						wireNode.setHighlight(WireNodeHighlight.SET);
+					} else {
+						wireNode.setHighlight(WireNodeHighlight.UNSET);
+					}
 					break;
 				default:
 					break;
@@ -199,8 +201,7 @@ public class WireCursorTool extends CursorTool {
 
 			// Highlight
 			WireNode closestWireNode = getClosestWireNode(point);
-			if (closestWireNode != null && closestWireNode != wiringNode
-					&& closestWireNode.getHighlight().equals(WireNodeHighlight.UNSET)) {
+			if (closestWireNode != null && closestWireNode != wiringNode) {
 				validWiring = isValidLinkingNode(closestWireNode);
 				if (validWiring) {
 					closestWireNode.setHighlight(WireNodeHighlight.HOVERING_WIRING_VALID);
