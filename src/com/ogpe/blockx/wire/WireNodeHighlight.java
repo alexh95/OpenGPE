@@ -1,4 +1,4 @@
-package com.ogpe.blockx;
+package com.ogpe.blockx.wire;
 
 import javafx.scene.paint.Color;
 

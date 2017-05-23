@@ -2,6 +2,7 @@ package com.ogpe.blockx;
 
 import java.util.Map;
 
+import com.ogpe.blockx.wire.WireNode;
 import com.ogpe.observable.Callback;
 import com.ogpe.observable.Observable;
 

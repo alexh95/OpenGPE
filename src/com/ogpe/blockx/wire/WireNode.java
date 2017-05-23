@@ -1,4 +1,8 @@
-package com.ogpe.blockx;
+package com.ogpe.blockx.wire;
+
+import com.ogpe.blockx.DataType;
+import com.ogpe.blockx.Point;
+import com.ogpe.blockx.Provider;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;

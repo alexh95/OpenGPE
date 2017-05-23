@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.ogpe.blockx.Block;
 import com.ogpe.blockx.Rectangle;
-import com.ogpe.blockx.WireNode;
+import com.ogpe.blockx.wire.WireNode;
 import com.ogpe.observable.Callback;
 import com.ogpe.observable.Observable;
 import com.ogpe.observable.Observer;

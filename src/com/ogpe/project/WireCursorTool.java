@@ -1,9 +1,9 @@
 package com.ogpe.project;
 
 import com.ogpe.blockx.Point;
-import com.ogpe.blockx.WireNode;
-import com.ogpe.blockx.WireNodeHighlight;
-import com.ogpe.blockx.WireNodeType;
+import com.ogpe.blockx.wire.WireNode;
+import com.ogpe.blockx.wire.WireNodeHighlight;
+import com.ogpe.blockx.wire.WireNodeType;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;

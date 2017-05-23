@@ -11,8 +11,8 @@ import com.ogpe.blockx.DataType;
 import com.ogpe.blockx.EditingPaneProducer;
 import com.ogpe.blockx.Point;
 import com.ogpe.blockx.Rectangle;
-import com.ogpe.blockx.WireNode;
-import com.ogpe.blockx.WireNodeType;
+import com.ogpe.blockx.wire.WireNode;
+import com.ogpe.blockx.wire.WireNodeType;
 
 import javafx.geometry.VPos;
 import javafx.scene.control.Button;
