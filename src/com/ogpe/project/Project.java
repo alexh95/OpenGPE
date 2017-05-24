@@ -7,8 +7,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import com.ogpe.blockx.BlockType;
-import com.ogpe.blockx.Provider;
+import com.ogpe.block.BlockType;
+import com.ogpe.block.Provider;
 import com.ogpe.observable.Callback;
 import com.ogpe.observable.Observer;
 

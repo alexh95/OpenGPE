@@ -1,6 +1,6 @@
 package com.ogpe.fx;
 
-import com.ogpe.blockx.BlockType;
+import com.ogpe.block.BlockType;
 import com.ogpe.observable.Callback;
 import com.ogpe.observable.Observer;
 import com.ogpe.project.Project;

@@ -1,8 +1,8 @@
 package com.ogpe.project;
 
-import com.ogpe.blockx.Block;
-import com.ogpe.blockx.Point;
-import com.ogpe.blockx.Rectangle;
+import com.ogpe.block.Block;
+import com.ogpe.block.Point;
+import com.ogpe.block.Rectangle;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;

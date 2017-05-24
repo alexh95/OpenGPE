@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.ogpe.blockx.Block;
-import com.ogpe.blockx.Point;
-import com.ogpe.blockx.Rectangle;
+import com.ogpe.block.Block;
+import com.ogpe.block.Point;
+import com.ogpe.block.Rectangle;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
