@@ -150,7 +150,10 @@ public class Project {
 		fileChooser.getExtensionFilters().add(extensionFilter);
 
 		File openFile = fileChooser.showOpenDialog(stageProvider.provide());
-
+		if (openFile == null) {
+			return;
+		}
+		
 		try {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(openFile));
 			projectModel.openProject(bufferedReader);
@@ -166,6 +169,9 @@ public class Project {
 		fileChooser.getExtensionFilters().add(extensionFilter);
 
 		File saveFile = fileChooser.showSaveDialog(stageProvider.provide());
+		if (saveFile == null) {
+			return;
+		}
 
 		try {
 			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(saveFile));

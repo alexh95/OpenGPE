@@ -172,6 +172,7 @@ public class ProjectModel {
 		blocks.clear();
 		wireNodes.clear();
 		wireNetwork.getLinks().clear();
+		redrawCallback.callback();
 	}
 	
 	public void saveProject(BufferedWriter bufferedWriter) throws IOException {
@@ -241,6 +242,7 @@ public class ProjectModel {
 		}
 		
 		wireNodes.stream().filter(wireNetwork::contains).forEach(wireNode -> wireNode.setHighlight(WireNodeHighlight.SET));
+		redrawCallback.callback();
 	}
 	
 }
