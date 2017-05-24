@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.ogpe.blockx.wire.WireNode;
 import com.ogpe.observable.Callback;
+import com.ogpe.observable.Observer;
 
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
@@ -12,6 +13,7 @@ import javafx.scene.paint.Color;
 public class Block {
 
 	private final Map<String, WireNode> wireNodes;
+	private final Observer<Block> blockReseter;
 	private final BlockRunner blockPreRunner;
 	private final BlockRunner blockRunner;
 	private final BlockRunner blockPostRunner;
@@ -25,10 +27,11 @@ public class Block {
 	private boolean selected;
 	private boolean editing;
 
-	public Block(Map<String, WireNode> wireNodes, BlockRunner blockPreRunner, BlockRunner blockRunner, BlockRunner blockPostRunner, Rectangle rectangle, BlockDrawer blockDrawer,
+	public Block(Map<String, WireNode> wireNodes, Observer<Block> blockReseter, BlockRunner blockPreRunner, BlockRunner blockRunner, BlockRunner blockPostRunner, Rectangle rectangle, BlockDrawer blockDrawer,
 			EditingPaneProducer editingPaneProducer) {
 		this.wireNodes = wireNodes;
 		this.wireNodes.values().forEach(wireNode -> wireNode.setBlockProvider(() -> this));
+		this.blockReseter = blockReseter;
 		this.blockPreRunner = blockPreRunner;
 		this.blockRunner = blockRunner;
 		this.blockPostRunner = blockPostRunner;
@@ -39,6 +42,10 @@ public class Block {
 
 	public Map<String, WireNode> getWireNodes() {
 		return wireNodes;
+	}
+	
+	public void reset() {
+		blockReseter.update(this);
 	}
 
 	public void preRunBlock(RunningContext context) {

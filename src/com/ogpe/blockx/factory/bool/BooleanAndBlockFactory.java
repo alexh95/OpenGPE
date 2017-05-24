@@ -44,7 +44,7 @@ public class BooleanAndBlockFactory extends BlockFactory {
 		context.setFill(Color.BLACK);
 		context.setTextAlign(TextAlignment.CENTER);
 		context.setTextBaseline(VPos.CENTER);
-		String text = "A&&B";
+		String text = "A&B";
 		double textX = rect.x + 13;
 		double textY = rect.y + 13;
 		context.fillText(text, textX + 0.5, textY + 0.5);

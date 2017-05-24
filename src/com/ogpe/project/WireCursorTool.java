@@ -245,17 +245,13 @@ public class WireCursorTool extends CursorTool {
 			getProjectModel().getWireNodes().forEach(wireNode -> {
 				switch (wireNode.getHighlight()) {
 				case WIRING:
+				case HOVERING_WIRING_VALID:
+				case HOVERING_WIRING_INVALID:
 					if (projectModel.getWireNetwork().contains(wireNode)) {
 						wireNode.setHighlight(WireNodeHighlight.SET);
 					} else {
 						wireNode.setHighlight(WireNodeHighlight.UNSET);
 					}
-					break;
-				case HOVERING_WIRING_VALID:
-					wireNode.setHighlight(WireNodeHighlight.UNSET);
-					break;
-				case HOVERING_WIRING_INVALID:
-					wireNode.setHighlight(WireNodeHighlight.UNSET);
 					break;
 				default:
 					break;

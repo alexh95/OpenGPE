@@ -9,6 +9,7 @@ import com.ogpe.blockx.Rectangle;
 import com.ogpe.blockx.RunningContext;
 import com.ogpe.blockx.wire.WireNetwork;
 import com.ogpe.blockx.wire.WireNode;
+import com.ogpe.blockx.wire.WireNodeHighlight;
 import com.ogpe.observable.Callback;
 import com.ogpe.observable.Observable;
 import com.ogpe.observable.Observer;
@@ -24,7 +25,7 @@ public class ProjectModel {
 	private final List<Block> blocks;
 	private final List<WireNode> wireNodes;
 	private final WireNetwork wireNetwork;
-	
+
 	private int maxRunnningIterations;
 
 	public ProjectModel(Callback redrawCallback, Observer<Node> editingPanePaneObserver,
@@ -38,7 +39,7 @@ public class ProjectModel {
 		blocks = new ArrayList<>();
 		wireNodes = new ArrayList<>();
 		wireNetwork = new WireNetwork();
-		
+
 		maxRunnningIterations = 0;
 	}
 
@@ -86,6 +87,8 @@ public class ProjectModel {
 		blocks.remove(block);
 		wireNodes.removeAll(block.getWireNodes().values());
 		wireNetwork.removeNode(block.getWireNodes().values());
+		wireNodes.stream().filter(wireNode -> !wireNetwork.contains(wireNode))
+				.forEach(wireNode -> wireNode.setHighlight(WireNodeHighlight.UNSET));
 	}
 
 	public void removeBlock(Collection<Block> blocks) {
@@ -99,12 +102,14 @@ public class ProjectModel {
 	public WireNetwork getWireNetwork() {
 		return wireNetwork;
 	}
-	
+
 	public void setMaxRunnningIterations(int maxRunnningIterations) {
 		this.maxRunnningIterations = maxRunnningIterations;
 	}
 
 	public void run() {
+		consoleOutputObservable.updateObservers("Running:");
+		blocks.forEach(block -> block.reset());
 		wireNetwork.getLinks().forEach(link -> {
 			link.getDst().setProvider(link.getSrc());
 		});
@@ -115,6 +120,8 @@ public class ProjectModel {
 	}
 
 	public void runContinuously() {
+		consoleOutputObservable.updateObservers("Running Continuously (up to " + maxRunnningIterations + " times):");
+		blocks.forEach(block -> block.reset());
 		wireNetwork.getLinks().forEach(link -> {
 			link.getDst().setProvider(link.getSrc());
 		});

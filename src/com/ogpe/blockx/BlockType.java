@@ -15,6 +15,7 @@ import com.ogpe.blockx.factory.number.NumberEqualsBlockFactory;
 import com.ogpe.blockx.factory.number.NumberGreaterThanBlockFactory;
 import com.ogpe.blockx.factory.number.NumberInverterBlockFactory;
 import com.ogpe.blockx.factory.number.NumberLessThanBlockFactory;
+import com.ogpe.blockx.factory.number.NumberMemoryBlockFactory;
 import com.ogpe.blockx.factory.number.NumberMultiplierBlockFactory;
 import com.ogpe.blockx.factory.number.NumberNegatorBlockFactory;
 import com.ogpe.blockx.factory.number.NumberSelectorBlockFactory;
@@ -32,12 +33,13 @@ public enum BlockType {
 	NUMBER_LESS_THAN(new NumberLessThanBlockFactory(), "A < B (Number Less Than)"),
 	NUMBER_GREATER_THAN(new NumberGreaterThanBlockFactory(), "A > B (Number Greater Than)"),
 	NUMBER_SELECTOR(new NumberSelectorBlockFactory(), "C ? A : B (Number Selector)"),
+	NUMBER_MEMORY(new NumberMemoryBlockFactory(), "N Mem (Number Memory)"),
 	// Boolean Blocks
 	BOOLEAN_VALUE(new BooleanValueBlockFactory(), "B (Boolean Value)"),
-	BOOLEAN_NOT(new BooleanNotBlockFactory(), "NOT B (Boolean Negation)"),
-	BOOLEAN_AND(new BooleanAndBlockFactory(), "A AND B (Boolean And)"),
-	BOOLEAN_OR(new BooleanOrBlockFactory(), "A OR B (Boolean Or)"),
-	BOOLEAN_XOR(new BooleanXorBlockFactory(), "A XOR B (Boolean Xor)"),
+	BOOLEAN_NOT(new BooleanNotBlockFactory(), "-B (Boolean Negation)"),
+	BOOLEAN_AND(new BooleanAndBlockFactory(), "A & B (Boolean And)"),
+	BOOLEAN_OR(new BooleanOrBlockFactory(), "A | B (Boolean Or)"),
+	BOOLEAN_XOR(new BooleanXorBlockFactory(), "A ^ B (Boolean Xor)"),
 	BOOLEAN_SELECTOR(new BooleanSelectorBlockFactory(), "C ? A : B (Boolean Selector)"),
 	// Effect Blocks
 	PRINTER(new PrinterBlockFactory(), "Printer"),
