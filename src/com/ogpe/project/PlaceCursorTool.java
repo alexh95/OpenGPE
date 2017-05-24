@@ -5,8 +5,8 @@ import java.util.stream.Collectors;
 
 import com.ogpe.block.Block;
 import com.ogpe.block.BlockType;
-import com.ogpe.block.Point;
-import com.ogpe.block.Rectangle;
+import com.ogpe.block.geometry.Point;
+import com.ogpe.block.geometry.Rectangle;
 
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;

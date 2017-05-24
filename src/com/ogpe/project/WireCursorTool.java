@@ -1,6 +1,6 @@
 package com.ogpe.project;
 
-import com.ogpe.block.Point;
+import com.ogpe.block.geometry.Point;
 import com.ogpe.block.wire.WireLink;
 import com.ogpe.block.wire.WireNode;
 import com.ogpe.block.wire.WireNodeHighlight;

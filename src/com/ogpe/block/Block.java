@@ -2,6 +2,8 @@ package com.ogpe.block;
 
 import java.util.Map;
 
+import com.ogpe.block.geometry.Point;
+import com.ogpe.block.geometry.Rectangle;
 import com.ogpe.block.wire.WireNode;
 import com.ogpe.observable.Callback;
 import com.ogpe.observable.Observer;

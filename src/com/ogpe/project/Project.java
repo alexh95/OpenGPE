@@ -8,9 +8,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import com.ogpe.block.BlockType;
-import com.ogpe.block.Provider;
 import com.ogpe.observable.Callback;
 import com.ogpe.observable.Observer;
+import com.ogpe.provider.Provider;
 
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;

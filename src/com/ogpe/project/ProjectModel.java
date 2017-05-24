@@ -12,9 +12,9 @@ import java.util.TreeMap;
 
 import com.ogpe.block.Block;
 import com.ogpe.block.BlockType;
-import com.ogpe.block.Point;
-import com.ogpe.block.Rectangle;
 import com.ogpe.block.RunningContext;
+import com.ogpe.block.geometry.Point;
+import com.ogpe.block.geometry.Rectangle;
 import com.ogpe.block.wire.WireLink;
 import com.ogpe.block.wire.WireNetwork;
 import com.ogpe.block.wire.WireNode;

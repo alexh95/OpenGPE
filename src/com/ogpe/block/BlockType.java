@@ -22,6 +22,7 @@ import com.ogpe.block.factory.number.NumberMultiplierBlockFactory;
 import com.ogpe.block.factory.number.NumberNegatorBlockFactory;
 import com.ogpe.block.factory.number.NumberSelectorBlockFactory;
 import com.ogpe.block.factory.number.NumberValueBlockFactory;
+import com.ogpe.block.geometry.Point;
 
 public enum BlockType {
 

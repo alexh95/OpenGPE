@@ -1,4 +1,4 @@
-package com.ogpe.block;
+package com.ogpe.block.geometry;
 
 public class Point {
 	

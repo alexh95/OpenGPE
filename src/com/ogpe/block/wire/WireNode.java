@@ -1,9 +1,8 @@
 package com.ogpe.block.wire;
 
 import com.ogpe.block.Block;
-import com.ogpe.block.DataType;
-import com.ogpe.block.Point;
-import com.ogpe.block.Provider;
+import com.ogpe.block.geometry.Point;
+import com.ogpe.provider.Provider;
 
 import javafx.scene.canvas.GraphicsContext;
 

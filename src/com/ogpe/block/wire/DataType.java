@@ -1,4 +1,4 @@
-package com.ogpe.block;
+package com.ogpe.block.wire;
 
 public enum DataType {
 	

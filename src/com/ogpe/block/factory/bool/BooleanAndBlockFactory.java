@@ -3,10 +3,10 @@ package com.ogpe.block.factory.bool;
 import java.util.Map;
 
 import com.ogpe.block.Block;
-import com.ogpe.block.DataType;
-import com.ogpe.block.Point;
-import com.ogpe.block.Rectangle;
 import com.ogpe.block.factory.BlockFactory;
+import com.ogpe.block.geometry.Point;
+import com.ogpe.block.geometry.Rectangle;
+import com.ogpe.block.wire.DataType;
 import com.ogpe.block.wire.WireNode;
 import com.ogpe.block.wire.WireNodeType;
 
