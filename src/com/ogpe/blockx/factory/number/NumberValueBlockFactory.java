@@ -46,9 +46,9 @@ public class NumberValueBlockFactory extends BlockFactory {
 		context.setTextAlign(TextAlignment.CENTER);
 		context.setTextBaseline(VPos.CENTER);
 		String text = ((BigDecimal) block.getWireNodes().get(OUTPUT_KEY).provide()).toString();
-		double textX = rect.x + Math.round(rect.w / 2);
-		double textY = rect.y + Math.round(rect.h / 2) - 3;
-		context.fillText(text, textX, textY);
+		double textX = rect.x + 23;
+		double textY = rect.y + 8;
+		context.fillText(text, textX + 0.5, textY + 0.5);
 	}
 
 	@Override
@@ -64,16 +64,18 @@ public class NumberValueBlockFactory extends BlockFactory {
 		numberValueTextField.setText(currentValue);
 
 		numberValueTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-			if (!newValue.matches("\\d*")) {
-				numberValueTextField.setText(oldValue);
-			} else {
-				String value = newValue;
-				if (newValue.isEmpty()) {
-					value = "0";
-				}
-				BigDecimal numberValue = new BigDecimal(value);
+			if (newValue.isEmpty()) {
+				BigDecimal numberValue = new BigDecimal("0");
 				block.getWireNodes().get(OUTPUT_KEY).setProvider(() -> numberValue);
 				redrawCallback.callback();
+			} else {
+				try {
+					BigDecimal numberValue = new BigDecimal(newValue);
+					block.getWireNodes().get(OUTPUT_KEY).setProvider(() -> numberValue);
+					redrawCallback.callback();
+				} catch (NumberFormatException e) {
+					
+				}
 			}
 		});
 

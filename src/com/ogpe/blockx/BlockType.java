@@ -5,12 +5,14 @@ import com.ogpe.blockx.factory.PrinterBlockFactory;
 import com.ogpe.blockx.factory.RunningIndexBlockFactory;
 import com.ogpe.blockx.factory.StopBlockFactory;
 import com.ogpe.blockx.factory.bool.BooleanAndBlockFactory;
+import com.ogpe.blockx.factory.bool.BooleanConnectorBlockFactory;
 import com.ogpe.blockx.factory.bool.BooleanNotBlockFactory;
 import com.ogpe.blockx.factory.bool.BooleanOrBlockFactory;
 import com.ogpe.blockx.factory.bool.BooleanSelectorBlockFactory;
 import com.ogpe.blockx.factory.bool.BooleanValueBlockFactory;
 import com.ogpe.blockx.factory.bool.BooleanXorBlockFactory;
 import com.ogpe.blockx.factory.number.NumberAdderBlockFactory;
+import com.ogpe.blockx.factory.number.NumberConnectorBlockFactory;
 import com.ogpe.blockx.factory.number.NumberEqualsBlockFactory;
 import com.ogpe.blockx.factory.number.NumberGreaterThanBlockFactory;
 import com.ogpe.blockx.factory.number.NumberInverterBlockFactory;
@@ -34,6 +36,7 @@ public enum BlockType {
 	NUMBER_GREATER_THAN(new NumberGreaterThanBlockFactory(), "A > B (Number Greater Than)"),
 	NUMBER_SELECTOR(new NumberSelectorBlockFactory(), "C ? A : B (Number Selector)"),
 	NUMBER_MEMORY(new NumberMemoryBlockFactory(), "N Mem (Number Memory)"),
+	NUMBER_CONNECTOR(new NumberConnectorBlockFactory(), "N C (Number Connector)"),
 	// Boolean Blocks
 	BOOLEAN_VALUE(new BooleanValueBlockFactory(), "B (Boolean Value)"),
 	BOOLEAN_NOT(new BooleanNotBlockFactory(), "-B (Boolean Negation)"),
@@ -41,12 +44,12 @@ public enum BlockType {
 	BOOLEAN_OR(new BooleanOrBlockFactory(), "A | B (Boolean Or)"),
 	BOOLEAN_XOR(new BooleanXorBlockFactory(), "A ^ B (Boolean Xor)"),
 	BOOLEAN_SELECTOR(new BooleanSelectorBlockFactory(), "C ? A : B (Boolean Selector)"),
+	BOOLEAN_CONNECTOR(new BooleanConnectorBlockFactory(), "B C (Boolean Connector)"),
 	// Effect Blocks
 	PRINTER(new PrinterBlockFactory(), "Printer"),
 	// Loop Blocks
 	RUNNING_INDEX(new RunningIndexBlockFactory(), "Running Index"),
 	STOP(new StopBlockFactory(), "Stop");
-	
 	
 	private final BlockFactory blockFactory;
 	private final String displayName;
