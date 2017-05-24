@@ -29,11 +29,14 @@ public class NumberSelectorBlockFactory extends BlockFactory {
 
 	@Override
 	protected void addWireNodes(Map<String, WireNode> wireNodes) {
-		wireNodes.put(INPUT_KEY_1, new WireNode(WireNodeType.INPUT, DataType.BOOLEAN, new Point(16.5, 3.5)));
-		wireNodes.put(INPUT_KEY_2, new WireNode(WireNodeType.INPUT, DataType.NUMBER, new Point(32.5, 3.5)));
-		wireNodes.put(INPUT_KEY_3, new WireNode(WireNodeType.INPUT, DataType.NUMBER, new Point(48.5, 3.5)));
+		wireNodes.put(INPUT_KEY_1,
+				new WireNode(INPUT_KEY_1, WireNodeType.INPUT, DataType.BOOLEAN, new Point(16.5, 3.5)));
+		wireNodes.put(INPUT_KEY_2,
+				new WireNode(INPUT_KEY_2, WireNodeType.INPUT, DataType.NUMBER, new Point(32.5, 3.5)));
+		wireNodes.put(INPUT_KEY_3,
+				new WireNode(INPUT_KEY_3, WireNodeType.INPUT, DataType.NUMBER, new Point(48.5, 3.5)));
 		wireNodes.put(OUTPUT_KEY,
-				new WireNode(WireNodeType.OUTPUT, DataType.BOOLEAN, new Point(32.5, size.y - 2.5), () -> {
+				new WireNode(OUTPUT_KEY, WireNodeType.OUTPUT, DataType.BOOLEAN, new Point(32.5, size.y - 2.5), () -> {
 					Boolean condition = (Boolean) wireNodes.get(INPUT_KEY_1).provide();
 					BigDecimal result;
 					if (condition) {

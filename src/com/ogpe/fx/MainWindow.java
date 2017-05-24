@@ -74,7 +74,7 @@ public class MainWindow extends Application {
 			canvasPane.redraw();
 		};
 		Observer<String> consoleOutputObserver = text -> consoleOutputPane.appendText(text);
-		project = new Project(canvasRedrawCallback, editingPaneObserver, consoleOutputObserver);
+		project = new Project(() -> primaryStage, canvasRedrawCallback, editingPaneObserver, consoleOutputObserver);
 		canvasPane.setDrawer(project::drawCanvas);
 		canvasPane.setOnMouseMoved(project::onMouseMoved);
 		canvasPane.setOnMousePressed(project::onMousePressed);

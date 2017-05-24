@@ -28,9 +28,9 @@ public class NumberInverterBlockFactory extends BlockFactory {
 
 	@Override
 	protected void addWireNodes(Map<String, WireNode> wireNodes) {
-		wireNodes.put(INPUT_KEY, new WireNode(WireNodeType.INPUT, DataType.NUMBER, new Point(11.5, 3.5)));
+		wireNodes.put(INPUT_KEY, new WireNode(INPUT_KEY, WireNodeType.INPUT, DataType.NUMBER, new Point(11.5, 3.5)));
 		wireNodes.put(OUTPUT_KEY,
-				new WireNode(WireNodeType.OUTPUT, DataType.NUMBER, new Point(11.5, size.y - 2.5), () -> {
+				new WireNode(OUTPUT_KEY, WireNodeType.OUTPUT, DataType.NUMBER, new Point(11.5, size.y - 2.5), () -> {
 					BigDecimal value = (BigDecimal) wireNodes.get(INPUT_KEY).provide();
 					BigDecimal result = BigDecimal.ZERO;
 					if (!value.equals(BigDecimal.ZERO)) {

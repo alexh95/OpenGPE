@@ -64,11 +64,11 @@ public enum BlockType {
 	}
 	
 	public Block makeBlock(Point position) {
-		return blockFactory.makeBlock(position);
+		return blockFactory.makeBlock(this, position);
 	}
 	
 	public Block makeBlock() {
-		return blockFactory.makeBlock();
+		return blockFactory.makeBlock(this);
 	}
 	
 	@Override

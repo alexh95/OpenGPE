@@ -26,8 +26,8 @@ public class RunningIndexBlockFactory extends BlockFactory {
 
 	@Override
 	protected void addWireNodes(Map<String, WireNode> wireNodes) {
-		wireNodes.put(OUTPUT_KEY,
-				new WireNode(WireNodeType.OUTPUT, DataType.NUMBER, new Point(size.x / 2 + 0.5, size.y - 2.5)));
+		wireNodes.put(OUTPUT_KEY, new WireNode(OUTPUT_KEY, WireNodeType.OUTPUT, DataType.NUMBER,
+				new Point(size.x / 2 + 0.5, size.y - 2.5)));
 	}
 
 	@Override

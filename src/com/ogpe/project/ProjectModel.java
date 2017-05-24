@@ -1,12 +1,21 @@
 package com.ogpe.project;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import com.ogpe.blockx.Block;
+import com.ogpe.blockx.BlockType;
+import com.ogpe.blockx.Point;
 import com.ogpe.blockx.Rectangle;
 import com.ogpe.blockx.RunningContext;
+import com.ogpe.blockx.wire.WireLink;
 import com.ogpe.blockx.wire.WireNetwork;
 import com.ogpe.blockx.wire.WireNode;
 import com.ogpe.blockx.wire.WireNodeHighlight;
@@ -44,6 +53,10 @@ public class ProjectModel {
 	}
 
 	public boolean canPlace(Rectangle rectangle) {
+		if (rectangle.x < 0 || rectangle.y < 0) {
+			return false;
+		}
+		
 		for (Block block : blocks) {
 			if (!block.isMoving()) {
 				if (block.getRectangle().intersects(rectangle)) {
@@ -106,8 +119,20 @@ public class ProjectModel {
 	public void setMaxRunnningIterations(int maxRunnningIterations) {
 		this.maxRunnningIterations = maxRunnningIterations;
 	}
+	
+	private boolean canRun() {
+		return wireNodes.stream().map(wireNetwork::contains).reduce(false, Boolean::logicalOr);
+	}
 
 	public void run() {
+		if (blocks.isEmpty()) {
+			consoleOutputObservable.updateObservers("Cannot Run! No blocks.");
+			return;
+		}
+		if (!canRun()) {
+			consoleOutputObservable.updateObservers("Cannot Run! Unlinked nodes.");
+			return;
+		}
 		consoleOutputObservable.updateObservers("Running:");
 		blocks.forEach(block -> block.reset());
 		wireNetwork.getLinks().forEach(link -> {
@@ -120,6 +145,14 @@ public class ProjectModel {
 	}
 
 	public void runContinuously() {
+		if (blocks.isEmpty()) {
+			consoleOutputObservable.updateObservers("Cannot Run! No blocks.");
+			return;
+		}
+		if (!canRun()) {
+			consoleOutputObservable.updateObservers("Cannot Run! Unlinked nodes.");
+			return;
+		}
 		consoleOutputObservable.updateObservers("Running Continuously (up to " + maxRunnningIterations + " times):");
 		blocks.forEach(block -> block.reset());
 		wireNetwork.getLinks().forEach(link -> {
@@ -134,5 +167,80 @@ public class ProjectModel {
 			stopped = context.isStopped();
 		}
 	}
-
+	
+	public void newProject() {
+		blocks.clear();
+		wireNodes.clear();
+		wireNetwork.getLinks().clear();
+	}
+	
+	public void saveProject(BufferedWriter bufferedWriter) throws IOException {
+		bufferedWriter.write(blocks.size() + "");
+		bufferedWriter.newLine();
+		int blockIndex = 0;
+		Map<Block, Integer> writeBlocks = new HashMap<>();
+		for (Block block : blocks) {
+			++blockIndex;
+			writeBlocks.put(block, blockIndex);
+			bufferedWriter.write(blockIndex + "");
+			bufferedWriter.write(",");
+			bufferedWriter.write(block.blockType.name());
+			bufferedWriter.write(",");
+			bufferedWriter.write(block.getRectangle().x + "");
+			bufferedWriter.write(",");
+			bufferedWriter.write(block.getRectangle().y + "");
+			bufferedWriter.newLine();
+		}
+		
+		bufferedWriter.write(wireNetwork.getLinks().size() + "");
+		bufferedWriter.newLine();
+		for (WireLink wireLink : wireNetwork.getLinks()) {
+			WireNode src = wireLink.getSrc();
+			bufferedWriter.write(writeBlocks.get(src.getBlock()) + "-" + src.key);
+			bufferedWriter.write(",");
+			WireNode dst = wireLink.getDst();
+			bufferedWriter.write(writeBlocks.get(dst.getBlock()) + "-" + dst.key);
+			bufferedWriter.newLine();
+		}
+	}
+	
+	public void openProject(BufferedReader bufferedReader) throws IOException {
+		blocks.clear();
+		wireNodes.clear();
+		wireNetwork.getLinks().clear();
+		
+		Map<Integer, Block> readBlocks = new TreeMap<>();
+		int blockCount = Integer.parseInt(bufferedReader.readLine());
+		for (int index = 0; index < blockCount; ++index) {
+			String[] words = bufferedReader.readLine().split(",");
+			int blockIndex = Integer.parseInt(words[0]);
+			Point position = new Point(Double.parseDouble(words[2]), Double.parseDouble(words[3]));
+			Block block = BlockType.valueOf(words[1]).makeBlock(position);
+			readBlocks.put(blockIndex, block);
+			addBlock(block);
+		}
+		
+		int linkCount = Integer.parseInt(bufferedReader.readLine());
+		for (int index = 0; index < linkCount; ++index) {
+			String[] words = bufferedReader.readLine().split(",");
+			
+			String[] srcParts = words[0].split("-");
+			int srcBlockIndex = Integer.parseInt(srcParts[0]);
+			String srcNodeKey = srcParts[1];
+			Block srcBlock = readBlocks.get(srcBlockIndex);
+			WireNode srcNode = srcBlock.getWireNodes().get(srcNodeKey);
+			
+			String[] dstParts = words[1].split("-");
+			int dstBlockIndex = Integer.parseInt(dstParts[0]);
+			String dstNodeKey = dstParts[1];
+			Block dstBlock = readBlocks.get(dstBlockIndex);
+			WireNode dstNode = dstBlock.getWireNodes().get(dstNodeKey);
+			
+			WireLink link = new WireLink(srcNode, dstNode);
+			wireNetwork.addLink(link);
+		}
+		
+		wireNodes.stream().filter(wireNetwork::contains).forEach(wireNode -> wireNode.setHighlight(WireNodeHighlight.SET));
+	}
+	
 }

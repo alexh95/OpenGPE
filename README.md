@@ -11,9 +11,6 @@ Graphical Programming Environment Project
 * ...
 
 ### Wire Tool:
-* Add a way to remove a wire
-* Make Output Ports support multiple connections
-* Fix Addition Block nodes location
 * ...
 
 ### Pan Tool

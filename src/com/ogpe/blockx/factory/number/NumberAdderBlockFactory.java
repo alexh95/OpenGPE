@@ -28,10 +28,11 @@ public class NumberAdderBlockFactory extends BlockFactory {
 
 	@Override
 	protected void addWireNodes(Map<String, WireNode> wireNodes) {
-		wireNodes.put(INPUT_KEY_1, new WireNode(WireNodeType.INPUT, DataType.NUMBER, new Point(7.5, 3.5)));
-		wireNodes.put(INPUT_KEY_2, new WireNode(WireNodeType.INPUT, DataType.NUMBER, new Point(size.x - 6.5, 3.5)));
+		wireNodes.put(INPUT_KEY_1, new WireNode(INPUT_KEY_1, WireNodeType.INPUT, DataType.NUMBER, new Point(7.5, 3.5)));
+		wireNodes.put(INPUT_KEY_2,
+				new WireNode(INPUT_KEY_2, WireNodeType.INPUT, DataType.NUMBER, new Point(size.x - 6.5, 3.5)));
 		wireNodes.put(OUTPUT_KEY,
-				new WireNode(WireNodeType.OUTPUT, DataType.NUMBER, new Point(13.5, size.y - 2.5), () -> {
+				new WireNode(OUTPUT_KEY, WireNodeType.OUTPUT, DataType.NUMBER, new Point(13.5, size.y - 2.5), () -> {
 					BigDecimal addend = (BigDecimal) wireNodes.get(INPUT_KEY_1).provide();
 					BigDecimal augend = (BigDecimal) wireNodes.get(INPUT_KEY_2).provide();
 					BigDecimal result = addend.add(augend);

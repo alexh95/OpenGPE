@@ -9,6 +9,8 @@ import javafx.scene.canvas.GraphicsContext;
 
 public class WireNode implements Provider<Object> {
 
+	public final String key;
+	
 	private Provider<Object> provider;
 
 	public final WireNodeType nodeType;
@@ -18,7 +20,8 @@ public class WireNode implements Provider<Object> {
 	private Provider<Block> blockProvider;
 	private WireNodeHighlight highlight;
 
-	public WireNode(WireNodeType nodeType, DataType dataType, Point location, Provider<Object> provider) {
+	public WireNode(String key, WireNodeType nodeType, DataType dataType, Point location, Provider<Object> provider) {
+		this.key = key;
 		this.nodeType = nodeType;
 		this.dataType = dataType;
 		this.location = location;
@@ -26,8 +29,8 @@ public class WireNode implements Provider<Object> {
 		highlight = WireNodeHighlight.UNSET;
 	}
 
-	public WireNode(WireNodeType nodeType, DataType dataType, Point location) {
-		this(nodeType, dataType, location, () -> null);
+	public WireNode(String key, WireNodeType nodeType, DataType dataType, Point location) {
+		this(key, nodeType, dataType, location, () -> null);
 	}
 
 	@Override

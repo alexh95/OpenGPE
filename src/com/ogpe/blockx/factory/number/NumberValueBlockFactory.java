@@ -31,8 +31,8 @@ public class NumberValueBlockFactory extends BlockFactory {
 
 	@Override
 	protected void addWireNodes(Map<String, WireNode> wireNodes) {
-		wireNodes.put(OUTPUT_KEY, new WireNode(WireNodeType.OUTPUT, DataType.NUMBER, new Point(23.5, size.y - 2.5),
-				() -> BigDecimal.valueOf(0)));
+		wireNodes.put(OUTPUT_KEY, new WireNode(OUTPUT_KEY, WireNodeType.OUTPUT, DataType.NUMBER,
+				new Point(23.5, size.y - 2.5), () -> BigDecimal.valueOf(0)));
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class NumberValueBlockFactory extends BlockFactory {
 					block.getWireNodes().get(OUTPUT_KEY).setProvider(() -> numberValue);
 					redrawCallback.callback();
 				} catch (NumberFormatException e) {
-					
+
 				}
 			}
 		});

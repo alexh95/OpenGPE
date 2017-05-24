@@ -19,16 +19,16 @@ public class BooleanNotBlockFactory extends BlockFactory {
 
 	public static final String INPUT_KEY = "input";
 	public static final String OUTPUT_KEY = "output";
-	
+
 	public BooleanNotBlockFactory() {
 		super(new Point(22, 26));
 	}
 
 	@Override
 	protected void addWireNodes(Map<String, WireNode> wireNodes) {
-		wireNodes.put(INPUT_KEY, new WireNode(WireNodeType.INPUT, DataType.BOOLEAN, new Point(11.5, 3.5)));
+		wireNodes.put(INPUT_KEY, new WireNode(INPUT_KEY, WireNodeType.INPUT, DataType.BOOLEAN, new Point(11.5, 3.5)));
 		wireNodes.put(OUTPUT_KEY,
-				new WireNode(WireNodeType.OUTPUT, DataType.BOOLEAN, new Point(11.5, size.y - 2.5), () -> {
+				new WireNode(OUTPUT_KEY, WireNodeType.OUTPUT, DataType.BOOLEAN, new Point(11.5, size.y - 2.5), () -> {
 					Boolean value = (Boolean) wireNodes.get(INPUT_KEY).provide();
 					Boolean result = !value;
 					return result;

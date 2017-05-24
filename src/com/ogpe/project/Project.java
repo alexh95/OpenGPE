@@ -1,6 +1,14 @@
 package com.ogpe.project;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import com.ogpe.blockx.BlockType;
+import com.ogpe.blockx.Provider;
 import com.ogpe.observable.Callback;
 import com.ogpe.observable.Observer;
 
@@ -9,11 +17,16 @@ import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 
 public class Project {
 
 	private ProjectModel projectModel;
 	private CursorTools cursorTools;
+
+	private Provider<Stage> stageProvider;
 
 	private CursorToolSelection cursorTool;
 
@@ -24,8 +37,9 @@ public class Project {
 	private Callback moveCursorToolMenuItemPressed;
 	private Callback wireCursorToolMenuItemPressed;
 
-	public Project(Callback redrawCallback, Observer<Node> editingPanePaneObserver,
+	public Project(Provider<Stage> stageProvider, Callback redrawCallback, Observer<Node> editingPanePaneObserver,
 			Observer<String> consoleOutputObserver) {
+		this.stageProvider = stageProvider;
 		projectModel = new ProjectModel(redrawCallback, editingPanePaneObserver, consoleOutputObserver);
 		cursorTools = new CursorTools(projectModel);
 	}
@@ -125,21 +139,58 @@ public class Project {
 		projectModel.callbackRedraw();
 	}
 
+	// New/Save/Open Project
+	private void newProject() {
+		projectModel.newProject();
+	}
+	
+	private void openProject() {
+		FileChooser fileChooser = new FileChooser();
+		ExtensionFilter extensionFilter = new ExtensionFilter("GPE files (*.gpe)", "*.gpe");
+		fileChooser.getExtensionFilters().add(extensionFilter);
+
+		File openFile = fileChooser.showOpenDialog(stageProvider.provide());
+
+		try {
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(openFile));
+			projectModel.openProject(bufferedReader);
+			bufferedReader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void saveProject() {
+		FileChooser fileChooser = new FileChooser();
+		ExtensionFilter extensionFilter = new ExtensionFilter("GPE files (*.gpe)", "*.gpe");
+		fileChooser.getExtensionFilters().add(extensionFilter);
+
+		File saveFile = fileChooser.showSaveDialog(stageProvider.provide());
+
+		try {
+			BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(saveFile));
+			projectModel.saveProject(bufferedWriter);
+			bufferedWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	// Menu
 	// File Menu
 	// File -> New Project
 	public void newProjectFileMenuItemEventHandler(ActionEvent event) {
-
+		newProject();
 	}
 
 	// File -> Open Project
 	public void openProjectFileMenuItemEventHandler(ActionEvent event) {
-
+		openProject();
 	}
 
 	// File -> Save Project
 	public void saveProjectFileMenuItemEventHandler(ActionEvent event) {
-
+		saveProject();
 	}
 
 	// File -> Exit
@@ -221,17 +272,17 @@ public class Project {
 	// File ToolBar
 	// File -> New Project
 	public void newProjectFileToolBarItemEventHandler(ActionEvent event) {
-
+		newProject();
 	}
 
 	// File -> Open Project
 	public void openProjectFileToolBarItemEventHandler(ActionEvent event) {
-
+		openProject();
 	}
 
 	// File -> Save Project
 	public void saveProjectFileToolBarItemEventHandler(ActionEvent event) {
-
+		saveProject();
 	}
 
 	// CursorTool ToolBar
@@ -278,7 +329,8 @@ public class Project {
 
 	// Edit -> Delete
 	public void deleteEditToolBarItemEventHandler(ActionEvent event) {
-
+		cursorTools.deleteSelectedBlocks();
+		projectModel.callbackRedraw();
 	}
 
 	// Run ToolBar

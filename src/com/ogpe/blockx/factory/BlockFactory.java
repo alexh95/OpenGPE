@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.ogpe.blockx.Block;
+import com.ogpe.blockx.BlockType;
 import com.ogpe.blockx.Point;
 import com.ogpe.blockx.Rectangle;
 import com.ogpe.blockx.RunningContext;
@@ -45,16 +46,16 @@ public abstract class BlockFactory {
 		return null;
 	}
 
-	public Block makeBlock(Point position) {
+	public Block makeBlock(BlockType blockType, Point position) {
 		Map<String, WireNode> wireNodes = new HashMap<>();
 		addWireNodes(wireNodes);
 
-		return new Block(wireNodes, this::blockReset, this::blockPreRun, this::blockRun, this::blockPostRun,
+		return new Block(blockType, wireNodes, this::blockReset, this::blockPreRun, this::blockRun, this::blockPostRun,
 				new Rectangle(position).setSize(size), this::drawBlock, this::produceEditingPane);
 	}
 
-	public Block makeBlock() {
-		return makeBlock(new Point());
+	public Block makeBlock(BlockType blockType) {
+		return makeBlock(blockType, new Point());
 	}
 
 }

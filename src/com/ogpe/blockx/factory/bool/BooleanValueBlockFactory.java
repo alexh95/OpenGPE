@@ -30,8 +30,8 @@ public class BooleanValueBlockFactory extends BlockFactory {
 
 	@Override
 	protected void addWireNodes(Map<String, WireNode> wireNodes) {
-		wireNodes.put(OUTPUT_KEY,
-				new WireNode(WireNodeType.OUTPUT, DataType.BOOLEAN, new Point(23.5, size.y - 2.5), () -> false));
+		wireNodes.put(OUTPUT_KEY, new WireNode(OUTPUT_KEY, WireNodeType.OUTPUT, DataType.BOOLEAN,
+				new Point(23.5, size.y - 2.5), () -> false));
 	}
 
 	@Override

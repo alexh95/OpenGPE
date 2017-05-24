@@ -12,6 +12,8 @@ import javafx.scene.paint.Color;
 
 public class Block {
 
+	public final BlockType blockType;
+	
 	private final Map<String, WireNode> wireNodes;
 	private final Observer<Block> blockReseter;
 	private final BlockRunner blockPreRunner;
@@ -27,8 +29,9 @@ public class Block {
 	private boolean selected;
 	private boolean editing;
 
-	public Block(Map<String, WireNode> wireNodes, Observer<Block> blockReseter, BlockRunner blockPreRunner, BlockRunner blockRunner, BlockRunner blockPostRunner, Rectangle rectangle, BlockDrawer blockDrawer,
+	public Block(BlockType blockType, Map<String, WireNode> wireNodes, Observer<Block> blockReseter, BlockRunner blockPreRunner, BlockRunner blockRunner, BlockRunner blockPostRunner, Rectangle rectangle, BlockDrawer blockDrawer,
 			EditingPaneProducer editingPaneProducer) {
+		this.blockType = blockType;
 		this.wireNodes = wireNodes;
 		this.wireNodes.values().forEach(wireNode -> wireNode.setBlockProvider(() -> this));
 		this.blockReseter = blockReseter;

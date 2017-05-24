@@ -30,18 +30,20 @@ public class NumberMemoryBlockFactory extends BlockFactory {
 
 	@Override
 	protected void addWireNodes(Map<String, WireNode> wireNodes) {
-		wireNodes.put(INPUT_KEY_1, new WireNode(WireNodeType.INPUT, DataType.NUMBER, new Point(7.5, 3.5)));
-		wireNodes.put(INPUT_KEY_2, new WireNode(WireNodeType.INPUT, DataType.NUMBER, new Point(size.x - 6.5, 3.5)));
-		wireNodes.put(THROUGHPUT_KEY, new WireNode(WireNodeType.THROUGHPUT, DataType.NUMBER, new Point(-10000, -10000)));
-		wireNodes.put(OUTPUT_KEY, new WireNode(WireNodeType.OUTPUT, DataType.NUMBER, new Point(13.5, size.y - 2.5),
-				wireNodes.get(INPUT_KEY_1)));
+		wireNodes.put(INPUT_KEY_1, new WireNode(INPUT_KEY_1, WireNodeType.INPUT, DataType.NUMBER, new Point(7.5, 3.5)));
+		wireNodes.put(INPUT_KEY_2,
+				new WireNode(INPUT_KEY_2, WireNodeType.INPUT, DataType.NUMBER, new Point(size.x - 6.5, 3.5)));
+		wireNodes.put(THROUGHPUT_KEY,
+				new WireNode(THROUGHPUT_KEY, WireNodeType.THROUGHPUT, DataType.NUMBER, new Point(-10000, -10000)));
+		wireNodes.put(OUTPUT_KEY, new WireNode(OUTPUT_KEY, WireNodeType.OUTPUT, DataType.NUMBER,
+				new Point(13.5, size.y - 2.5), wireNodes.get(INPUT_KEY_1)));
 	}
 
 	@Override
 	protected void blockReset(Block block) {
 		block.getWireNodes().get(OUTPUT_KEY).setProvider(block.getWireNodes().get(INPUT_KEY_1));
 	}
-	
+
 	@Override
 	protected void blockRun(Block block, RunningContext context) {
 		Object value = block.getWireNodes().get(INPUT_KEY_2).provide();

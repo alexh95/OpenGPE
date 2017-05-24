@@ -25,7 +25,7 @@ public class PrinterBlockFactory extends BlockFactory {
 
 	@Override
 	protected void addWireNodes(Map<String, WireNode> wireNodes) {
-		wireNodes.put(INPUT_KEY, new WireNode(WireNodeType.INPUT, DataType.ANY, new Point(23.5, 3.5)));
+		wireNodes.put(INPUT_KEY, new WireNode(INPUT_KEY, WireNodeType.INPUT, DataType.ANY, new Point(23.5, 3.5)));
 	}
 
 	@Override
